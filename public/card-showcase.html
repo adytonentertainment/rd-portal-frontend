@@ -1,0 +1,1203 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Verax – Card Showcase (Screen Record)</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+      html, body {
+        background: #000;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        -webkit-font-smoothing: antialiased;
+        color: #eeeef0;
+        scroll-behavior: smooth;
+      }
+
+      /* Star canvas behind everything */
+      #starCanvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: 0;
+        pointer-events: none;
+      }
+
+      .showcase {
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        z-index: 1;
+      }
+
+      /* Each card gets a full viewport section */
+      .card-section {
+        width: 100vw;
+        height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: relative;
+      }
+
+      .card-label {
+        position: absolute;
+        top: 24px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: 11px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1.5px;
+        color: rgba(255,255,255,0.2);
+      }
+
+      /* ═══════════════════════════════════════════
+         CARD 1: Connect Your Catalog (iframe)
+         ═══════════════════════════════════════════ */
+      .card1-frame {
+        width: 420px;
+        height: 614px;
+        border: none;
+        border-radius: 24px;
+        overflow: hidden;
+      }
+
+      /* ═══════════════════════════════════════════
+         SHARED DARK CARD STYLES (Cards 2 & 3)
+         ═══════════════════════════════════════════ */
+      .dark-card {
+        position: relative;
+        width: 420px;
+        height: 614px;
+        background: #000000;
+        border-radius: 24px;
+        padding: 44px 32px 32px;
+        overflow: hidden;
+        border: 1px solid rgba(255,255,255,0.05);
+        display: flex;
+        flex-direction: column;
+        text-align: left;
+      }
+
+      .dark-card-title {
+        font-size: 28px;
+        font-weight: 700;
+        color: #eeeef0;
+        line-height: 1.15;
+        margin-bottom: 14px;
+        letter-spacing: -0.3px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .dark-card-subtitle {
+        font-size: 14.5px;
+        line-height: 1.6;
+        color: rgba(255,255,255,0.35);
+        margin-bottom: 28px;
+        max-width: 330px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .decor-blob {
+        position: absolute;
+        bottom: -30px;
+        left: -30px;
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.03);
+        pointer-events: none;
+      }
+
+      .decor-blob-right {
+        position: absolute;
+        bottom: -30px;
+        right: -30px;
+        width: 140px;
+        height: 140px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.03);
+        pointer-events: none;
+      }
+
+      /* Carousel dots */
+      .carousel-dots {
+        display: flex;
+        justify-content: center;
+        gap: 6px;
+        margin-top: 20px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .c-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 6px;
+        background: rgba(255,255,255,0.12);
+        transition: all 0.3s ease;
+      }
+
+      .c-dot.active {
+        width: 24px;
+        background: rgba(255,255,255,0.55);
+      }
+
+      /* Slide system */
+      .slide-container {
+        position: relative;
+        flex: 1;
+        overflow: hidden;
+        z-index: 1;
+      }
+
+      .slide {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        transform: translateX(16px);
+        transition: opacity 0.45s ease, transform 0.45s ease;
+        pointer-events: none;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .slide.active {
+        opacity: 1;
+        transform: translateX(0);
+        pointer-events: auto;
+      }
+
+      /* Shared progress bar */
+      .progress-bar {
+        width: 100%;
+        height: 4px;
+        background: rgba(255,255,255,0.08);
+        border-radius: 4px;
+        overflow: hidden;
+      }
+
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, rgba(255,255,255,0.4), rgba(255,255,255,0.9));
+        border-radius: 4px;
+        transition: width 0.15s linear;
+      }
+
+      .progress-fill-blue {
+        height: 100%;
+        background: #4f8eff;
+        border-radius: 4px;
+        transition: width 0.5s ease;
+      }
+
+      /* ═══════════════════════════════════════════
+         CARD 2: Scan Card
+         ═══════════════════════════════════════════ */
+
+      /* Slide 0: Scanning */
+      .scan-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 16px;
+        background: rgba(255,255,255,0.045);
+        border-radius: 14px;
+        margin-bottom: 10px;
+      }
+
+      .scan-spinner {
+        width: 24px;
+        height: 24px;
+        border: 2.5px solid rgba(255,255,255,0.1);
+        border-top-color: rgba(255,255,255,0.55);
+        border-radius: 50%;
+        flex-shrink: 0;
+      }
+
+      .scan-spinner.spinning { animation: spin 1s linear infinite; }
+
+      @keyframes spin { to { transform: rotate(360deg); } }
+
+      .scan-row-title {
+        font-size: 14.5px;
+        font-weight: 700;
+        color: #eeeef0;
+      }
+
+      .scan-row-sub {
+        font-size: 12px;
+        color: rgba(255,255,255,0.28);
+      }
+
+      .scan-percent {
+        font-size: 16px;
+        font-weight: 700;
+        color: rgba(255,255,255,0.65);
+        font-variant-numeric: tabular-nums;
+        margin-left: auto;
+      }
+
+      /* Slide 1: Critical Issues */
+      .issue-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 16px;
+        background: rgba(255,255,255,0.04);
+        border-radius: 14px;
+        margin-bottom: 10px;
+        border: 1px solid rgba(255,255,255,0.04);
+      }
+
+      .issue-header-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        background: rgba(245,158,11,0.12);
+        color: #f59e0b;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      .issue-header-title {
+        font-size: 14.5px;
+        font-weight: 700;
+        color: #eeeef0;
+      }
+
+      .issue-header-sub {
+        font-size: 12px;
+        color: rgba(255,255,255,0.28);
+      }
+
+      .issue-list {
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+
+      .issue-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 11px 14px;
+        border-radius: 12px;
+        background: rgba(255,255,255,0.025);
+        border: 1px solid rgba(255,255,255,0.035);
+        opacity: 0;
+        transform: translateY(8px);
+        transition: opacity 0.4s ease, transform 0.4s ease;
+      }
+
+      .issue-row.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .issue-brand {
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        font-size: 9px;
+        font-weight: 800;
+        letter-spacing: 0.3px;
+        background: rgba(255,255,255,0.06);
+        color: rgba(255,255,255,0.55);
+      }
+
+      .issue-brand.youtube { background: rgba(255,0,0,0.1); color: #ff0000; }
+      .issue-brand.spotify { background: rgba(30,215,96,0.1); color: #1ed760; }
+
+      .issue-row-title {
+        font-size: 13.5px;
+        font-weight: 600;
+        color: rgba(255,255,255,0.8);
+      }
+
+      .issue-row-sub {
+        font-size: 11.5px;
+        color: rgba(255,255,255,0.25);
+      }
+
+      .issue-row-money {
+        font-size: 11.5px;
+        color: rgba(74,222,128,0.6);
+        font-weight: 500;
+      }
+
+      .issue-tag {
+        font-size: 9.5px;
+        font-weight: 600;
+        color: rgba(255,255,255,0.22);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        flex-shrink: 0;
+        margin-left: auto;
+      }
+
+      /* Slide 2: Uncollected Royalties */
+      .royalty-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 16px;
+        background: rgba(255,255,255,0.04);
+        border-radius: 14px;
+        margin-bottom: 10px;
+        border: 1px solid rgba(255,255,255,0.04);
+      }
+
+      .royalty-header-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        background: rgba(245,158,11,0.12);
+        color: #f59e0b;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      .royalty-header-title { font-size: 14.5px; font-weight: 700; color: #eeeef0; }
+      .royalty-header-sub { font-size: 12px; color: rgba(255,255,255,0.28); }
+
+      .revenue-card {
+        background: rgba(245,158,11,0.06);
+        border: 1px solid rgba(245,158,11,0.1);
+        border-radius: 14px;
+        padding: 18px;
+        opacity: 0;
+        transform: translateY(8px);
+        transition: opacity 0.5s ease, transform 0.5s ease;
+      }
+
+      .revenue-card.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .revenue-label {
+        font-size: 11px;
+        font-weight: 600;
+        color: #f59e0b;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 4px;
+      }
+
+      .revenue-amount {
+        font-size: 34px;
+        font-weight: 800;
+        color: #eeeef0;
+        letter-spacing: -1.5px;
+        margin-bottom: 14px;
+        line-height: 1;
+      }
+
+      .revenue-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 4px;
+      }
+
+      .revenue-row-label { font-size: 13px; color: rgba(255,255,255,0.5); font-weight: 500; }
+      .revenue-row-value { font-size: 13px; color: #eeeef0; font-weight: 600; }
+
+      .revenue-bar {
+        width: 100%;
+        height: 4px;
+        background: rgba(255,255,255,0.06);
+        border-radius: 4px;
+        overflow: hidden;
+        margin-bottom: 10px;
+      }
+
+      .revenue-bar-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #f59e0b, #fbbf24);
+        border-radius: 4px;
+        transition: width 1s ease;
+      }
+
+      .royalty-footer {
+        font-size: 11px;
+        color: rgba(255,255,255,0.22);
+        margin-top: 10px;
+      }
+
+      /* ═══════════════════════════════════════════
+         CARD 3: Registration Card
+         ═══════════════════════════════════════════ */
+
+      .reg-steps {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 16px;
+        padding: 0 4px;
+      }
+
+      .reg-step {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .reg-step span {
+        font-size: 11px;
+        font-weight: 500;
+        color: rgba(255,255,255,0.22);
+        transition: color 0.3s ease;
+      }
+
+      .reg-step.active span { color: #eeeef0; font-weight: 600; }
+
+      .reg-step-icon {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: rgba(255,255,255,0.04);
+        color: rgba(255,255,255,0.2);
+        transition: all 0.4s ease;
+      }
+
+      .reg-step.active .reg-step-icon {
+        background: rgba(255,255,255,0.12);
+        color: #eeeef0;
+      }
+
+      .reg-step.active .reg-step-icon.green {
+        background: rgba(34,197,94,0.2);
+        color: #22c55e;
+      }
+
+      /* Slide 0: Select */
+      .reg-panel {
+        background: rgba(255,255,255,0.035);
+        border-radius: 14px;
+        padding: 14px 16px 12px;
+        margin-bottom: 8px;
+      }
+
+      .reg-panel-header { font-size: 14.5px; font-weight: 700; color: #eeeef0; margin-bottom: 3px; }
+      .reg-panel-count { font-size: 12px; color: rgba(255,255,255,0.28); margin-bottom: 10px; }
+
+      .works-list { display: flex; flex-direction: column; gap: 6px; }
+
+      .work-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 11px 14px;
+        border-radius: 12px;
+        background: rgba(255,255,255,0.025);
+        border: 1px solid rgba(255,255,255,0.035);
+        opacity: 0.35;
+        transition: opacity 0.5s ease, background 0.3s ease;
+      }
+
+      .work-item.selected {
+        opacity: 1;
+        background: rgba(255,255,255,0.045);
+      }
+
+      .work-art {
+        width: 32px;
+        height: 32px;
+        border-radius: 7px;
+        object-fit: cover;
+        flex-shrink: 0;
+      }
+
+      .work-title { font-size: 13.5px; font-weight: 600; color: rgba(255,255,255,0.8); }
+      .work-sub { font-size: 11.5px; color: rgba(255,255,255,0.22); }
+
+      .work-copy {
+        margin-left: auto;
+        color: rgba(255,255,255,0.12);
+      }
+
+      /* Slide 1: Submit */
+      .submit-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 16px;
+        background: rgba(255,255,255,0.04);
+        border-radius: 14px;
+        margin-bottom: 10px;
+        border: 1px solid rgba(255,255,255,0.04);
+      }
+
+      .submit-spinner {
+        width: 28px;
+        height: 28px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: rgba(255,255,255,0.5);
+        flex-shrink: 0;
+      }
+
+      .submit-spinner svg { animation: spin 1.5s linear infinite; }
+
+      .submit-row-title { font-size: 14.5px; font-weight: 700; color: #eeeef0; }
+      .submit-row-sub { font-size: 12px; color: rgba(255,255,255,0.28); }
+
+      .submit-percent {
+        font-size: 16px;
+        font-weight: 700;
+        color: rgba(255,255,255,0.6);
+        font-variant-numeric: tabular-nums;
+        margin-left: auto;
+      }
+
+      .checklist-label {
+        font-size: 12px;
+        color: rgba(255,255,255,0.3);
+        margin-top: 14px;
+        margin-bottom: 10px;
+      }
+
+      .checklist { display: flex; flex-direction: column; gap: 8px; }
+
+      .checklist-item {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .checklist-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 50%;
+        background: rgba(255,255,255,0.15);
+        flex-shrink: 0;
+      }
+
+      .checklist-text {
+        flex: 1;
+        font-size: 13px;
+        font-weight: 500;
+        color: rgba(255,255,255,0.6);
+      }
+
+      .checklist-check {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        border: 1.5px solid rgba(255,255,255,0.08);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        color: transparent;
+        transition: all 0.4s ease;
+      }
+
+      .checklist-check.done {
+        border-color: #22c55e;
+        color: #22c55e;
+      }
+
+      /* Slide 2: Register */
+      .register-header {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 14px;
+        background: rgba(255,255,255,0.04);
+        border-radius: 12px;
+        margin-bottom: 8px;
+        border: 1px solid rgba(255,255,255,0.04);
+      }
+
+      .register-header-icon {
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+        background: rgba(34,197,94,0.12);
+        color: #22c55e;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      .register-header-title { font-size: 14.5px; font-weight: 700; color: #eeeef0; }
+      .register-header-sub { font-size: 12px; color: rgba(255,255,255,0.28); }
+
+      .society-list { display: flex; flex-direction: column; gap: 4px; }
+
+      .society-row {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 9px 12px;
+        border-radius: 12px;
+        background: rgba(255,255,255,0.025);
+        border: 1px solid rgba(255,255,255,0.035);
+        transition: background 0.4s ease, border-color 0.4s ease;
+      }
+
+      .society-row.done {
+        background: rgba(34,197,94,0.04);
+        border-color: rgba(34,197,94,0.1);
+      }
+
+      .society-code {
+        font-size: 11px;
+        font-weight: 700;
+        color: rgba(255,255,255,0.3);
+        width: 24px;
+        text-align: center;
+        flex-shrink: 0;
+      }
+
+      .society-name { font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.8); }
+      .society-sub { font-size: 10px; color: rgba(255,255,255,0.25); transition: color 0.3s ease; }
+      .society-row.done .society-sub { color: rgba(34,197,94,0.5); }
+
+      .society-check {
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        border: 1.5px solid rgba(255,255,255,0.08);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        margin-left: auto;
+        color: transparent;
+        transition: all 0.4s ease;
+      }
+
+      .society-check.done {
+        border-color: #22c55e;
+        color: #22c55e;
+        background: rgba(34,197,94,0.1);
+      }
+
+      /* SVG icons inline */
+      .icon-svg { width: 17px; height: 17px; }
+    </style>
+  </head>
+  <body>
+    <canvas id="starCanvas"></canvas>
+    <div class="showcase">
+
+      <!-- ════════════════════════════════════════
+           SECTION 1: Connect Your Catalog (iframe)
+           ════════════════════════════════════════ -->
+      <div class="card-section" id="section1">
+        <div class="card-label">01 — Connect Your Catalog</div>
+        <iframe id="card1" src="verax-card.html" class="card1-frame" title="Connect catalog"></iframe>
+      </div>
+
+      <!-- ════════════════════════════════════════
+           SECTION 2: Scan Card
+           ════════════════════════════════════════ -->
+      <div class="card-section" id="section2">
+        <div class="card-label">02 — See What You're Missing</div>
+        <div class="dark-card" id="scanCard">
+          <h2 class="dark-card-title">See what you are missing.</h2>
+          <p class="dark-card-subtitle">
+            Full audit of your registrations, statements, and collection status.
+            Every gap, every error, every uncollected royalty surfaced in one place.
+          </p>
+
+          <div class="slide-container">
+            <!-- Slide 0: Scanning -->
+            <div class="slide active" data-scan-slide="0">
+              <div class="scan-row">
+                <div class="scan-spinner spinning" id="scanSpinner"></div>
+                <div>
+                  <div class="scan-row-title">Scanning catalog...</div>
+                  <div class="scan-row-sub">Checking <span id="worksCount">0</span> works</div>
+                </div>
+                <div class="scan-percent" id="scanPercent">0%</div>
+              </div>
+              <div class="progress-bar">
+                <div class="progress-fill" id="scanProgress" style="width:0%"></div>
+              </div>
+            </div>
+
+            <!-- Slide 1: Critical Issues -->
+            <div class="slide" data-scan-slide="1">
+              <div class="issue-header">
+                <div class="issue-header-icon">
+                  <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                </div>
+                <div>
+                  <div class="issue-header-title">Critical Issues</div>
+                  <div class="issue-header-sub">4 items need attention</div>
+                </div>
+              </div>
+              <div class="issue-list">
+                <div class="issue-row" id="issue0">
+                  <div class="issue-brand">BMI</div>
+                  <div>
+                    <div class="issue-row-title">BMI Statement Q4 2025</div>
+                    <div class="issue-row-money">$1,240</div>
+                  </div>
+                  <div class="issue-tag">STATEMENT</div>
+                </div>
+                <div class="issue-row" id="issue1">
+                  <div class="issue-brand youtube">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.2a3 3 0 00-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 00.5 6.2 31.5 31.5 0 000 12a31.5 31.5 0 00.5 5.8 3 3 0 002.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 002.1-2.1A31.5 31.5 0 0024 12a31.5 31.5 0 00-.5-5.8zM9.6 15.6V8.4L15.8 12l-6.2 3.6z"/></svg>
+                  </div>
+                  <div>
+                    <div class="issue-row-title">YouTube Content ID</div>
+                    <div class="issue-row-sub">Sync mismatch</div>
+                  </div>
+                  <div class="issue-tag">COLLECTION</div>
+                </div>
+                <div class="issue-row" id="issue2">
+                  <div class="issue-brand spotify">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.6 0 12 0zm5.5 17.3c-.2.3-.6.4-1 .2-2.7-1.6-6-2-10-1.1-.4.1-.8-.2-.9-.5-.1-.4.2-.8.5-.9 4.3-1 8-0.6 11 1.2.4.3.5.7.3 1.1zm1.5-3.3c-.3.4-.8.5-1.2.3-3-1.9-7.7-2.4-11.3-1.3-.5.1-1-.1-1.1-.6-.1-.5.1-1 .6-1.1 4.1-1.3 9.2-0.7 12.7 1.5.3.2.5.7.3 1.2zm.1-3.4c-3.7-2.2-9.7-2.4-13.2-1.3-.5.2-1.1-.1-1.3-.6-.2-.5.1-1.1.6-1.3 4-1.2 10.6-1 14.8 1.5.5.3.6.9.3 1.4-.2.4-.8.6-1.2.3z"/></svg>
+                  </div>
+                  <div>
+                    <div class="issue-row-title">Spotify Q1 Royalties</div>
+                    <div class="issue-row-money">$3,850</div>
+                  </div>
+                  <div class="issue-tag">COLLECTION</div>
+                </div>
+                <div class="issue-row" id="issue3">
+                  <div class="issue-brand">HFA</div>
+                  <div>
+                    <div class="issue-row-title">HFA Registration</div>
+                    <div class="issue-row-sub">Incomplete metadata</div>
+                  </div>
+                  <div class="issue-tag">REGISTRATION</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Slide 2: Uncollected Royalties -->
+            <div class="slide" data-scan-slide="2">
+              <div class="royalty-header">
+                <div class="royalty-header-icon">
+                  <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+                </div>
+                <div>
+                  <div class="royalty-header-title">Uncollected Royalties</div>
+                  <div class="royalty-header-sub">Ready to claim</div>
+                </div>
+              </div>
+              <div class="revenue-card" id="revenueCard">
+                <div class="revenue-label">Total Missing Revenue</div>
+                <div class="revenue-amount">$5,090</div>
+                <div class="revenue-row">
+                  <span class="revenue-row-label">Streaming Royalties</span>
+                  <span class="revenue-row-value">$3,850</span>
+                </div>
+                <div class="revenue-bar"><div class="revenue-bar-fill" id="revBar1" style="width:0%"></div></div>
+                <div class="revenue-row">
+                  <span class="revenue-row-label">Performance Rights</span>
+                  <span class="revenue-row-value">$1,240</span>
+                </div>
+                <div class="revenue-bar"><div class="revenue-bar-fill" id="revBar2" style="width:0%"></div></div>
+              </div>
+              <div class="royalty-footer">Verax can help you collect this revenue automatically</div>
+            </div>
+          </div>
+
+          <div class="decor-blob"></div>
+          <div class="carousel-dots">
+            <span class="c-dot active" id="scanDot0"></span>
+            <span class="c-dot" id="scanDot1"></span>
+            <span class="c-dot" id="scanDot2"></span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ════════════════════════════════════════
+           SECTION 3: Registration Card
+           ════════════════════════════════════════ -->
+      <div class="card-section" id="section3">
+        <div class="card-label">03 — Take Action or Let Us</div>
+        <div class="dark-card" id="regCard">
+          <h2 class="dark-card-title">Take action or let us.</h2>
+          <p class="dark-card-subtitle">
+            Streamlined registration across global collection societies.
+            Submit once, register everywhere.
+          </p>
+
+          <!-- Step indicators -->
+          <div class="reg-steps">
+            <div class="reg-step active" id="regStep0">
+              <div class="reg-step-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>
+              </div>
+              <span>Select</span>
+            </div>
+            <div class="reg-step" id="regStep1">
+              <div class="reg-step-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M12 16v-8"/><path d="M8 12l4-4 4 4"/><path d="M20 21H4a1 1 0 01-1-1V4"/></svg>
+              </div>
+              <span>Submit</span>
+            </div>
+            <div class="reg-step" id="regStep2">
+              <div class="reg-step-icon">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+              </div>
+              <span>Register</span>
+            </div>
+          </div>
+
+          <div class="slide-container">
+            <!-- Slide 0: Select Works -->
+            <div class="slide active" data-reg-slide="0">
+              <div class="reg-panel">
+                <div class="reg-panel-header">Select works to register</div>
+                <div class="reg-panel-count"><span id="selectedCount">0</span> of 3 selected</div>
+                <div class="progress-bar"><div class="progress-fill-blue" id="selectProgress" style="width:0%"></div></div>
+              </div>
+              <div class="works-list">
+                <div class="work-item" id="work0">
+                  <img class="work-art" src="The_Weeknd_-_Blinding_Lights.png" alt="Blinding Lights" />
+                  <div>
+                    <div class="work-title">Blinding Lights</div>
+                    <div class="work-sub">The Weeknd</div>
+                  </div>
+                  <div class="work-copy">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                  </div>
+                </div>
+                <div class="work-item" id="work1">
+                  <img class="work-art" src="album-levitating.png" alt="Levitating" />
+                  <div>
+                    <div class="work-title">Levitating</div>
+                    <div class="work-sub">Dua Lipa</div>
+                  </div>
+                  <div class="work-copy">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                  </div>
+                </div>
+                <div class="work-item" id="work2">
+                  <img class="work-art" src="album-as-it-was.png" alt="As It Was" />
+                  <div>
+                    <div class="work-title">As It Was</div>
+                    <div class="work-sub">Harry Styles</div>
+                  </div>
+                  <div class="work-copy">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Slide 1: Submit -->
+            <div class="slide" data-reg-slide="1">
+              <div class="submit-row">
+                <div class="submit-spinner">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/></svg>
+                </div>
+                <div>
+                  <div class="submit-row-title">Submitting registration data</div>
+                  <div class="submit-row-sub">Processing metadata</div>
+                </div>
+                <div class="submit-percent" id="submitPercent">0%</div>
+              </div>
+              <div class="progress-bar"><div class="progress-fill" id="submitProgress" style="width:0%"></div></div>
+              <div class="checklist-label">Preparing registrations for:</div>
+              <div class="checklist">
+                <div class="checklist-item"><span class="checklist-dot"></span><span class="checklist-text">Work metadata</span><span class="checklist-check" id="cl0"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></span></div>
+                <div class="checklist-item"><span class="checklist-dot"></span><span class="checklist-text">Writer & publisher info</span><span class="checklist-check" id="cl1"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></span></div>
+                <div class="checklist-item"><span class="checklist-dot"></span><span class="checklist-text">Territory specifications</span><span class="checklist-check" id="cl2"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></span></div>
+                <div class="checklist-item"><span class="checklist-dot"></span><span class="checklist-text">Rights allocation</span><span class="checklist-check" id="cl3"><svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></span></div>
+              </div>
+            </div>
+
+            <!-- Slide 2: Register -->
+            <div class="slide" data-reg-slide="2">
+              <div class="register-header">
+                <div class="register-header-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+                </div>
+                <div>
+                  <div class="register-header-title">Registering globally</div>
+                  <div class="register-header-sub"><span id="socCount">0</span> of 4 societies</div>
+                </div>
+              </div>
+              <div class="society-list">
+                <div class="society-row" id="soc0"><span class="society-code">US</span><div><div class="society-name">ASCAP</div><div class="society-sub">Processing...</div></div><div class="society-check"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+                <div class="society-row" id="soc1"><span class="society-code">UK</span><div><div class="society-name">PRS</div><div class="society-sub">Processing...</div></div><div class="society-check"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+                <div class="society-row" id="soc2"><span class="society-code">DE</span><div><div class="society-name">GEMA</div><div class="society-sub">Processing...</div></div><div class="society-check"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+                <div class="society-row" id="soc3"><span class="society-code">CA</span><div><div class="society-name">SOCAN</div><div class="society-sub">Processing...</div></div><div class="society-check"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round"><polyline points="20 6 9 17 4 12"/></svg></div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="decor-blob-right"></div>
+          <div class="carousel-dots">
+            <span class="c-dot active" id="regDot0"></span>
+            <span class="c-dot" id="regDot1"></span>
+            <span class="c-dot" id="regDot2"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      /* ════════════════════════════════════
+         CARD 1: iframe auto-start
+         ════════════════════════════════════ */
+      const card1 = document.getElementById('card1');
+      card1.addEventListener('load', () => {
+        card1.contentWindow.postMessage('start', '*');
+      });
+
+      /* ════════════════════════════════════
+         CARD 2: Scan Card Animation
+         ════════════════════════════════════ */
+      let scanSlide = 0;
+      const scanSlides = document.querySelectorAll('[data-scan-slide]');
+      const scanDots = [document.getElementById('scanDot0'), document.getElementById('scanDot1'), document.getElementById('scanDot2')];
+
+      function setScanSlide(n) {
+        scanSlides[scanSlide].classList.remove('active');
+        scanDots[scanSlide].classList.remove('active');
+        scanSlide = n;
+        scanSlides[scanSlide].classList.add('active');
+        scanDots[scanSlide].classList.add('active');
+      }
+
+      function animateScanCard() {
+        // Reset
+        setScanSlide(0);
+        document.getElementById('scanProgress').style.width = '0%';
+        document.getElementById('scanPercent').textContent = '0%';
+        document.getElementById('worksCount').textContent = '0';
+        document.getElementById('scanSpinner').classList.add('spinning');
+        [0,1,2,3].forEach(i => document.getElementById('issue'+i).classList.remove('visible'));
+        document.getElementById('revenueCard').classList.remove('visible');
+        document.getElementById('revBar1').style.width = '0%';
+        document.getElementById('revBar2').style.width = '0%';
+
+        // Slide 0: Scanning animation
+        const duration = 3000;
+        const target = 17;
+        const t0 = performance.now();
+        function tick(now) {
+          const p = Math.min((now - t0) / duration, 1);
+          document.getElementById('scanPercent').textContent = Math.round(p * 100) + '%';
+          document.getElementById('scanProgress').style.width = Math.round(p * 100) + '%';
+          document.getElementById('worksCount').textContent = Math.round(p * target);
+          if (p < 1) requestAnimationFrame(tick);
+        }
+        requestAnimationFrame(tick);
+
+        // Slide 0 → 1
+        setTimeout(() => {
+          setScanSlide(1);
+          // Stagger issues
+          [0,1,2,3].forEach((i) => {
+            setTimeout(() => document.getElementById('issue'+i).classList.add('visible'), 300 + i * 350);
+          });
+        }, 4500);
+
+        // Slide 1 → 2
+        setTimeout(() => {
+          setScanSlide(2);
+          setTimeout(() => document.getElementById('revenueCard').classList.add('visible'), 300);
+          setTimeout(() => {
+            document.getElementById('revBar1').style.width = '75%';
+            document.getElementById('revBar2').style.width = '25%';
+          }, 600);
+        }, 4500 + 300 + 4 * 350 + 2000);
+
+        // Loop
+        const totalTime = 4500 + 300 + 4 * 350 + 2000 + 5000;
+        setTimeout(() => animateScanCard(), totalTime);
+      }
+
+      /* ════════════════════════════════════
+         CARD 3: Registration Card Animation
+         ════════════════════════════════════ */
+      let regSlide = 0;
+      const regSlides = document.querySelectorAll('[data-reg-slide]');
+      const regDots = [document.getElementById('regDot0'), document.getElementById('regDot1'), document.getElementById('regDot2')];
+      const regSteps = [document.getElementById('regStep0'), document.getElementById('regStep1'), document.getElementById('regStep2')];
+
+      function setRegSlide(n) {
+        regSlides[regSlide].classList.remove('active');
+        regDots[regSlide].classList.remove('active');
+        regSteps[regSlide].classList.remove('active');
+        regSlide = n;
+        regSlides[regSlide].classList.add('active');
+        regDots[regSlide].classList.add('active');
+        regSteps[regSlide].classList.add('active');
+        // Green icons for steps 1 and 2
+        if (n >= 1) regSteps[n].querySelector('.reg-step-icon').classList.add('green');
+      }
+
+      function animateRegCard() {
+        // Reset
+        setRegSlide(0);
+        regSteps.forEach(s => { s.classList.remove('active'); s.querySelector('.reg-step-icon').classList.remove('green'); });
+        regSteps[0].classList.add('active');
+        [0,1,2].forEach(i => document.getElementById('work'+i).classList.remove('selected'));
+        document.getElementById('selectedCount').textContent = '0';
+        document.getElementById('selectProgress').style.width = '0%';
+        document.getElementById('submitPercent').textContent = '0%';
+        document.getElementById('submitProgress').style.width = '0%';
+        [0,1,2,3].forEach(i => document.getElementById('cl'+i).classList.remove('done'));
+        document.getElementById('socCount').textContent = '0';
+        [0,1,2,3].forEach(i => {
+          const row = document.getElementById('soc'+i);
+          row.classList.remove('done');
+          row.querySelector('.society-check').classList.remove('done');
+          row.querySelector('.society-sub').textContent = 'Processing...';
+        });
+
+        let selected = 0;
+
+        // Slide 0: Select works
+        [0,1,2].forEach((i) => {
+          setTimeout(() => {
+            document.getElementById('work'+i).classList.add('selected');
+            selected++;
+            document.getElementById('selectedCount').textContent = selected;
+            document.getElementById('selectProgress').style.width = Math.round((selected / 3) * 100) + '%';
+          }, 800 + i * 700);
+        });
+
+        const slide0End = 800 + 2 * 700 + 1500;
+
+        // Slide 1: Submit
+        setTimeout(() => {
+          setRegSlide(1);
+          const duration = 3000;
+          const t0 = performance.now();
+          function tick(now) {
+            const p = Math.min((now - t0) / duration, 1);
+            document.getElementById('submitPercent').textContent = Math.round(p * 100) + '%';
+            document.getElementById('submitProgress').style.width = Math.round(p * 100) + '%';
+            if (p < 1) requestAnimationFrame(tick);
+          }
+          requestAnimationFrame(tick);
+          [0,1,2,3].forEach((i) => {
+            setTimeout(() => document.getElementById('cl'+i).classList.add('done'), 600 + i * 650);
+          });
+        }, slide0End);
+
+        const slide1End = slide0End + 3000 + 1500;
+
+        // Slide 2: Register societies
+        setTimeout(() => {
+          setRegSlide(2);
+          [0,1,2,3].forEach((i) => {
+            setTimeout(() => {
+              const row = document.getElementById('soc'+i);
+              row.classList.add('done');
+              row.querySelector('.society-check').classList.add('done');
+              row.querySelector('.society-sub').textContent = 'Registered';
+              document.getElementById('socCount').textContent = i + 1;
+            }, 500 + i * 700);
+          });
+        }, slide1End);
+
+        const totalTime = slide1End + 500 + 3 * 700 + 3000;
+        setTimeout(() => animateRegCard(), totalTime);
+      }
+
+      /* ════════════════════════════════════
+         Start all animations
+         ════════════════════════════════════ */
+      animateScanCard();
+      animateRegCard();
+
+      /* ════════════════════════════════════
+         STAR / PARTICLE BACKGROUND
+         ════════════════════════════════════ */
+      (function() {
+        const canvas = document.getElementById('starCanvas');
+        const ctx = canvas.getContext('2d');
+        const dpr = window.devicePixelRatio || 1;
+        let w, h;
+
+        function resize() {
+          w = window.innerWidth;
+          h = document.documentElement.scrollHeight;
+          canvas.width = w * dpr;
+          canvas.height = h * dpr;
+          canvas.style.width = w + 'px';
+          canvas.style.height = h + 'px';
+          ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        }
+        resize();
+        window.addEventListener('resize', resize);
+
+        const PARTICLE_COUNT = 220;
+        const particles = [];
+
+        for (let i = 0; i < PARTICLE_COUNT; i++) {
+          particles.push({
+            x: Math.random() * w,
+            y: Math.random() * h,
+            r: Math.random() * 1.4 + 0.3,
+            alpha: Math.random() * 0.5 + 0.15,
+            vx: (Math.random() - 0.5) * 0.25,
+            vy: -(Math.random() * 0.6 + 0.2),          // drift upward, faster
+            twinkleSpeed: Math.random() * 0.02 + 0.005,
+            twinkleOffset: Math.random() * Math.PI * 2,
+          });
+        }
+
+        let frame = 0;
+
+        function draw() {
+          frame++;
+          ctx.clearRect(0, 0, w, h);
+
+          const scrollY = window.scrollY;
+
+          for (const p of particles) {
+            p.x += p.vx;
+            p.y += p.vy;
+
+            // Wrap around
+            if (p.y < -10) { p.y = h + 10; p.x = Math.random() * w; }
+            if (p.x < -10) p.x = w + 10;
+            if (p.x > w + 10) p.x = -10;
+
+            // Twinkle
+            const twinkle = 0.5 + 0.5 * Math.sin(frame * p.twinkleSpeed + p.twinkleOffset);
+            const alpha = p.alpha * (0.4 + 0.6 * twinkle);
+
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(255, 255, 255, ${alpha})`;
+            ctx.fill();
+          }
+
+          requestAnimationFrame(draw);
+        }
+
+        draw();
+      })();
+    </script>
+  </body>
+</html>

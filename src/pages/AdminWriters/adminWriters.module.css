@@ -1,0 +1,710 @@
+/* Client Manager (Writer-Scale UX PRD, Feature C). Palette via the shared
+   CSS vars used across the admin surface (--text, --soft-text, --accent,
+   --card-bg, --border, --error, --input-bg). */
+
+.shell {
+  margin-left: var(--sidebar-width, 72px);
+  width: calc(100% - var(--sidebar-width, 72px));
+  box-sizing: border-box;
+  padding: 32px 40px 64px;
+  min-height: 100vh;
+  color: var(--text);
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.headerLeft {
+  min-width: 0;
+}
+
+.title {
+  font-size: 34px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.subtitle {
+  margin: 4px 0 0;
+  color: var(--soft-text);
+  font-size: 14px;
+}
+
+.inviteButton {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.inviteButton:hover {
+  filter: brightness(1.05);
+}
+
+/* --- search ------------------------------------------------------------- */
+.searchRow {
+  margin-bottom: 16px;
+}
+.search {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--input-bg, rgba(255, 255, 255, 0.04));
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 12px;
+  color: var(--soft-text);
+  width: 360px;
+  max-width: 100%;
+}
+.search input {
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--text);
+  font-size: 14px;
+  width: 100%;
+}
+.clearSearch {
+  background: transparent;
+  border: none;
+  color: var(--soft-text);
+  cursor: pointer;
+  display: inline-flex;
+}
+
+/* --- table -------------------------------------------------------------- */
+.tableWrapper {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.table th {
+  text-align: left;
+  padding: 12px 16px;
+  color: var(--soft-text);
+  font-weight: 600;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  border-bottom: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.015);
+}
+.table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+}
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+.rowMuted {
+  opacity: 0.5;
+}
+.soft {
+  color: var(--soft-text);
+}
+.num {
+  font-variant-numeric: tabular-nums;
+}
+.nameLink {
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font-weight: 600;
+  font-size: 14px;
+  cursor: pointer;
+  padding: 0;
+  text-align: left;
+}
+.nameLink:hover {
+  color: var(--accent);
+  text-decoration: underline;
+}
+.stateCell {
+  text-align: center;
+  color: var(--soft-text);
+  padding: 40px 16px;
+}
+.actionsCell {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.iconBtn,
+.iconBtnDanger {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  width: 30px;
+  height: 30px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--soft-text);
+  cursor: pointer;
+}
+.iconBtn:hover {
+  color: var(--text);
+  border-color: var(--accent);
+}
+.iconBtnDanger:hover {
+  color: #fff;
+  background: var(--error, #ef4444);
+  border-color: var(--error, #ef4444);
+}
+.iconBtn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+/* --- pills -------------------------------------------------------------- */
+.pill {
+  display: inline-block;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.pillActive {
+  background: rgba(34, 197, 94, 0.14);
+  color: #22c55e;
+}
+.pillInvited {
+  background: rgba(245, 158, 11, 0.14);
+  color: #f59e0b;
+}
+.pillNone {
+  background: rgba(148, 163, 184, 0.14);
+  color: var(--soft-text);
+}
+
+/* --- pagination --------------------------------------------------------- */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 18px;
+}
+.pageButton {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 14px;
+  color: var(--text);
+  font-size: 13px;
+  cursor: pointer;
+}
+.pageButton:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.pageInfo {
+  color: var(--soft-text);
+  font-size: 13px;
+  font-variant-numeric: tabular-nums;
+}
+
+.pageError {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+  padding: 10px 14px;
+  border-radius: 10px;
+  margin-bottom: 14px;
+  font-size: 14px;
+}
+
+/* --- modals ------------------------------------------------------------- */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 24px;
+}
+.formModal,
+.inviteModal {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  width: 560px;
+  max-width: 100%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  color: var(--text);
+}
+.inviteModal {
+  width: 480px;
+}
+.formHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.formTitle {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0;
+}
+.formBody {
+  padding: 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.formFooter {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 16px 20px;
+  border-top: 1px solid var(--border);
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+.fieldRow {
+  display: flex;
+  gap: 12px;
+}
+.fieldLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--soft-text);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.input {
+  background: var(--input-bg, rgba(255, 255, 255, 0.04));
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 9px 11px;
+  color: var(--text);
+  font-size: 14px;
+  outline: none;
+  width: 100%;
+  box-sizing: border-box;
+}
+.input:focus {
+  border-color: var(--accent);
+}
+
+.chipRow {
+  display: flex;
+  gap: 8px;
+}
+.chip {
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 6px 14px;
+  color: var(--soft-text);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.chipActive {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.contactList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.contactRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 12px;
+}
+.contactEmail {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  flex-wrap: wrap;
+  /* Take the leftover width and stay shrinkable: without min-width:0 a long
+     address sizes this column to its own content and pushes the Resend/Revoke
+     buttons out past the edge of the dialog. */
+  flex: 1;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.contactRole,
+.contactLogin {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--soft-text);
+  background: rgba(148, 163, 184, 0.14);
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+.contactLogin {
+  color: #22c55e;
+  background: rgba(34, 197, 94, 0.14);
+}
+.linkDanger {
+  background: transparent;
+  border: none;
+  color: var(--error, #ef4444);
+  cursor: pointer;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.accountsBox {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+}
+.accountRow {
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  gap: 12px;
+  padding: 8px 12px;
+  font-size: 13px;
+  border-bottom: 1px solid var(--border);
+}
+.accountRow:last-child {
+  border-bottom: none;
+}
+.accountStatus {
+  color: var(--soft-text);
+  text-transform: capitalize;
+}
+
+.mutedNote {
+  font-size: 13px;
+  color: var(--soft-text);
+}
+.formError {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+  padding: 9px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+}
+
+.linkBox {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: rgba(34, 197, 94, 0.06);
+  border: 1px solid rgba(34, 197, 94, 0.25);
+  border-radius: 10px;
+  padding: 12px;
+}
+.linkRow {
+  display: flex;
+  gap: 8px;
+}
+.copyBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+/* --- shared buttons ----------------------------------------------------- */
+.primaryBtn {
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 9px;
+  padding: 9px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.primaryBtn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.secondaryBtn {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 9px;
+  padding: 9px 18px;
+  font-size: 14px;
+  cursor: pointer;
+}
+.dangerBtn {
+  background: var(--error, #ef4444);
+  color: #fff;
+  border: none;
+  border-radius: 9px;
+  padding: 9px 18px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+/* --- confirm modal ------------------------------------------------------ */
+.confirmModal {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  width: 440px;
+  max-width: 100%;
+  padding: 24px;
+  color: var(--text);
+}
+.confirmTitle {
+  font-size: 18px;
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+.confirmBody {
+  color: var(--soft-text);
+  font-size: 14px;
+  margin: 0 0 20px;
+  line-height: 1.5;
+}
+.confirmActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+}
+
+.spin {
+  animation: aw-spin 0.9s linear infinite;
+}
+@keyframes aw-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.inviteRowBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 7px;
+  padding: 4px 10px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.inviteRowBtn:hover {
+  filter: brightness(1.05);
+}
+
+/* --- dashboard summary bar --------------------------------------------- */
+.summaryBar {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+  margin-bottom: 20px;
+}
+.summaryCards {
+  display: flex;
+  gap: 14px;
+  flex-wrap: wrap;
+  flex: 1;
+}
+.summaryCard {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 18px;
+  min-width: 190px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.summaryCardWarn {
+  border-color: rgba(245, 158, 11, 0.4);
+  background: rgba(245, 158, 11, 0.06);
+}
+.summaryCardOk {
+  border-color: rgba(34, 197, 94, 0.35);
+  background: rgba(34, 197, 94, 0.05);
+}
+.summaryLabel {
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--soft-text);
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+.summaryValue {
+  font-size: 26px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  line-height: 1.1;
+}
+.summaryHint {
+  font-size: 12.5px;
+  color: var(--soft-text);
+}
+.summaryAction {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  gap: 8px;
+}
+.sendAllBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 12px 20px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.sendAllBtn:hover {
+  filter: brightness(1.05);
+}
+.sendAllBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+  filter: none;
+}
+.reviewLink {
+  background: none;
+  border: none;
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  padding: 0;
+}
+
+.pageSizeRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-right: auto;
+}
+.pageButtonActive {
+  background: var(--accent);
+  color: #fff;
+  border-color: var(--accent);
+}
+
+/* Invite delivery: whether the email actually reached the writer. */
+.rowActions {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  flex-shrink: 0;
+}
+.linkAction {
+  background: transparent;
+  border: none;
+  color: var(--text-muted, #94a3b8);
+  cursor: pointer;
+  font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+.linkAction:hover:not(:disabled) {
+  color: var(--text, #e2e8f0);
+}
+.linkAction:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+.deliveryError {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  margin-top: 4px;
+  font-size: 12px;
+  color: var(--error, #ef4444);
+}
+
+/* Bulk cleanup — needs-attention view only. */
+.checkCell {
+  width: 34px;
+  text-align: center;
+}
+.checkCell input {
+  cursor: pointer;
+  width: 15px;
+  height: 15px;
+  accent-color: var(--accent);
+}
+.bulkBar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 0 0 12px;
+  padding: 10px 14px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.03);
+}
+.bulkCount {
+  margin-right: auto;
+  font-size: 13px;
+  color: var(--soft-text);
+}

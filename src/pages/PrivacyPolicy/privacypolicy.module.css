@@ -1,0 +1,42 @@
+.pp {
+  padding: 0 20px;
+}
+
+.pp h2 {
+  font-size: 1.5rem;
+  margin: 30px 0 10px;
+  font-weight: 600;
+}
+
+.pp p {
+  margin: 10px 0;
+  line-height: 1.8;
+}
+
+.pp ul {
+  margin: 10px 0;
+  padding-left: 24px;
+  line-height: 1.8;
+}
+
+.pp li {
+  margin: 4px 0;
+}
+
+.pp a {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+@media (max-width: 768px) {
+  .pp h2 {
+    font-size: 1.2rem;
+    margin: 24px 0 8px;
+  }
+
+  .pp p,
+  .pp li {
+    font-size: 14px;
+    line-height: 1.7;
+  }
+}

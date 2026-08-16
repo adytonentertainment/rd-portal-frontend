@@ -1,0 +1,158 @@
+/* Subscription Card Container */
+.card {
+  position: relative;
+  width: 100%;
+  padding: 20px;
+  margin-bottom: 12px;
+  border-radius: var(--radius-lg);
+  background: var(--surface);
+  border: 1px solid var(--border);
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+:global(:root[data-theme='dark']) .card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+:global(:root[data-theme='light']) .card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+}
+
+.card:hover {
+  background: var(--surface);
+  box-shadow: none;
+  transform: translateY(-2px);
+}
+
+:global(:root[data-theme='light']) .card:hover {
+  background: var(--surface);
+}
+
+/* Loading State */
+.loading {
+  text-align: center;
+  font-size: 11px;
+  color: var(--muted-text);
+  opacity: 0.6;
+}
+
+/* Tier Tooltip - Hidden by default, shows on hover */
+.tierTooltip {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 8px 16px;
+  border-radius: var(--radius-lg);
+  font-size: 12px;
+  font-weight: 700;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+  pointer-events: none;
+  z-index: 10;
+  white-space: nowrap;
+  box-shadow: none;
+}
+
+.card:hover .tierTooltip {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, -50%) scale(1.05);
+}
+
+/* Stats Container */
+.stats {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: opacity 0.3s ease;
+}
+
+.card:hover .stats {
+  opacity: 0.3;
+}
+
+/* Individual Stat Item */
+.statItem {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.statHeader {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  color: var(--muted-text);
+}
+
+:global(:root[data-theme='light']) .statHeader {
+  color: var(--muted-text);
+}
+
+.statLabel {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.statValue {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+:global(:root[data-theme='light']) .statValue {
+  color: var(--text);
+}
+
+/* Progress Bar */
+.progressBar {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+:global(:root[data-theme='light']) .progressBar {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.progressFill {
+  height: 100%;
+  transition: width 0.3s ease;
+  border-radius: 2px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .card {
+    padding: 10px;
+  }
+
+  .tierBadge {
+    font-size: 10px;
+    padding: 5px 8px;
+  }
+
+  .statLabel {
+    font-size: 9px;
+  }
+
+  .statValue {
+    font-size: 12px;
+  }
+}

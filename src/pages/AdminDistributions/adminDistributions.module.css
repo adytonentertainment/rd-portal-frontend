@@ -1,0 +1,103 @@
+.shell {
+  margin-left: var(--sidebar-width, 72px);
+  width: calc(100% - var(--sidebar-width, 72px));
+  box-sizing: border-box;
+  padding: 32px 40px 64px;
+  font-family: var(--font-body);
+  color: var(--text);
+}
+
+.header {
+  margin-bottom: 24px;
+}
+
+.title {
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 8px 0;
+  font-family: var(--font-body);
+}
+
+.subtitle {
+  font-size: 15px;
+  color: var(--soft-text);
+  margin: 0;
+}
+
+.tableWrapper {
+  background: var(--card-bg);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  text-align: left;
+  padding: 14px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--soft-text);
+  border-bottom: 1px solid var(--border);
+  background: var(--card-bg);
+}
+
+.table td {
+  padding: 14px 16px;
+  font-size: 14px;
+  color: var(--text);
+  border-bottom: 1px solid var(--border-subtle, var(--border));
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.table tbody tr {
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.table tbody tr:hover {
+  background: var(--hover-overlay, rgba(0, 0, 0, 0.03));
+}
+
+.periodLabel {
+  font-weight: 600;
+}
+
+.statusPill {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.amount {
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+}
+
+.date {
+  color: var(--soft-text);
+  font-size: 13px;
+}
+
+.errorBanner {
+  margin: 0 0 16px;
+  padding: 10px 14px;
+  border: 1px solid rgba(220, 38, 38, 0.4);
+  border-radius: 10px;
+  background: rgba(220, 38, 38, 0.08);
+  color: #f87171;
+  font-size: 14px;
+}

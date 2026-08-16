@@ -1,0 +1,151 @@
+.background-import-toast {
+  position: fixed;
+  bottom: 24px;
+  right: 24px;
+  background: var(--panel-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: none;
+  z-index: 9999;
+  min-width: 320px;
+  max-width: 420px;
+  overflow: hidden;
+  animation: slideIn 150ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.background-import-toast.complete {
+  border-color: rgba(34, 197, 94, 0.5);
+}
+
+.background-import-toast.error {
+  border-color: rgba(239, 68, 68, 0.5);
+}
+
+.toast-content {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px;
+}
+
+.toast-icon {
+  flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(82, 39, 255, 0.1);
+  color: rgb(82, 39, 255);
+}
+
+.background-import-toast.complete .toast-icon {
+  background: rgba(34, 197, 94, 0.1);
+  color: rgb(34, 197, 94);
+}
+
+.background-import-toast.error .toast-icon {
+  background: rgba(239, 68, 68, 0.1);
+  color: rgb(239, 68, 68);
+}
+
+.spinner {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.toast-message {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.toast-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text);
+  font-family: var(--font-body);
+}
+
+.toast-subtitle {
+  font-size: 12px;
+  color: var(--soft-text);
+  font-family: var(--font-body);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.toast-actions {
+  flex-shrink: 0;
+}
+
+.toast-btn {
+  padding: 8px 16px;
+  border-radius: var(--radius-md);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: var(--font-body);
+  cursor: pointer;
+  transition: all 150ms cubic-bezier(0.22, 1, 0.36, 1);
+  border: none;
+}
+
+.toast-btn.cancel {
+  background: transparent;
+  border: 1px solid var(--border);
+  color: var(--text);
+}
+
+.toast-btn.cancel:hover {
+  background: var(--hover-overlay);
+}
+
+.toast-btn.dismiss {
+  background: var(--text);
+  color: var(--background);
+}
+
+.toast-btn.dismiss:hover {
+  opacity: 0.9;
+}
+
+.toast-progress {
+  height: 3px;
+  background: var(--accent);
+  animation: progressPulse 1.5s ease-in-out infinite;
+}
+
+@keyframes progressPulse {
+  0%,
+  100% {
+    opacity: 0.6;
+    width: 30%;
+  }
+  50% {
+    opacity: 1;
+    width: 70%;
+  }
+}

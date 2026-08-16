@@ -1,0 +1,452 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+
+/* Scoped CSS variables — match FreeAudit aesthetic */
+.wizardScope {
+  --text: #d4d4d4;
+  --soft-text: #737373;
+  --background: #000000;
+  --card-bg: transparent;
+  --panel-bg: #000000;
+  --border: #262626;
+  --border-hover: #404040;
+  --accent: #4ade80;
+  --accent-dim: rgba(74, 222, 128, 0.15);
+  --accent-text: #000000;
+  --success: #4ade80;
+  --error: #f87171;
+  --warning: #fbbf24;
+  --muted-text: #525252;
+  --hover-bg: #0a0a0a;
+
+  --font: 'JetBrains Mono', monospace;
+  --radius: 4px;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--text);
+}
+
+:global(:root[data-theme='light']) .wizardScope {
+  --text: #1a1a1a;
+  --soft-text: #6b6b6b;
+  --background: #f5f3ef;
+  --card-bg: transparent;
+  --panel-bg: #f5f3ef;
+  --border: #d6d3cd;
+  --border-hover: #a8a5a0;
+  --accent: #111111;
+  --accent-dim: rgba(0, 0, 0, 0.06);
+  --accent-text: #ffffff;
+  --success: #16a34a;
+  --error: #dc2626;
+  --warning: #d97706;
+  --muted-text: #8a8a8a;
+  --hover-bg: #eae7e1;
+}
+
+/* HeroUI overrides scoped to signup */
+.wizardScope :global(.nextui-card),
+.wizardScope :global([class*='Card']) {
+  box-shadow: none !important;
+}
+
+.wizardScope :global(input) {
+  font-family: var(--font) !important;
+}
+
+.wizardScope :global([data-slot='input-wrapper']) {
+  border-radius: var(--radius) !important;
+}
+
+.wizardScope :global([data-slot='trigger']) {
+  border-radius: var(--radius) !important;
+}
+
+.signupContainer {
+  /* Additional styles for signup container if needed */
+}
+
+/* Honeypot */
+.hp {
+  opacity: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  height: 0;
+  width: 0;
+  z-index: -1;
+}
+
+.policies {
+  background-color: transparent;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--muted-text);
+  font-size: 12px;
+  padding: 12px;
+  text-align: center;
+  margin: 1rem 0;
+  line-height: 1.5;
+  font-family: var(--font);
+}
+
+.linkButton {
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: var(--font);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+  padding: 0;
+  transition: color 150ms var(--ease);
+}
+
+.linkButton:hover {
+  color: var(--accent);
+}
+
+.errorMessage {
+  background-color: rgba(239, 68, 68, 0.06);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--radius);
+  color: var(--error);
+  font-size: 13px;
+  padding: 12px;
+  text-align: center;
+  width: fit-content;
+  margin: 1rem auto;
+}
+
+.message {
+  box-shadow: none;
+  background-color: rgba(74, 222, 128, 0.06);
+  border: 1px solid var(--success);
+  border-radius: var(--radius);
+  color: var(--success);
+  font-size: 13px;
+  padding: 10px;
+  text-align: center;
+  margin: 2rem 1rem;
+}
+
+.loginIcons {
+  margin: 20px 0px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+  gap: 20px;
+}
+
+.icon {
+  display: inline-block;
+  cursor: pointer;
+  background-color: rgb(226, 226, 226);
+  width: 80px;
+  height: max-content;
+  padding: 10px;
+  border-radius: var(--radius);
+}
+.icon > * {
+  margin: 0 auto;
+}
+.userDropdownList li {
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Signup wizard layout */
+.wizardWrapper {
+  position: relative;
+  overflow: hidden;
+  padding: 20px;
+  background: var(--background);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+  min-height: 100vh;
+  flex-direction: column;
+  font-family: var(--font);
+}
+
+.gridTwoCol {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.gridOneCol {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.stepHeading {
+  font-size: 16px;
+  font-weight: 500;
+  font-family: var(--font);
+  margin-bottom: 8px;
+  text-align: center;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+
+.stepSubtext {
+  font-size: 13px;
+  font-family: var(--font);
+  color: var(--muted-text);
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.optionButton {
+  padding: 28px 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  cursor: pointer;
+  transition: all 150ms var(--ease);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  color: var(--text);
+}
+
+.optionButton:hover {
+  border-color: var(--border-hover);
+  background: var(--hover-bg);
+}
+
+.optionButtonText {
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  cursor: pointer;
+  transition: all 150ms var(--ease);
+  text-align: left;
+  color: var(--text);
+}
+
+.optionButtonText:hover {
+  border-color: var(--border-hover);
+  background: var(--hover-bg);
+}
+
+.optionTitle {
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 2px;
+  color: var(--text);
+}
+
+.optionDesc {
+  font-size: 12px;
+  color: var(--muted-text);
+}
+
+.yesNoButton {
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  cursor: pointer;
+  transition: all 150ms var(--ease);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.yesNoButton:hover {
+  border-color: var(--border-hover);
+  background: var(--hover-bg);
+}
+
+.proCard {
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  margin-bottom: 16px;
+}
+
+.publisherCard {
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+}
+
+.addButton {
+  width: 100%;
+  padding: 12px;
+  border: 1px dashed var(--border);
+  border-radius: var(--radius);
+  background: transparent;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--muted-text);
+  transition: all 150ms var(--ease);
+  margin-bottom: 16px;
+}
+
+.addButton:hover {
+  border-color: var(--border-hover);
+  color: var(--text);
+}
+
+/* Progress bar */
+.progressBar {
+  margin-bottom: 24px;
+}
+
+.progressText {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-size: 11px;
+  color: var(--muted-text);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.progressTrack {
+  width: 100%;
+  height: 2px;
+  background: var(--border);
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: var(--accent);
+  transition: width 0.3s var(--ease);
+}
+
+/* Prevent iOS zoom on input focus */
+.wizardScope :global(input) {
+  font-size: 16px !important;
+}
+
+/* Mobile-specific styles for signup page */
+@media (max-width: 768px) {
+  .wizardWrapper {
+    padding: 10px 12px;
+    min-height: 0;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+
+  /* Constrain logo on mobile */
+  .wizardWrapper > :global(a:first-child) {
+    margin-bottom: 6px !important;
+  }
+
+  .wizardWrapper > :global(a:first-child) img {
+    max-width: 55px !important;
+    max-height: 55px !important;
+  }
+
+  .gridTwoCol {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .gridOneCol {
+    gap: 6px;
+  }
+
+  .stepHeading {
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+
+  .stepSubtext {
+    font-size: 12px;
+    margin-bottom: 10px;
+  }
+
+  .optionButton {
+    padding: 14px 12px;
+    gap: 6px;
+  }
+
+  .optionButtonText {
+    padding: 10px 12px;
+  }
+
+  .optionTitle {
+    font-size: 13px;
+  }
+
+  .optionDesc {
+    font-size: 11px;
+  }
+
+  .yesNoButton {
+    padding: 12px;
+    font-size: 13px;
+  }
+
+  .proCard {
+    padding: 12px;
+    margin-bottom: 10px;
+  }
+
+  .publisherCard {
+    padding: 12px;
+  }
+
+  .addButton {
+    padding: 8px;
+    font-size: 12px;
+    margin-bottom: 10px;
+  }
+
+  .progressBar {
+    margin-bottom: 10px;
+  }
+
+  .progressText {
+    font-size: 10px;
+    margin-bottom: 4px;
+  }
+
+  .errorMessage {
+    padding: 8px;
+    font-size: 12px;
+    margin: 8px auto;
+  }
+
+  .linkButton {
+    font-size: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .wizardWrapper {
+    padding: 6px 8px;
+  }
+
+  .stepHeading {
+    font-size: 13px;
+  }
+
+  .optionButton {
+    padding: 12px 10px;
+  }
+
+  .optionTitle {
+    font-size: 12px;
+  }
+}

@@ -1,0 +1,192 @@
+.globe-container {
+  position: relative;
+  width: 20rem;
+  height: 20rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.globe-container.large-globe {
+  width: 35rem;
+  height: 35rem;
+}
+
+.globe-canvas {
+  width: 100%;
+  height: 100%;
+  display: block;
+}
+
+.pings-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+}
+
+.ping-marker {
+  position: absolute;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.ping-dot {
+  width: 8px;
+  height: 8px;
+  background: #ff0000;
+  border-radius: 50%;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 10px rgba(255, 0, 0, 0.8);
+  z-index: 3;
+}
+
+.ping-circle {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #ff0000;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+  opacity: 0.75;
+  z-index: 2;
+}
+
+.ping-circle-2 {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  border: 1px solid #ff6666;
+  border-radius: 50%;
+  transform: translate(-50%, -50%);
+  animation: ping 2s cubic-bezier(0, 0, 0.2, 1) infinite;
+  animation-delay: 1s;
+  opacity: 0.5;
+  z-index: 1;
+}
+
+@keyframes ping {
+  0% {
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 0.75;
+  }
+  75%,
+  100% {
+    transform: translate(-50%, -50%) scale(3);
+    opacity: 0;
+  }
+}
+
+.revenue-tooltip {
+  position: fixed;
+  background: rgba(0, 0, 0, 0.95);
+  border: 1px solid rgba(255, 0, 0, 0.5);
+  border-radius: 8px;
+  padding: 12px 16px;
+  color: white;
+  font-size: 14px;
+  z-index: 1000;
+  pointer-events: none;
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.5),
+    0 0 20px rgba(255, 0, 0, 0.2);
+  animation: fadeIn 0.2s ease-in-out;
+  min-width: 150px;
+}
+
+/* Light mode tooltip */
+[data-theme='light'] .revenue-tooltip {
+  background: rgba(255, 255, 255, 0.98);
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  box-shadow:
+    0 4px 20px rgba(0, 0, 0, 0.15),
+    0 0 20px rgba(0, 0, 0, 0.05);
+}
+
+.tooltip-country {
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #ff6666;
+  font-size: 15px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+[data-theme='light'] .tooltip-country {
+  color: #cc0000;
+}
+
+.tooltip-amount {
+  font-size: 18px;
+  font-weight: 700;
+  color: #ffffff;
+  text-shadow: 0 0 10px rgba(255, 0, 0, 0.5);
+}
+
+[data-theme='light'] .tooltip-amount {
+  color: #000000;
+  text-shadow: none;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Hover effect for ping markers */
+.ping-marker:hover .ping-dot {
+  background: #ff3333;
+  box-shadow: 0 0 20px rgba(255, 0, 0, 1);
+  transform: translate(-50%, -50%) scale(1.2);
+}
+
+.ping-marker:hover .ping-circle {
+  border-color: #ff3333;
+}
+
+.ping-marker:hover .ping-circle-2 {
+  border-color: #ff9999;
+}
+
+/* Light mode - greenish glow */
+:root[data-theme='light'] .ping-dot {
+  background: #10b981 !important;
+  box-shadow: 0 0 10px rgba(16, 185, 129, 0.8) !important;
+}
+
+:root[data-theme='light'] .ping-circle {
+  border-color: #10b981 !important;
+}
+
+:root[data-theme='light'] .ping-circle-2 {
+  border-color: #34d399 !important;
+}
+
+:root[data-theme='light'] .ping-marker:hover .ping-dot {
+  background: #059669 !important;
+  box-shadow: 0 0 20px rgba(5, 150, 105, 1) !important;
+}
+
+:root[data-theme='light'] .ping-marker:hover .ping-circle {
+  border-color: #059669 !important;
+}
+
+:root[data-theme='light'] .ping-marker:hover .ping-circle-2 {
+  border-color: #10b981 !important;
+}

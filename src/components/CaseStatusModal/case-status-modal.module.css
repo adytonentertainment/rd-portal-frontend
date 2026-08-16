@@ -1,0 +1,12 @@
+.case-status-stepper {
+  background: transparent !important;
+  border: none !important;
+}
+
+.case-status-content {
+  min-height: 150px;
+}
+
+.case-status-footer {
+  display: none !important;
+}

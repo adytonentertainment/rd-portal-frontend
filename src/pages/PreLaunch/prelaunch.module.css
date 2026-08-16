@@ -1,0 +1,547 @@
+/* Container */
+.container {
+  margin: 0 auto;
+  max-width: 100%;
+  overflow-x: hidden;
+  padding: 0 24px;
+}
+
+.containerCards {
+  max-width: 1400px;
+}
+
+/* Hero */
+.heroCentered {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* Launch Badge - pill above headline */
+.launchBadge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 20px;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 50px;
+  margin-bottom: 28px;
+}
+
+.launchBadgeText {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--soft-text);
+  letter-spacing: 0.3px;
+}
+
+/* Hero Headline */
+.heroHeadline {
+  display: flex;
+  flex-direction: column;
+  font-size: 38px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.12;
+  letter-spacing: -0.03em;
+  margin: 0 0 20px;
+}
+
+.heroLine {
+  display: block;
+}
+
+/* Hero Description */
+.heroDescription {
+  font-size: 16px;
+  font-weight: 400;
+  color: var(--soft-text);
+  line-height: 1.6;
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 0 8px;
+}
+
+/* Problem Section */
+.problemSection {
+  text-align: center;
+  margin-bottom: 0;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.problemSection h2 {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin-bottom: 32px;
+}
+
+.problemCardsWrapper {
+  margin-bottom: 0;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.problemCardsGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+  padding-bottom: 0;
+  padding-top: 0;
+}
+
+.problemCardsGrid::-webkit-scrollbar {
+  display: none;
+}
+
+.problemCard {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 14px 16px;
+  min-width: 0;
+  width: 100%;
+  height: auto;
+  min-height: 0;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 14px;
+  position: relative;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+}
+
+.problemCard:hover {
+  box-shadow: none;
+}
+
+.problemCardIconWrapper {
+  width: 40px;
+  height: 40px;
+  min-width: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+}
+
+.iconPlaceholder {
+  width: 100%;
+  height: 100%;
+  border: 1px dashed var(--border-subtle);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--input-bg);
+  color: var(--soft-text);
+  font-size: 12px;
+  text-align: center;
+  padding: 10px;
+}
+
+.problemCardText {
+  text-align: left;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  min-width: 0;
+}
+
+.problemCardHeadline {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+  line-height: 1.3;
+}
+
+.problemCardBody {
+  font-size: 11px;
+  color: var(--soft-text);
+  line-height: 1.4;
+}
+
+/* Services Section */
+.servicesSection {
+  text-align: center;
+  margin-bottom: 80px;
+}
+
+.servicesTitle {
+  font-size: 48px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin-bottom: 60px;
+}
+
+.servicesGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+  width: 100%;
+}
+
+/* Signup Section */
+.signupSection {
+  text-align: center;
+  padding: 60px 20px;
+  border-radius: 24px;
+}
+
+.signupTitle {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  margin-bottom: 16px;
+}
+
+.signupDescription {
+  font-size: 15px;
+  color: var(--soft-text);
+  line-height: 1.6;
+  max-width: 500px;
+  margin: 0 auto 32px;
+}
+
+.signupForm {
+  max-width: 500px;
+  margin: 0 auto;
+}
+
+.inputWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.emailInput {
+  flex: 1;
+  padding: 14px 20px;
+  font-size: 15px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--input-bg);
+  color: var(--text);
+  outline: none;
+  transition: all 0.3s ease;
+}
+
+.emailInput:focus {
+  border-color: var(--secondary);
+  box-shadow: none;
+}
+
+.emailInput:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.emailInput::placeholder {
+  color: var(--muted-text);
+}
+
+.submitButton {
+  padding: 14px 28px;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--secondary-text);
+  background: var(--secondary);
+  border: none;
+  border-radius: var(--radius-lg);
+  cursor: pointer;
+  transition: all 150ms cubic-bezier(0.22, 1, 0.36, 1);
+  white-space: nowrap;
+  width: 100%;
+}
+
+.submitButton:hover:not(:disabled) {
+  box-shadow: none;
+}
+
+.submitButton:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.message {
+  padding: 12px 20px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+}
+
+.message.success {
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: #10b981;
+}
+
+.message.error {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+}
+
+.privacyNote {
+  font-size: 14px;
+  color: var(--muted-text);
+  margin-top: 16px;
+}
+
+/* Footer */
+.footer {
+  padding: 40px 0;
+  background: var(--background);
+  border-top: 1px solid var(--border);
+}
+
+.footerContent {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.footerText {
+  font-size: 14px;
+  color: var(--muted-text);
+  margin: 0;
+}
+
+.footerLinks {
+  display: flex;
+  gap: 24px;
+}
+
+.footerLink {
+  font-size: 14px;
+  color: var(--soft-text);
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+.footerLink:hover {
+  color: var(--secondary);
+}
+
+/* ===== Responsive: Tablet+ ===== */
+@media (min-width: 640px) {
+  .launchBadge {
+    padding: 10px 24px;
+    margin-bottom: 32px;
+  }
+
+  .launchBadgeText {
+    font-size: 14px;
+  }
+
+  .heroHeadline {
+    font-size: 44px;
+  }
+
+  .heroDescription {
+    font-size: 17px;
+    max-width: 560px;
+  }
+
+  .problemSection h2 {
+    font-size: 34px;
+    margin-bottom: 40px;
+  }
+
+  .problemCardsGrid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+
+  .problemCard {
+    padding: 20px 16px;
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  .problemCardIconWrapper {
+    width: 70px;
+    height: 70px;
+    min-width: 70px;
+    margin-bottom: 14px;
+  }
+
+  .problemCardText {
+    text-align: center;
+  }
+
+  .problemCardHeadline {
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+
+  .problemCardBody {
+    font-size: 12px;
+  }
+
+  .signupTitle {
+    font-size: 34px;
+  }
+
+  .signupDescription {
+    font-size: 17px;
+  }
+
+  .inputWrapper {
+    flex-direction: row;
+  }
+
+  .submitButton {
+    width: auto;
+  }
+}
+
+/* ===== Responsive: Desktop ===== */
+@media (min-width: 768px) {
+  .container {
+    padding: 0 32px;
+  }
+
+  .launchBadge {
+    padding: 10px 28px;
+    margin-bottom: 36px;
+  }
+
+  .launchBadgeText {
+    font-size: 15px;
+  }
+
+  .heroHeadline {
+    font-size: 52px;
+  }
+
+  .heroDescription {
+    font-size: 18px;
+    max-width: 600px;
+  }
+
+  .problemSection h2 {
+    font-size: 42px;
+    margin-bottom: 50px;
+  }
+
+  .problemCardsGrid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+
+  .problemCard {
+    padding: 30px 20px;
+    min-height: 260px;
+    border-radius: var(--radius-lg);
+    flex-direction: column;
+    align-items: center;
+    gap: 0;
+  }
+
+  .problemCardIconWrapper {
+    width: 100px;
+    height: 100px;
+    min-width: 100px;
+    margin-bottom: 24px;
+  }
+
+  .problemCardText {
+    text-align: center;
+  }
+
+  .problemCardHeadline {
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+
+  .problemCardBody {
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .signupSection {
+    padding: 80px 20px;
+  }
+
+  .signupTitle {
+    font-size: 48px;
+    margin-bottom: 20px;
+  }
+
+  .signupDescription {
+    font-size: 18px;
+    max-width: 600px;
+    margin: 0 auto 40px;
+  }
+
+  .signupForm {
+    max-width: 600px;
+  }
+
+  .emailInput {
+    padding: 16px 24px;
+    font-size: 16px;
+  }
+
+  .submitButton {
+    padding: 16px 32px;
+    font-size: 16px;
+  }
+
+  .footerContent {
+    flex-direction: row;
+    text-align: left;
+  }
+
+  .servicesGrid {
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+  }
+}
+
+/* ===== Responsive: Large Desktop ===== */
+@media (min-width: 1024px) {
+  .heroHeadline {
+    font-size: 56px;
+  }
+
+  .problemSection h2 {
+    font-size: 48px;
+    margin-bottom: 60px;
+  }
+}
+
+@media (min-width: 1200px) {
+  .problemCardsGrid {
+    gap: 24px;
+    max-width: 1400px;
+  }
+
+  .problemCard {
+    min-height: 280px;
+    padding: 35px 25px;
+  }
+}

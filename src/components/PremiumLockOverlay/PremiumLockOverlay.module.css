@@ -1,0 +1,483 @@
+/* Lock Overlay - Lower opacity to see blurred graph behind */
+.lockOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* no backdrop-filter - flat design */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  animation: fadeIn 150ms cubic-bezier(0.22, 1, 0.36, 1);
+  pointer-events: none;
+}
+
+/* Dark theme overlay */
+.lockOverlay[data-theme='dark'] {
+  background: rgba(10, 10, 10, 0.7);
+}
+
+/* Light theme overlay */
+.lockOverlay[data-theme='light'] {
+  background: rgba(255, 255, 255, 0.6);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.lockContainer {
+  text-align: center;
+  padding: 15px;
+  max-width: 100%;
+  animation: slideUp 150ms cubic-bezier(0.22, 1, 0.36, 1) 0.2s both;
+  transform-origin: center;
+  transform: scale(0.85);
+  pointer-events: auto;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px) scale(0.85);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0) scale(0.85);
+    opacity: 1;
+  }
+}
+
+/* Animated Lock Icon */
+.lockIcon {
+  width: 50px;
+  height: 50px;
+  margin: 0 auto 12px;
+  position: relative;
+  animation: pulse 2s infinite;
+  transition: transform 150ms cubic-bezier(0.22, 1, 0.36, 1);
+  cursor: pointer;
+}
+
+/* Hover state - rotate and scale up */
+.lockIcon:hover {
+  transform: scale(1.15) rotate(5deg);
+  animation: none;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.lockIcon svg {
+  width: 100%;
+  height: 100%;
+  filter: none;
+  transition: filter 150ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Enhanced glow on hover */
+.lockIcon:hover svg {
+  filter: none;
+}
+
+.lockBody {
+  fill: url(#lockGradient);
+  animation: glow 3s ease-in-out infinite;
+}
+
+@keyframes glow {
+  0%,
+  100% {
+    filter: brightness(1);
+  }
+  50% {
+    filter: brightness(1.2);
+  }
+}
+
+/* Shackle group - for hover interaction */
+.shackleGroup {
+  transform-origin: 60px 10px;
+}
+
+/* Left side of shackle - stays fixed */
+.lockShackleLeft {
+  transition: all 150ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Right side of shackle - opens on hover */
+.lockShackleRight {
+  transform-origin: 60px 10px;
+  transition: all 150ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* When hovering the lock icon, open the shackle dramatically */
+.lockIcon:hover .lockShackleRight {
+  transform: rotate(-60deg) translateX(3px);
+  stroke: url(#shackleGradient);
+  filter: none;
+}
+
+/* Old lockShackle styles - keep for backwards compatibility */
+.lockShackle {
+  stroke: url(#shackleGradient);
+  stroke-width: 8;
+  fill: none;
+  stroke-linecap: round;
+  animation: lockShake 4s ease-in-out infinite;
+  transform-origin: center top;
+}
+
+@keyframes lockShake {
+  0%,
+  10%,
+  100% {
+    transform: rotate(0deg);
+  }
+  2% {
+    transform: rotate(-2deg);
+  }
+  4% {
+    transform: rotate(2deg);
+  }
+  6% {
+    transform: rotate(-2deg);
+  }
+  8% {
+    transform: rotate(2deg);
+  }
+}
+
+/* Particles */
+.particles {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 150px;
+  height: 150px;
+  pointer-events: none;
+}
+
+.particle {
+  position: absolute;
+  width: 3px;
+  height: 3px;
+  background: var(--accent);
+  border-radius: 50%;
+  animation: float 6s infinite;
+}
+
+.particle:nth-child(1) {
+  animation-delay: 0s;
+  --x: 45px;
+  --y: -45px;
+}
+.particle:nth-child(2) {
+  animation-delay: 1s;
+  --x: -55px;
+  --y: 40px;
+}
+.particle:nth-child(3) {
+  animation-delay: 2s;
+  --x: 60px;
+  --y: 30px;
+}
+.particle:nth-child(4) {
+  animation-delay: 3s;
+  --x: -40px;
+  --y: -55px;
+}
+.particle:nth-child(5) {
+  animation-delay: 4s;
+  --x: 30px;
+  --y: 55px;
+}
+.particle:nth-child(6) {
+  animation-delay: 5s;
+  --x: -45px;
+  --y: -30px;
+}
+
+@keyframes float {
+  0%,
+  100% {
+    transform: translate(0, 0) scale(0);
+    opacity: 0;
+  }
+  10% {
+    transform: translate(0, 0) scale(1);
+    opacity: 1;
+  }
+  90% {
+    transform: translate(var(--x), var(--y)) scale(0.3);
+    opacity: 0;
+  }
+}
+
+/* Content */
+.title {
+  font-size: 18px;
+  font-weight: 700;
+  margin-bottom: 6px;
+  line-height: 1.2;
+}
+
+/* Dark theme title */
+.lockOverlay[data-theme='dark'] .title {
+  color: var(--text);
+}
+
+/* Light theme title */
+.lockOverlay[data-theme='light'] .title {
+  color: var(--text);
+}
+
+.subtitle {
+  font-size: 12px;
+  margin-bottom: 12px;
+  line-height: 1.3;
+}
+
+/* Dark theme subtitle */
+.lockOverlay[data-theme='dark'] .subtitle {
+  color: #94a3b8;
+}
+
+/* Light theme subtitle */
+.lockOverlay[data-theme='light'] .subtitle {
+  color: #475569;
+}
+
+/* Features List */
+.features {
+  margin: 10px auto;
+  text-align: left;
+  max-width: fit-content;
+}
+
+.feature {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+  opacity: 0;
+  animation: slideIn 150ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+}
+
+.feature:nth-child(1) {
+  animation-delay: 0.6s;
+}
+.feature:nth-child(2) {
+  animation-delay: 0.8s;
+}
+.feature:nth-child(3) {
+  animation-delay: 1s;
+}
+.feature:nth-child(4) {
+  animation-delay: 1.2s;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.featureIcon {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 8px;
+  flex-shrink: 0;
+}
+
+/* Dark mode - white background for feature icons */
+.lockOverlay[data-theme='dark'] .featureIcon {
+  background: #ffffff;
+}
+
+/* Light mode - dark background for feature icons */
+.lockOverlay[data-theme='light'] .featureIcon {
+  background: #000000;
+}
+
+.featureIcon svg {
+  width: 11px;
+  height: 11px;
+}
+
+/* Dark mode - black checkmark on white background */
+.lockOverlay[data-theme='dark'] .featureIcon svg path {
+  fill: #000000;
+}
+
+/* Light mode - white checkmark on black background */
+.lockOverlay[data-theme='light'] .featureIcon svg path {
+  fill: #ffffff;
+}
+
+.featureText {
+  font-size: 12px;
+  font-family: var(--font-body);
+}
+
+/* Dark theme feature text */
+.lockOverlay[data-theme='dark'] .featureText {
+  color: #e2e8f0;
+}
+
+/* Light theme feature text */
+.lockOverlay[data-theme='light'] .featureText {
+  color: #334155;
+}
+
+/* CTA Button */
+.ctaButton {
+  display: inline-block;
+  padding: 10px 28px;
+  background: var(--accent);
+  color: white;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: var(--font-body);
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+  transition: all 150ms cubic-bezier(0.22, 1, 0.36, 1);
+  margin-top: 8px;
+  text-decoration: none;
+  box-shadow: none;
+}
+
+.ctaButton:hover {
+  transform: translateY(-1px);
+  box-shadow: none;
+}
+
+.ctaButton:active {
+  transform: scale(0.97);
+}
+
+/* Price Badge */
+.priceBadge {
+  display: inline-block;
+  background: rgba(16, 185, 129, 0.1);
+  color: #10b981;
+  padding: 4px 10px;
+  border-radius: 16px;
+  font-size: 11px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  animation: flash 3s infinite;
+}
+
+@keyframes flash {
+  0%,
+  100% {
+    opacity: 0.8;
+  }
+  50% {
+    opacity: 1;
+  }
+}
+
+/* Trust Badges */
+.trustBadges {
+  margin-top: 8px;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  opacity: 0;
+  animation: fadeInUp 0.5s ease-out 1.4s forwards;
+}
+
+@keyframes fadeInUp {
+  from {
+    transform: translateY(10px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.trustBadge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 11px;
+}
+
+/* Dark theme trust badges */
+.lockOverlay[data-theme='dark'] .trustBadge {
+  color: #64748b;
+}
+
+.lockOverlay[data-theme='dark'] .trustBadge svg {
+  fill: #64748b;
+}
+
+/* Light theme trust badges */
+.lockOverlay[data-theme='light'] .trustBadge {
+  color: #475569;
+}
+
+.lockOverlay[data-theme='light'] .trustBadge svg {
+  fill: #475569;
+}
+
+.trustBadge svg {
+  width: 13px;
+  height: 13px;
+}
+
+/* Mobile Optimization */
+@media (max-width: 640px) {
+  .lockContainer {
+    padding: 20px 15px;
+    transform: scale(0.75);
+  }
+
+  .title {
+    font-size: 16px;
+  }
+
+  .subtitle {
+    font-size: 11px;
+  }
+
+  .ctaButton {
+    width: 100%;
+    padding: 12px 24px;
+  }
+
+  .trustBadges {
+    flex-direction: column;
+    gap: 8px;
+  }
+}

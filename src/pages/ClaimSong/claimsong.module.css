@@ -1,0 +1,78 @@
+.royaltyClaim {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.tunescanLogo {
+  width: 10rem;
+  cursor: pointer;
+  margin-bottom: 2rem;
+}
+
+.authScreen {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: var(--surface);
+  color: rgb(202, 202, 202);
+  border-radius: var(--radius-lg);
+  padding: 3rem;
+}
+
+.authScreen h1 {
+  font-size: 2rem;
+}
+
+.authNote {
+  font-size: 0.8rem;
+  color: #929292;
+  text-wrap: wrap;
+  word-break: break-all;
+}
+
+.authButtons {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 2rem 2rem;
+}
+
+.spotifyButton {
+  height: 2rem;
+  background-color: #1db954;
+  color: #191414;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  padding: 1.4rem 0.7rem;
+  border-radius: 0.4rem;
+  justify-content: space-between;
+  font-weight: 800;
+}
+
+.spotifyButton img {
+  width: 2rem;
+}
+
+.geniusButton {
+  height: 2rem;
+  background-color: #1db954;
+  color: #191414;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  padding: 1.4rem 0.7rem;
+  border-radius: 0.4rem;
+  justify-content: space-between;
+  font-weight: 800;
+}
+
+.geniusButton img {
+  width: 2rem;
+}
+
+.royaltyClaimDashboard {
+  color: white;
+}

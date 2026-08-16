@@ -1,0 +1,205 @@
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+
+/* Light Mode Modal */
+.modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 24px;
+  max-width: 420px;
+  width: 90%;
+  position: relative;
+  box-shadow: none;
+  text-align: center;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', sans-serif;
+}
+
+/* Dark Mode Modal */
+:global(:root[data-theme='dark']) .modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: none;
+}
+
+.closeButton {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  color: #6b7280;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.closeButton:hover {
+  background: #f3f4f6;
+  color: #2c2416;
+}
+
+:global(:root[data-theme='dark']) .closeButton {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+:global(:root[data-theme='dark']) .closeButton:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.iconWrapper {
+  width: 64px;
+  height: 64px;
+  background: #f97316;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+}
+
+.crownIcon {
+  color: white;
+}
+
+.title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #2c2416;
+  margin: 0 0 12px;
+}
+
+:global(:root[data-theme='dark']) .title {
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.description {
+  font-size: 14px;
+  color: #6b7280;
+  line-height: 1.6;
+  margin: 0 0 24px;
+}
+
+:global(:root[data-theme='dark']) .description {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.features {
+  text-align: left;
+  margin: 0 auto 24px;
+  max-width: 320px;
+  padding-left: 0;
+  list-style: none;
+}
+
+.featureItem {
+  color: #2c2416;
+  padding: 6px 0 6px 24px;
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.5;
+  position: relative;
+}
+
+.featureItem::before {
+  content: '•';
+  position: absolute;
+  left: 8px;
+  color: #f97316;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+:global(:root[data-theme='dark']) .featureItem {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+:global(:root[data-theme='dark']) .featureItem::before {
+  color: #f97316;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* Light Mode - Primary Button */
+.upgradeButton {
+  background: #2c2416;
+  color: #ffffff;
+  border: none;
+  padding: 14px 24px;
+  border-radius: 8px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: none;
+}
+
+.upgradeButton:hover {
+  background: #1a1510;
+  transform: translateY(-1px);
+  box-shadow: none;
+}
+
+/* Dark Mode - Primary Button */
+:global(:root[data-theme='dark']) .upgradeButton {
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: rgba(255, 255, 255, 0.95);
+}
+
+:global(:root[data-theme='dark']) .upgradeButton:hover {
+  background: rgba(255, 255, 255, 0.18);
+  border-color: rgba(255, 255, 255, 0.25);
+  transform: translateY(-1px);
+}
+
+/* Light Mode - Cancel Button */
+.cancelButton {
+  background: none;
+  border: 1px solid #e5e7eb;
+  color: #6b7280;
+  padding: 12px 24px;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancelButton:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+  color: #2c2416;
+}
+
+/* Dark Mode - Cancel Button */
+:global(:root[data-theme='dark']) .cancelButton {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: rgba(255, 255, 255, 0.6);
+}
+
+:global(:root[data-theme='dark']) .cancelButton:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.2);
+  color: rgba(255, 255, 255, 0.9);
+}

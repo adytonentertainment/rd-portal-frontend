@@ -1,0 +1,161 @@
+.shell {
+  margin-left: var(--sidebar-width, 72px);
+  width: calc(100% - var(--sidebar-width, 72px));
+  box-sizing: border-box;
+  padding: 32px 40px 64px;
+  font-family: var(--font-body);
+  color: var(--text);
+}
+
+.backLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  color: var(--soft-text);
+  text-decoration: none;
+  margin-bottom: 24px;
+  transition: color 0.2s;
+}
+
+.backLink:hover {
+  color: var(--accent);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.headerLeft {
+  display: flex;
+  flex-direction: column;
+}
+
+.titleRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.title {
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+}
+
+.statusPill {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.meta {
+  display: flex;
+  gap: 16px;
+  font-size: 14px;
+  color: var(--soft-text);
+}
+
+.headerRight {
+  display: flex;
+  align-items: flex-start;
+}
+
+.distributeButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 20px;
+  background: var(--accent);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.distributeButton:hover:not(:disabled) {
+  background: var(--accent-hover, #dc2626);
+}
+
+.distributeButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.tableWrapper {
+  background: var(--card-bg);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  text-align: left;
+  padding: 14px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--soft-text);
+  border-bottom: 1px solid var(--border);
+  background: var(--card-bg);
+}
+
+.table td {
+  padding: 14px 16px;
+  font-size: 14px;
+  color: var(--text);
+  border-bottom: 1px solid var(--border-subtle, var(--border));
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.writerName {
+  font-weight: 500;
+}
+
+.amount {
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+}
+
+.totalsRow td {
+  font-weight: 600;
+  background: var(--hover-overlay, rgba(0, 0, 0, 0.03));
+  border-top: 2px solid var(--border);
+}
+
+.notFound {
+  text-align: center;
+  padding: 64px 24px;
+}
+
+.notFoundTitle {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 8px 0;
+}
+
+.notFoundText {
+  color: var(--soft-text);
+  margin: 0;
+}

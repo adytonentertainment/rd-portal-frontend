@@ -1,0 +1,87 @@
+.dropdownMenuElement {
+  position: relative;
+  transition: all 150ms cubic-bezier(0.22, 1, 0.36, 1);
+  background-color: transparent;
+  padding: 7px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 0.5rem;
+  align-items: center;
+  justify-content: space-between;
+  user-select: none;
+  font-size: 11px;
+  text-transform: none;
+  letter-spacing: 0;
+  color: var(--soft-text);
+  font-weight: 500;
+  font-family: var(--font-body);
+}
+.dropdownMenuElement:hover {
+  border: 1px solid var(--border);
+}
+.dropdownMenuClick {
+  flex-grow: 1;
+  text-align: center;
+  position: relative;
+  cursor: pointer;
+  text-align: center;
+}
+.dropdownMenuContent {
+  position: absolute;
+  left: 0%;
+  top: 0%;
+  display: inline-block;
+  background-color: var(--surface);
+  padding: 0.75rem;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  transition:
+    opacity 150ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 150ms cubic-bezier(0.22, 1, 0.36, 1);
+  z-index: 9999;
+  min-width: 100%;
+  box-shadow: none;
+}
+
+.dropdownMenuContent > div {
+  padding: 6px 8px;
+  transition: background-color 150ms cubic-bezier(0.22, 1, 0.36, 1);
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 2px;
+}
+
+.dropdownMenuContent > div:hover {
+  background-color: var(--input-bg);
+}
+
+.dropdownMenuContent > div:last-child {
+  margin-bottom: 0;
+}
+
+.dropdownMenuContent::-webkit-scrollbar {
+  width: 6px;
+}
+
+.dropdownMenuContent::-webkit-scrollbar-track {
+  background: var(--input-bg);
+  border-radius: 3px;
+}
+
+.dropdownMenuContent::-webkit-scrollbar-thumb {
+  background: var(--button-border);
+  border-radius: 3px;
+}
+
+.dropdownMenuContent::-webkit-scrollbar-thumb:hover {
+  background: var(--soft-text);
+}
+.dropdownMenuCaret {
+  transition: rotate 150ms cubic-bezier(0.22, 1, 0.36, 1);
+  rotate: 0deg;
+}
+.dropdownMenuCaretRotate {
+  rotate: 180deg;
+}

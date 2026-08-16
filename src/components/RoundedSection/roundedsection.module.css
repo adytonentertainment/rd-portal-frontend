@@ -1,0 +1,15 @@
+.roundedSection {
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow-sm);
+  background-color: var(--card-bg);
+  transition: all 200ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.roundedSection:hover {
+  box-shadow: var(--shadow-md);
+}
+
+.filled {
+  background-color: var(--card-bg);
+}

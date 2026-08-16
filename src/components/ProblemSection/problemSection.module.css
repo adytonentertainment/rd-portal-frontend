@@ -1,0 +1,316 @@
+/* Problem Section */
+.problemSection {
+  text-align: center;
+  margin-bottom: 80px;
+  max-width: 100%;
+  overflow-x: hidden;
+  padding: 60px 20px;
+}
+
+.problemSection h2 {
+  font-size: 48px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.2;
+  letter-spacing: -0.03em;
+  margin-bottom: 56px;
+}
+
+.cardsContainer {
+  margin-bottom: 48px;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.cardsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 16px;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 8px;
+}
+
+.cardsGrid::-webkit-scrollbar {
+  display: none;
+}
+
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px 12px;
+  min-width: 160px;
+  width: 160px;
+  height: 200px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  position: relative;
+  flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+.card:hover {
+  box-shadow: none;
+}
+
+.heroCard {
+  width: 100%;
+  height: auto;
+  min-height: 160px;
+  flex-shrink: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  flex-direction: column;
+}
+
+/* Light mode card styling */
+:root[data-theme='light'] .heroCard {
+  background: #ffffff !important;
+}
+
+/* Dark mode card styling */
+:root[data-theme='dark'] .heroCard {
+  background: rgba(30, 30, 35, 0.95) !important;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.heroCard:hover {
+  transform: translateY(-4px);
+}
+
+.cardIconWrapper {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--text);
+  opacity: 0.85;
+}
+
+.cardIconWrapper svg {
+  width: 100%;
+  height: 100%;
+  display: block;
+  max-width: 28px;
+  max-height: 28px;
+}
+
+.iconPlaceholder {
+  width: 100%;
+  height: 100%;
+  border: 1px dashed var(--border-subtle);
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--input-bg);
+  color: var(--soft-text);
+  font-size: 12px;
+  text-align: center;
+  padding: 10px;
+}
+
+.cardText {
+  text-align: center;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.cardHeadline {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0;
+  line-height: 1.3;
+  letter-spacing: -0.01em;
+}
+
+.cardBody {
+  font-size: 13px;
+  color: var(--soft-text);
+  line-height: 1.55;
+  margin: 0;
+  text-align: left;
+}
+
+/* Mobile Responsive (< 768px) */
+@media (max-width: 767px) {
+  .problemSection {
+    margin-bottom: 48px;
+    padding: 40px 16px;
+  }
+
+  .problemSection h2 {
+    font-size: 28px;
+    margin-bottom: 32px;
+    padding: 0 8px;
+  }
+
+  .cardsContainer {
+    margin-bottom: 32px;
+  }
+
+  .cardsGrid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    padding: 4px;
+    overflow-x: visible;
+    margin: 0 auto;
+  }
+
+  .heroCard {
+    width: 100%;
+    min-width: unset;
+    min-height: 140px;
+  }
+
+  .cardIconWrapper {
+    width: 22px;
+    height: 22px;
+  }
+
+  .cardIconWrapper svg {
+    max-width: 22px;
+    max-height: 22px;
+  }
+
+  .cardHeadline {
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .cardBody {
+    font-size: 11px;
+    line-height: 1.45;
+  }
+}
+
+/* Extra small mobile (< 400px) */
+@media (max-width: 400px) {
+  .problemSection h2 {
+    font-size: 24px;
+  }
+
+  .cardsGrid {
+    grid-template-columns: 1fr;
+    gap: 10px;
+  }
+
+  .heroCard {
+    min-height: 120px;
+  }
+}
+
+/* Tablet (768px - 1023px) */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .problemSection {
+    padding: 50px 24px;
+  }
+
+  .cardsGrid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    overflow-x: visible;
+    max-width: 100%;
+    margin: 0 auto;
+  }
+
+  .heroCard {
+    width: 100%;
+    min-width: unset;
+    min-height: 150px;
+  }
+
+  .cardIconWrapper {
+    width: 24px;
+    height: 24px;
+  }
+
+  .cardIconWrapper svg {
+    max-width: 24px;
+    max-height: 24px;
+  }
+
+  .cardHeadline {
+    font-size: 13px;
+  }
+
+  .cardBody {
+    font-size: 12px;
+    line-height: 1.5;
+  }
+}
+
+/* Desktop (1024px - 1199px) */
+@media (min-width: 1024px) {
+  .problemSection {
+    padding: 60px 32px;
+  }
+
+  .cardsGrid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 18px;
+    max-width: 1120px;
+    margin: 0 auto;
+  }
+
+  .heroCard {
+    min-height: 160px;
+  }
+
+  .cardIconWrapper {
+    width: 26px;
+    height: 26px;
+  }
+
+  .cardIconWrapper svg {
+    max-width: 26px;
+    max-height: 26px;
+  }
+
+  .cardHeadline {
+    font-size: 14px;
+  }
+
+  .cardBody {
+    font-size: 13px;
+  }
+}
+
+/* Large Desktop (1200px+) */
+@media (min-width: 1200px) {
+  .cardsGrid {
+    gap: 20px;
+    max-width: 1200px;
+  }
+
+  .heroCard {
+    min-height: 165px;
+  }
+
+  .cardIconWrapper {
+    width: 28px;
+    height: 28px;
+  }
+
+  .cardIconWrapper svg {
+    max-width: 28px;
+    max-height: 28px;
+  }
+
+  .cardHeadline {
+    font-size: 15px;
+  }
+
+  .cardBody {
+    font-size: 13px;
+  }
+}

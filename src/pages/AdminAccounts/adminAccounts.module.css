@@ -1,0 +1,196 @@
+/* The sidebar is position:fixed, so it is out of normal flow and reserves no
+   space of its own — `flex: 1` had nothing to flex against and the content
+   started at x=0, underneath it. Every other admin page reserves the width
+   explicitly; this one did not. */
+.shell {
+  margin-left: var(--sidebar-width, 72px);
+  width: calc(100% - var(--sidebar-width, 72px));
+  box-sizing: border-box;
+  padding: 32px 40px 64px;
+  min-height: 100vh;
+  color: var(--text);
+}
+
+.header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.title {
+  font-size: 22px;
+  font-weight: 700;
+  margin: 0;
+}
+
+.sub {
+  font-size: 13px;
+  color: #9ca3af;
+  margin: 4px 0 0;
+}
+
+.refresh {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  color: #d1d5db;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  cursor: pointer;
+}
+.refresh:hover {
+  background: rgba(255, 255, 255, 0.09);
+}
+
+.panel {
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(255, 255, 255, 0.02);
+  margin-bottom: 18px;
+  overflow: hidden;
+}
+
+.panelHead {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #9ca3af;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.07);
+  background: rgba(255, 255, 255, 0.02);
+}
+
+.row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+.row:last-child {
+  border-bottom: none;
+}
+/* Narrow viewports: the three columns cannot sit side by side without the email
+   collapsing to almost pure ellipsis. Give it its own line instead. */
+@media (max-width: 560px) {
+  .row {
+    flex-wrap: wrap;
+  }
+  .who {
+    flex-basis: 100%;
+  }
+}
+
+.who {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0;
+}
+
+/* Truncate rather than overflow. `.who` is the only flexible column in the row,
+   so without this a long address — steven@adytonentertainment.com is 30
+   characters — runs out from under its column and sits on top of the status
+   pill and the action button. */
+.email {
+  font-size: 13.5px;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.username {
+  font-size: 11.5px;
+  color: #6b7280;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  /* Flex items shrink by default, so without this the email squeezes the pill
+     instead of the pill holding its size and the email truncating. */
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.pillPending {
+  color: #fbbf24;
+  background: rgba(245, 158, 11, 0.12);
+}
+
+.pillActive {
+  color: #22c55e;
+  background: rgba(34, 197, 94, 0.12);
+}
+
+.approve,
+.revoke {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  border: 1px solid transparent;
+  flex-shrink: 0;
+  white-space: nowrap;
+}
+
+.approve {
+  color: #fff;
+  background: #22c55e;
+}
+.approve:hover:not(:disabled) {
+  background: #16a34a;
+}
+
+.revoke {
+  color: #9ca3af;
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.12);
+}
+.revoke:hover:not(:disabled) {
+  color: #fca5a5;
+  border-color: rgba(239, 68, 68, 0.4);
+}
+
+.approve:disabled,
+.revoke:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.error {
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 12.5px;
+  color: #fca5a5;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  margin-bottom: 14px;
+}
+
+.muted {
+  padding: 14px 16px;
+  font-size: 12.5px;
+  color: #6b7280;
+}

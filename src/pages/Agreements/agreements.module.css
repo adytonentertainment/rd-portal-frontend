@@ -1,0 +1,460 @@
+.container {
+  padding: 24px;
+  min-height: 100vh;
+  background: var(--bg);
+}
+
+.breadcrumb {
+  margin-bottom: 16px;
+}
+
+/* Page Header */
+.pageHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.pageTitle {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 6px 0;
+}
+
+.pageSubtitle {
+  font-size: 13px;
+  color: var(--muted-text);
+  margin: 0;
+}
+
+/* Upload Section */
+.uploadSection {
+  background: var(--panel-bg);
+  border-radius: 12px;
+  border: 1px solid var(--button-border);
+  padding: 20px 24px;
+  margin-bottom: 20px;
+}
+
+.uploadContent {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.fieldLabel {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.uploadControls {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.typeSelect {
+  flex: 1;
+  max-width: 400px;
+  padding: 12px 16px;
+  background: var(--input-bg);
+  border: 1px solid var(--button-border);
+  border-radius: 8px;
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239ca3af' d='M3 4.5L6 7.5L9 4.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 16px center;
+  padding-right: 40px;
+}
+
+.typeSelect:focus {
+  outline: none;
+  border-color: var(--soft-text);
+}
+
+.uploadButton {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px 24px;
+  background: var(--text);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.uploadButton:hover {
+  opacity: 0.9;
+}
+
+/* Filter Section */
+.filterSection {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.filterIcon {
+  color: var(--muted-text);
+}
+
+.filterLabel {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.filterChips {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.filterChip {
+  padding: 6px 14px;
+  background: var(--panel-bg);
+  border: 1px solid var(--button-border);
+  border-radius: 20px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.filterChip:hover {
+  background: var(--input-bg);
+  border-color: var(--soft-text);
+}
+
+.filterChipActive {
+  background: var(--text);
+  color: #fff;
+  border-color: var(--text);
+}
+
+.filterChipActive:hover {
+  background: var(--text);
+  border-color: var(--text);
+}
+
+/* List Section */
+.listSection {
+  background: var(--panel-bg);
+  border-radius: 12px;
+  border: 1px solid var(--button-border);
+  min-height: 300px;
+}
+
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 80px 20px;
+}
+
+.emptyIcon {
+  color: var(--muted-text);
+  opacity: 0.4;
+  margin-bottom: 16px;
+}
+
+.emptyText {
+  font-size: 14px;
+  color: var(--muted-text);
+  margin: 0;
+  max-width: 400px;
+}
+
+.agreementsList {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Agreement Item */
+.agreementItem {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  background: var(--input-bg);
+  border: 1px solid var(--button-border);
+  border-radius: 8px;
+  transition: all 0.2s;
+}
+
+.agreementItem:hover {
+  border-color: var(--soft-text);
+}
+
+.agreementIcon {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(59, 130, 246, 0.1);
+  border-radius: 8px;
+  color: #3b82f6;
+  flex-shrink: 0;
+}
+
+.agreementInfo {
+  flex: 1;
+  min-width: 0;
+}
+
+.agreementName {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.agreementMeta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 2px;
+}
+
+.agreementType {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--muted-text);
+  text-transform: capitalize;
+}
+
+.agreementSize {
+  font-size: 11px;
+  color: var(--muted-text);
+}
+
+.typeSelectSmall {
+  padding: 6px 28px 6px 10px;
+  background: var(--panel-bg);
+  border: 1px solid var(--button-border);
+  border-radius: 6px;
+  font-size: 12px;
+  color: var(--text);
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239ca3af' d='M3 4.5L6 7.5L9 4.5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  text-transform: capitalize;
+}
+
+.typeSelectSmall:focus {
+  outline: none;
+  border-color: var(--soft-text);
+}
+
+.agreementTypeBadge {
+  padding: 4px 10px;
+  background: rgba(59, 130, 246, 0.1);
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 500;
+  color: #3b82f6;
+  text-transform: capitalize;
+  white-space: nowrap;
+}
+
+.viewButton {
+  padding: 6px 14px;
+  background: var(--panel-bg);
+  border: 1px solid var(--button-border);
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.viewButton:hover {
+  background: var(--input-bg);
+  border-color: var(--soft-text);
+}
+
+.deleteButton {
+  padding: 8px;
+  background: transparent;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  color: var(--muted-text);
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.deleteButton:hover {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+}
+
+/* Health and Red Flag Indicators */
+.metaDivider {
+  color: var(--muted-text);
+  margin: 0 4px;
+}
+
+.agreementRating {
+  font-size: 11px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.redFlagCount {
+  font-size: 11px;
+  font-weight: 500;
+  color: #ef4444;
+}
+
+.healthBadge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: all 0.2s;
+}
+
+.healthIcon {
+  font-size: 12px;
+  font-weight: bold;
+}
+
+.redFlagBadge {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #ef4444;
+  white-space: nowrap;
+  cursor: help;
+  transition: all 0.2s;
+}
+
+.redFlagBadge:hover {
+  background: rgba(239, 68, 68, 0.15);
+  border-color: rgba(239, 68, 68, 0.5);
+}
+
+.redFlagIcon {
+  font-size: 12px;
+}
+
+/* Extraction Method Dropdown */
+.extractionMethodWrapper {
+  position: relative;
+}
+
+.extractionToggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  background: var(--panel-bg);
+  border: 1px solid var(--button-border);
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: var(--text);
+  cursor: pointer;
+  transition: all 0.2s;
+  white-space: nowrap;
+}
+
+.extractionToggle:hover {
+  border-color: var(--soft-text);
+  background: var(--input-bg);
+}
+
+.extractionDropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 240px;
+  background: var(--panel-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: none;
+  z-index: 100;
+  overflow: hidden;
+}
+
+.extractionDropdownHeader {
+  padding: 12px 14px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--muted-text);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid var(--button-border);
+}
+
+.extractionOption {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 12px 14px;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.extractionOption:hover {
+  background: var(--input-bg);
+}
+
+.extractionOption input[type="radio"] {
+  margin-top: 2px;
+  accent-color: var(--text);
+}
+
+.extractionOptionContent {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.extractionOptionLabel {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text);
+}
+
+.extractionOptionDesc {
+  font-size: 11px;
+  color: var(--muted-text);
+}

@@ -1,0 +1,49 @@
+:root[data-theme='dark'] .button-red {
+  background: var(--error);
+  border-radius: var(--radius-md);
+  border: none;
+  height: 36px;
+  padding: 0 24px;
+  color: var(--secondary-text);
+  cursor: pointer;
+  transition: opacity 150ms cubic-bezier(0.22, 1, 0.36, 1);
+  font-size: 11px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  position: relative;
+  z-index: 100;
+}
+:root[data-theme='dark'] .button-red:hover {
+  opacity: 0.85;
+}
+:root[data-theme='dark'] .button-red:focus-visible {
+  outline: 2px solid var(--error);
+  outline-offset: 2px;
+}
+
+:root[data-theme='light'] .button-red {
+  background: var(--error);
+  border-radius: var(--radius-md);
+  border: none;
+  height: 36px;
+  padding: 0 24px;
+  color: var(--secondary-text);
+  cursor: pointer;
+  transition: opacity 150ms cubic-bezier(0.22, 1, 0.36, 1);
+  font-size: 11px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  position: relative;
+  z-index: 100;
+}
+:root[data-theme='light'] .button-red:hover {
+  opacity: 0.85;
+}
+:root[data-theme='light'] .button-red:focus-visible {
+  outline: 2px solid var(--error);
+  outline-offset: 2px;
+}

@@ -1,0 +1,19 @@
+.dropdown-element {
+  position: relative;
+}
+.dropdown-click {
+  position: relative;
+  cursor: pointer;
+  display: inline-block;
+}
+.dropdown-content {
+  position: absolute;
+  left: 0%;
+  top: 0%;
+  z-index: 999;
+  display: inline-block;
+  overflow: visible;
+  transition:
+    opacity 150ms cubic-bezier(0.22, 1, 0.36, 1),
+    transform 150ms cubic-bezier(0.22, 1, 0.36, 1);
+}

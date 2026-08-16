@@ -1,0 +1,6 @@
+build/
+coverage/
+# static assets served as-is (vendored minified pdf.js worker, service worker)
+public/
+# scratch file, not imported anywhere
+src/components/Globe/Globe_Pins_NEW.js

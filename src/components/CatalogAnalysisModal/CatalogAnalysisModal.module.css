@@ -1,0 +1,399 @@
+/* Overlay */
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  animation: fadeIn 0.3s ease-out;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* Popup Container - Modern Style */
+.popup {
+  position: relative;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-xl);
+  padding: 24px;
+  max-width: 500px;
+  width: 90%;
+  color: var(--text);
+  font-family:
+    'Inter',
+    -apple-system,
+    BlinkMacSystemFont,
+    'Segoe UI',
+    sans-serif;
+  animation: slideUp 0.4s ease-out;
+  box-shadow: none;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Close Button */
+.closeBtn {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  color: var(--muted-text);
+  font-size: 24px;
+  cursor: pointer;
+  z-index: 10;
+  transition: color 0.2s;
+  padding: 4px;
+  line-height: 1;
+}
+
+.closeBtn:hover {
+  color: var(--text);
+}
+
+/* Screen Container */
+.screen {
+  width: 100%;
+}
+
+/* Progress Indicator */
+.progressIndicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 32px;
+  font-size: 12px;
+  color: var(--text);
+  gap: 4px;
+}
+
+.progressDot {
+  color: var(--muted-text);
+  transition: color 0.3s;
+  font-size: 12px;
+}
+
+.progressDotActive {
+  color: var(--text);
+  font-weight: bold;
+}
+
+.progressLine {
+  color: var(--muted-text);
+  font-size: 10px;
+}
+
+/* Typography */
+.screen h2 {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 16px;
+  line-height: 1.3;
+}
+
+/* Question */
+.question {
+  margin-bottom: 24px;
+}
+
+.questionText {
+  font-size: 16px;
+  font-weight: 500;
+  color: var(--text);
+  margin-bottom: 8px;
+  line-height: 1.5;
+}
+
+.questionSubtitle {
+  font-size: 14px;
+  color: var(--muted-text);
+  line-height: 1.5;
+}
+
+/* Button Group (Horizontal) */
+.buttonGroup {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 24px;
+}
+
+/* Button Group (Vertical) */
+.buttonGroupVertical {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 24px;
+}
+
+/* Buttons - Modern Style */
+.btn {
+  background: var(--secondary);
+  color: var(--secondary-text);
+  border: none;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.2s;
+  font-family: inherit;
+  flex: 1;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+  box-shadow: none;
+  opacity: 0.9;
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+.btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.btn:disabled:hover {
+  transform: none;
+  box-shadow: none;
+}
+
+.buttonGroupVertical .btn {
+  width: 100%;
+}
+
+/* Checkbox Group */
+.checkboxGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.checkboxItem {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  cursor: pointer;
+  padding: 12px;
+  border-radius: 8px;
+  transition: background-color 0.2s;
+}
+
+.checkboxItem:hover {
+  background-color: var(--hover-overlay);
+}
+
+.checkboxRow {
+  display: flex;
+  align-items: center;
+}
+
+.checkboxItem input[type='checkbox'] {
+  width: 20px;
+  height: 20px;
+  margin-right: 12px;
+  cursor: pointer;
+  accent-color: var(--secondary);
+  flex-shrink: 0;
+}
+
+.checkboxItem label {
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--text);
+  flex: 1;
+  font-weight: 400;
+}
+
+/* Other PRO Input */
+.otherInput {
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  padding: 10px 12px;
+  font-size: 14px;
+  font-family: inherit;
+  margin-left: 12px;
+  flex: 1;
+  transition: border-color 0.2s;
+}
+
+.otherInput:focus {
+  outline: none;
+  border-color: var(--secondary);
+  border-width: 2px;
+}
+
+.otherInput::placeholder {
+  color: var(--muted-text);
+}
+
+/* IPI Input */
+.ipiInput {
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text);
+  padding: 10px 12px;
+  font-size: 13px;
+  font-family: inherit;
+  width: 100%;
+  margin-left: 32px;
+  transition: border-color 0.2s;
+}
+
+.ipiInput:focus {
+  outline: none;
+  border-color: var(--secondary);
+  border-width: 2px;
+}
+
+.ipiInput::placeholder {
+  color: var(--muted-text);
+  font-size: 13px;
+}
+
+/* Warning Box */
+.warningBox {
+  background: rgba(255, 193, 7, 0.1);
+  border: 1px solid rgba(255, 193, 7, 0.3);
+  border-radius: var(--radius-xl);
+  padding: 20px;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.warningIcon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+}
+
+.warningText {
+  font-size: 15px;
+  line-height: 1.6;
+  color: var(--text);
+  font-weight: 400;
+}
+
+/* Secondary Button */
+.btnSecondary {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border-radius: 8px;
+  transition: all 0.2s;
+  font-family: inherit;
+  flex: 1;
+}
+
+.btnSecondary:hover {
+  background: var(--hover-overlay);
+  border-color: var(--text);
+  transform: translateY(-1px);
+}
+
+.btnSecondary:active {
+  transform: translateY(0);
+}
+
+/* Success Screen */
+.successMessage {
+  text-align: center;
+  padding: 20px 0;
+}
+
+.successIcon {
+  font-size: 64px;
+  margin-bottom: 20px;
+  color: var(--secondary);
+  animation: scaleIn 0.5s ease-out;
+}
+
+@keyframes scaleIn {
+  from {
+    transform: scale(0);
+  }
+  to {
+    transform: scale(1);
+  }
+}
+
+.successText {
+  font-size: 16px;
+  line-height: 1.6;
+  color: var(--text);
+  font-weight: 400;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .popup {
+    width: 95%;
+    max-width: 95%;
+    padding: 24px;
+  }
+
+  .screen h2 {
+    font-size: 20px;
+  }
+
+  .buttonGroup {
+    flex-direction: column;
+  }
+
+  .btn {
+    width: 100%;
+  }
+
+  .questionText {
+    font-size: 15px;
+  }
+
+  .progressIndicator {
+    font-size: 10px;
+  }
+}

@@ -1,0 +1,171 @@
+.emptyCard {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  padding: 64px 24px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  text-align: center;
+  color: var(--soft-text);
+}
+
+.emptyTitle {
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.emptyBody {
+  font-size: 13px;
+  line-height: 1.5;
+  max-width: 480px;
+}
+
+.yearSection {
+  margin-bottom: 24px;
+}
+
+.yearSection:last-child {
+  margin-bottom: 0;
+}
+
+.yearHeading {
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.1em;
+  color: var(--soft-text);
+  font-family: var(--font-mono);
+  margin-bottom: 10px;
+}
+
+.tableCard {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  text-align: left;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--soft-text);
+  padding: 14px 18px;
+  background: var(--hover-overlay);
+  border-bottom: 1px solid var(--border);
+  font-family: var(--font-mono);
+}
+
+.table td {
+  padding: 16px 18px;
+  font-size: 13px;
+  color: var(--text);
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.stmtCell {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.stmtIcon {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--accent-soft);
+  color: var(--accent);
+  flex-shrink: 0;
+}
+
+.stmtName {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.muted {
+  color: var(--soft-text);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.amount {
+  text-align: right;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  font-family: var(--font-mono);
+  color: var(--text);
+}
+
+.downloadBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--card-bg);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-body);
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+
+.downloadBtn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-1px);
+}
+
+/* Live portal: header total pill + error banner */
+.totalPill {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  padding: 8px 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface, rgba(255, 255, 255, 0.03));
+}
+.totalLabel {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--text-muted, #8a8f98);
+}
+.totalValue {
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--accent);
+}
+.errorBanner {
+  margin: 8px 0 16px;
+  padding: 10px 14px;
+  border: 1px solid rgba(220, 38, 38, 0.4);
+  border-radius: 10px;
+  background: rgba(220, 38, 38, 0.08);
+  color: #f87171;
+  font-size: 14px;
+}

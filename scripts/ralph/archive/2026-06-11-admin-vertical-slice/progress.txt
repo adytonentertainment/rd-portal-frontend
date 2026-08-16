@@ -1,0 +1,12 @@
+# Ralph Progress Log — Statement Data Integration UI
+Started: 2026-06-11 (Phase 1 frontend, see PRD-statement-data-integration.md §8-9)
+---
+
+## Codebase Patterns
+- Dev server: http://localhost:3001, compile log at /tmp/verax_rd_frontend.log. Admin routes under /admin, gated by useIsAdmin() (src/utils/auth.js hardcoded ADMIN_EMAILS).
+- Demo/mock state: src/mocks/distributionState.js + localStorage 'rd_distribution_state_v1' (subscribe(listener) pattern). RedZed (id -5) uses real data via src/mocks/redZedRealData.js. NEVER break the mock path — live behavior only behind REACT_APP_STATEMENTS_LIVE via src/config/featureFlags.js.
+- Persona system: src/utils/persona.js, /persona/:id routes.
+- Backend under parallel construction at /Users/stevengarcia/VERAX_2/verax_backend branch ralph/statement-data-integration — check its app/routers/ + scripts/ralph/prd.json to see which endpoints are real yet; PRD §9 is the contract otherwise. Real fixture files + expected_values.json: verax_backend/tests/fixtures/statements/.
+- Statement domain vocabulary (PRD §2): period codes PUB25H2/PUB26H1/PUB25Q4/PUB26Q2; catalogs MECH/YT; account codes like CSJ002/JN0249/C00650/C00739-New; zero payable is NORMAL (threshold_carryover/recouped/zero_earnings) and must be explained, not alarmed.
+- Pre-existing uncommitted demo WIP must be committed once as its own chore commit, never reverted (see scripts/ralph/CLAUDE.md).
+---

@@ -1,0 +1,46 @@
+.container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0 1rem;
+}
+
+.accordions {
+  max-width: 900px;
+  width: 100%;
+  margin: 3rem auto 5rem auto;
+  padding: 0 2rem;
+}
+
+.accordions h1 {
+  font-size: 2.25rem;
+  margin: 3rem 0 1.5rem 0;
+  font-weight: 600;
+  color: var(--text);
+  text-align: left;
+}
+
+.accordions h1:first-child {
+  margin-top: 0;
+}
+
+.faqIntro {
+  max-width: 900px;
+  margin: 0 auto 3rem auto;
+  padding: 0 2rem;
+  font-size: 1.125rem;
+  line-height: 2rem;
+  color: var(--soft-text);
+  text-align: center;
+}
+
+.faqOutro {
+  max-width: 900px;
+  margin: 3rem auto 5rem auto;
+  padding: 0 2rem;
+  font-size: 1.125rem;
+  line-height: 2rem;
+  color: var(--soft-text);
+  text-align: center;
+}

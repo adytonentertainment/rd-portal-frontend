@@ -1,0 +1,12 @@
+.spotify-button {
+  background-color: #1db954;
+  color: #191414;
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+  padding: 1.4rem 0.7rem;
+  border-radius: 0.4rem;
+  justify-content: space-between;
+  cursor: pointer;
+  user-select: none;
+}

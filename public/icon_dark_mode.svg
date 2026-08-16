@@ -1,0 +1,14 @@
+<svg viewBox="10 15 60 50" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <pattern id="stripes-dark-icon" x="0" y="0" width="4" height="4" patternUnits="userSpaceOnUse">
+      <rect x="0" y="0" width="2" height="4" fill="#FFF"/>
+    </pattern>
+  </defs>
+  <g transform="translate(10, 10)">
+    <g transform="rotate(45, 30, 35)">
+      <rect x="20" y="25" width="20" height="20" fill="url(#stripes-dark-icon)"/>
+    </g>
+    <circle cx="45" cy="35" r="8" fill="#FFF"/>
+    <polygon points="15,50 25,20 35,50" fill="#FFF"/>
+  </g>
+</svg>

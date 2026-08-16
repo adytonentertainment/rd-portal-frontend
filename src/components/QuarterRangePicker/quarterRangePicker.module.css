@@ -1,0 +1,147 @@
+.wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--card-bg);
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 600;
+  font-family: var(--font-mono);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: border-color 0.15s ease;
+}
+
+.trigger:hover {
+  border-color: var(--accent);
+}
+
+.popup {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 1000;
+  width: 320px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-lg);
+  padding: 14px;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.headerTitle {
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--soft-text);
+  font-family: var(--font-mono);
+  text-align: center;
+  flex: 1;
+}
+
+.navBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--card-bg);
+  color: var(--soft-text);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.navBtn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.grid {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.yearRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.yearLabel {
+  width: 42px;
+  font-size: 12px;
+  font-weight: 800;
+  color: var(--soft-text);
+  font-family: var(--font-mono);
+  flex-shrink: 0;
+}
+
+.quarters {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 4px;
+  flex: 1;
+}
+
+.qCell {
+  padding: 8px 0;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--card-bg);
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 700;
+  font-family: var(--font-mono);
+  cursor: pointer;
+  transition: all 0.1s ease;
+}
+
+.qCell:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.qInRange {
+  background: var(--accent-soft, rgba(200, 16, 46, 0.12));
+  border-color: transparent;
+}
+
+.qEnd {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: var(--secondary-text, #fff);
+}
+
+.qEnd:hover {
+  color: var(--secondary-text, #fff);
+}
+
+.footer {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid var(--border-subtle, var(--border));
+  font-size: 11px;
+  color: var(--soft-text);
+  font-family: var(--font-mono);
+  text-align: center;
+}

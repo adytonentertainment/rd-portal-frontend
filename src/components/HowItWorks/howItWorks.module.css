@@ -1,0 +1,1739 @@
+/* Section */
+.section {
+  padding: 100px 0 80px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.sectionTitle {
+  font-size: 42px;
+  font-weight: 700;
+  color: var(--text);
+  letter-spacing: -0.02em;
+  margin-bottom: 72px;
+  text-align: center;
+}
+
+/* 3-Column Grid */
+.stepsGrid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+}
+
+.stepColumn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  transition:
+    opacity 0.5s ease,
+    filter 0.5s ease;
+}
+
+.stepColumnActive {
+  opacity: 1;
+  filter: none;
+}
+
+.stepColumnDim {
+  opacity: 0.35;
+  filter: grayscale(0.4);
+}
+
+.stepNumber {
+  font-size: 56px;
+  font-weight: 800;
+  color: var(--text);
+  opacity: 0.07;
+  line-height: 1;
+  margin-bottom: 8px;
+  letter-spacing: -2px;
+  transition: opacity 0.5s ease, color 0.5s ease;
+}
+
+.stepColumnActive .stepNumber {
+  opacity: 0.55;
+  color: #ffffff;
+}
+
+/* White border on active card in dark mode */
+.stepColumnActive .darkCard {
+  border-color: rgba(255, 255, 255, 0.35);
+}
+
+.stepColumnActive .iframeWrap {
+  border: 1px solid rgba(255, 255, 255, 0.35);
+}
+
+.stepTitle {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1.2;
+  margin-bottom: 10px;
+  letter-spacing: -0.3px;
+}
+
+.stepDescription {
+  font-size: 14px;
+  line-height: 1.65;
+  color: var(--soft-text);
+  max-width: 340px;
+  margin-bottom: 28px;
+}
+
+.stepCard {
+  width: 100%;
+  height: 500px;
+  display: flex;
+  justify-content: center;
+}
+
+/* Iframe for card 1 — scale from native 420×614 to fit container */
+.iframeWrap {
+  width: 340px;
+  height: 500px;
+  overflow: hidden;
+  border-radius: 20px;
+  background: #000000;
+  -webkit-mask-image: -webkit-radial-gradient(white, black);
+  mask-image: radial-gradient(white, black);
+  isolation: isolate;
+}
+
+.cardIframe {
+  width: 420px;
+  height: 614px;
+  border: none;
+  background: #000000;
+  transform: scale(0.810);
+  transform-origin: top left;
+}
+
+/* ═══════════ Dark Card Base ═══════════ */
+.darkCard {
+  position: relative;
+  width: 100%;
+  max-width: 340px;
+  height: 100%;
+  background: #000000;
+  border-radius: 20px;
+  padding: 28px 24px 18px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+}
+
+.darkCardTitle {
+  font-size: 21px;
+  font-weight: 700;
+  color: #eeeef0;
+  line-height: 1.15;
+  margin-bottom: 8px;
+  position: relative;
+  z-index: 1;
+  letter-spacing: -0.3px;
+  text-align: left;
+}
+
+.darkCardSubtitle {
+  font-size: 11.5px;
+  line-height: 1.55;
+  color: rgba(255, 255, 255, 0.35);
+  margin-bottom: 16px;
+  position: relative;
+  z-index: 1;
+  font-weight: 400;
+  text-align: left;
+}
+
+.darkCardBody {
+  position: relative;
+  z-index: 1;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ═══════════ Slide System (translateX like card 1) ═══════════ */
+.slideContainer {
+  position: relative;
+  flex: 1;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.slide {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  transform: translateX(16px);
+  pointer-events: none;
+  transition:
+    opacity 0.45s ease,
+    transform 0.45s ease;
+  display: flex;
+  flex-direction: column;
+}
+
+.slideActive {
+  opacity: 1;
+  transform: translateX(0);
+  pointer-events: auto;
+}
+
+.slideNext {
+  opacity: 0;
+  transform: translateX(16px);
+}
+
+/* ═══════════ Shared Progress Bar ═══════════ */
+.progressBar {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.08);
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.progressFill {
+  height: 100%;
+  background: linear-gradient(90deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.9));
+  border-radius: 4px;
+  transition: width 0.15s linear;
+}
+
+.progressFillBlue {
+  height: 100%;
+  background: #4f8eff;
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+
+/* ═══════════ Decorative Blobs ═══════════ */
+.decorBlob {
+  position: absolute;
+  bottom: -30px;
+  left: -30px;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.03);
+  pointer-events: none;
+}
+
+.decorBlobRight {
+  position: absolute;
+  bottom: -30px;
+  right: -30px;
+  width: 140px;
+  height: 140px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.03);
+  pointer-events: none;
+}
+
+/* ═══════════ Carousel Dots ═══════════ */
+.carouselDots {
+  display: flex;
+  gap: 6px;
+  justify-content: center;
+  padding-top: 14px;
+  position: relative;
+  z-index: 1;
+}
+
+.dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.12);
+  transition: all 0.3s ease;
+}
+
+.dotActive {
+  width: 24px;
+  height: 6px;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.55);
+  transition: all 0.3s ease;
+}
+
+/* ═══════════ SCAN CARD — Slide 1: Scanning ═══════════ */
+.scanRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  margin-bottom: 10px;
+}
+
+.scanSpinner {
+  width: 22px;
+  height: 22px;
+  border: 2.5px solid rgba(255, 255, 255, 0.1);
+  border-top-color: rgba(255, 255, 255, 0.55);
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.scanSpinnerActive {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.scanRowText {
+  flex: 1;
+}
+
+.scanRowTitle {
+  font-size: 12.8px;
+  font-weight: 700;
+  color: #eeeef0;
+}
+
+.scanRowSub {
+  font-size: 10.5px;
+  color: rgba(255, 255, 255, 0.28);
+  font-weight: 400;
+}
+
+.scanPercent {
+  font-size: 15px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.65);
+  font-variant-numeric: tabular-nums;
+}
+
+/* ═══════════ SCAN CARD — Slide 2: Critical Issues ═══════════ */
+.issueHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 12px;
+  margin-bottom: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.issueHeaderIcon {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: rgba(245, 158, 11, 0.12);
+  color: #f59e0b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.issueHeaderText {
+  flex: 1;
+}
+
+.issueHeaderTitle {
+  font-size: 12.8px;
+  font-weight: 700;
+  color: #eeeef0;
+}
+
+.issueHeaderSub {
+  font-size: 10.5px;
+  color: rgba(255, 255, 255, 0.28);
+  font-weight: 400;
+}
+
+.issueList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.issueRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.035);
+  opacity: 0;
+  transform: translateY(6px);
+  transition:
+    opacity 0.4s ease,
+    transform 0.4s ease;
+}
+
+.issueRowVisible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.issueBrandIcon {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.issueBrandIcon[data-brand='youtube'] {
+  background: rgba(255, 0, 0, 0.1);
+  color: #ff0000;
+}
+
+.issueBrandIcon[data-brand='spotify'] {
+  background: rgba(30, 215, 96, 0.1);
+  color: #1ed760;
+}
+
+.issueBrandIcon[data-brand='bmi'] {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.issueBrandIcon[data-brand='hfa'] {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.brandText {
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  color: rgba(255, 255, 255, 0.55);
+  line-height: 1;
+}
+
+.issueRowText {
+  flex: 1;
+  min-width: 0;
+}
+
+.issueRowTitle {
+  font-size: 12.5px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.issueRowSub {
+  font-size: 10.5px;
+  color: rgba(255, 255, 255, 0.25);
+  font-weight: 400;
+}
+
+.issueRowMoney {
+  font-size: 10.5px;
+  color: rgba(74, 222, 128, 0.6);
+  font-weight: 500;
+}
+
+.issueTag {
+  font-size: 9px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.22);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  flex-shrink: 0;
+}
+
+/* ═══════════ REGISTRATION CARD — Step Indicators ═══════════ */
+.regSteps {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 10px;
+  padding: 0 4px;
+}
+
+.regStep {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+
+.regStep span {
+  font-size: 10px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.22);
+  transition:
+    color 0.3s ease,
+    font-weight 0.3s ease;
+}
+
+.regStepActive span {
+  color: #eeeef0;
+  font-weight: 600;
+}
+
+.regStepIcon {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.04);
+  color: rgba(255, 255, 255, 0.2);
+  transition: all 0.4s ease;
+}
+
+.regStepIconActive {
+  background: rgba(255, 255, 255, 0.12);
+  color: #eeeef0;
+}
+
+.regStepIconGreen {
+  background: rgba(34, 197, 94, 0.2);
+  color: #22c55e;
+}
+
+/* ═══════════ REGISTRATION CARD — Slide 1: Select ═══════════ */
+.regPanel {
+  background: rgba(255, 255, 255, 0.035);
+  border-radius: 12px;
+  padding: 12px 14px 10px;
+  margin-bottom: 6px;
+}
+
+.regPanelHeader {
+  font-size: 12.8px;
+  font-weight: 700;
+  color: #eeeef0;
+  margin-bottom: 3px;
+}
+
+.regPanelCount {
+  font-size: 10.5px;
+  color: rgba(255, 255, 255, 0.28);
+  margin-bottom: 10px;
+}
+
+.worksList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.workItem {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 9px 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.035);
+  opacity: 0.35;
+  transition:
+    opacity 0.5s ease,
+    background 0.3s ease;
+}
+
+.workItemSelected {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.045);
+}
+
+.workArt {
+  width: 28px;
+  height: 28px;
+  border-radius: 5px;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+
+.workIcon {
+  color: rgba(255, 255, 255, 0.18);
+  flex-shrink: 0;
+  transition: color 0.4s ease;
+}
+
+.workIconSelected {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.workText {
+  flex: 1;
+  min-width: 0;
+}
+
+.workTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.workSub {
+  font-size: 10.5px;
+  color: rgba(255, 255, 255, 0.22);
+  font-weight: 400;
+}
+
+.workCopy {
+  color: rgba(255, 255, 255, 0.12);
+  flex-shrink: 0;
+}
+
+/* ═══════════ REGISTRATION CARD — Slide 2: Submit ═══════════ */
+.submitRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 12px;
+  margin-bottom: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.submitSpinner {
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: rgba(255, 255, 255, 0.5);
+}
+
+.submitSpinnerIcon {
+  animation: spin 1.5s linear infinite;
+}
+
+.submitRowText {
+  flex: 1;
+}
+
+.submitRowTitle {
+  font-size: 12.8px;
+  font-weight: 700;
+  color: #eeeef0;
+}
+
+.submitRowSub {
+  font-size: 10.5px;
+  color: rgba(255, 255, 255, 0.28);
+  font-weight: 400;
+}
+
+.submitPercent {
+  font-size: 15px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.6);
+  font-variant-numeric: tabular-nums;
+}
+
+.checklistLabel {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.3);
+  margin-top: 12px;
+  margin-bottom: 8px;
+  font-weight: 400;
+}
+
+.checklist {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.checklistItem {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.checklistDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.15);
+  flex-shrink: 0;
+}
+
+.checklistText {
+  flex: 1;
+  font-size: 12.5px;
+  font-weight: 500;
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.checklistCheck {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: transparent;
+  transition: all 0.4s ease;
+}
+
+.checklistCheckVisible {
+  border-color: #22c55e;
+  color: #22c55e;
+}
+
+/* ═══════════ SCAN CARD — Slide 3: Uncollected Royalties ═══════════ */
+.royaltyHeader {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 12px;
+  margin-bottom: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.royaltyHeaderIcon {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  background: rgba(245, 158, 11, 0.12);
+  color: #f59e0b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.royaltyHeaderText {
+  flex: 1;
+}
+
+.royaltyHeaderTitle {
+  font-size: 12.8px;
+  font-weight: 700;
+  color: #eeeef0;
+}
+
+.royaltyHeaderSub {
+  font-size: 10.5px;
+  color: rgba(255, 255, 255, 0.28);
+  font-weight: 400;
+}
+
+.revenueCard {
+  background: rgba(245, 158, 11, 0.06);
+  border: 1px solid rgba(245, 158, 11, 0.1);
+  border-radius: 12px;
+  padding: 14px 14px;
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity 0.5s ease,
+    transform 0.5s ease;
+}
+
+.revenueCardVisible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.revenueLabel {
+  font-size: 11px;
+  font-weight: 600;
+  color: #f59e0b;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 4px;
+}
+
+.revenueAmount {
+  font-size: 28px;
+  font-weight: 800;
+  color: #eeeef0;
+  letter-spacing: -1px;
+  margin-bottom: 12px;
+  line-height: 1;
+}
+
+.revenueRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.revenueRowLabel {
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.5);
+  font-weight: 500;
+}
+
+.revenueRowValue {
+  font-size: 12px;
+  color: #eeeef0;
+  font-weight: 600;
+}
+
+.revenueBar {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.06);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 8px;
+}
+
+.revenueBarFill {
+  height: 100%;
+  background: linear-gradient(90deg, #f59e0b, #fbbf24);
+  border-radius: 4px;
+  transition: width 1s ease;
+}
+
+.royaltyFooter {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.22);
+  margin-top: 8px;
+  font-weight: 400;
+  text-align: left;
+}
+
+/* ═══════════ REGISTRATION CARD — Slide 3: Register ═══════════ */
+.registerHeader {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 10px;
+  margin-bottom: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.04);
+}
+
+.registerHeaderIcon {
+  width: 26px;
+  height: 26px;
+  border-radius: 7px;
+  background: rgba(34, 197, 94, 0.12);
+  color: #22c55e;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.registerHeaderText {
+  flex: 1;
+}
+
+.registerHeaderTitle {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #eeeef0;
+}
+
+.registerHeaderSub {
+  font-size: 9.5px;
+  color: rgba(255, 255, 255, 0.28);
+  font-weight: 400;
+}
+
+.societyList {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.societyRow {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.025);
+  border: 1px solid rgba(255, 255, 255, 0.035);
+  transition:
+    background 0.4s ease,
+    border-color 0.4s ease;
+}
+
+.societyRowDone {
+  background: rgba(34, 197, 94, 0.04);
+  border-color: rgba(34, 197, 94, 0.1);
+}
+
+.societyCode {
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.3);
+  width: 20px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+.societyText {
+  flex: 1;
+  min-width: 0;
+}
+
+.societyName {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.societySub {
+  font-size: 9px;
+  color: rgba(255, 255, 255, 0.25);
+  font-weight: 400;
+  transition: color 0.3s ease;
+}
+
+.societyRowDone .societySub {
+  color: rgba(34, 197, 94, 0.5);
+}
+
+.societyCheck {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: transparent;
+  transition: all 0.4s ease;
+}
+
+.societyCheckDone {
+  border-color: #22c55e;
+  color: #22c55e;
+  background: rgba(34, 197, 94, 0.1);
+}
+
+/* ═══════════ Light Mode ═══════════ */
+
+/* Card base */
+:global(:root[data-theme='light']) .darkCard {
+  background: #ffffff;
+  border-color: #e2ddd5;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
+}
+
+:global(:root[data-theme='light']) .iframeWrap {
+  background: #ffffff;
+  border: 1px solid #e2ddd5;
+  box-shadow: 0 2px 16px rgba(0, 0, 0, 0.06);
+}
+
+:global(:root[data-theme='light']) .darkCardTitle {
+  color: #111111;
+}
+
+:global(:root[data-theme='light']) .darkCardSubtitle {
+  color: #6b6b6b;
+}
+
+:global(:root[data-theme='light']) .stepNumber {
+  opacity: 0.09;
+}
+
+:global(:root[data-theme='light']) .stepColumnActive .stepNumber {
+  opacity: 0.35;
+  color: #111111;
+}
+
+:global(:root[data-theme='light']) .stepColumnActive .darkCard {
+  border-color: #c5c0b8;
+}
+
+:global(:root[data-theme='light']) .stepColumnActive .iframeWrap {
+  border-color: #c5c0b8;
+}
+
+/* Shared UI */
+:global(:root[data-theme='light']) .progressBar {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+:global(:root[data-theme='light']) .progressFill {
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.6));
+}
+
+:global(:root[data-theme='light']) .decorBlob,
+:global(:root[data-theme='light']) .decorBlobRight {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+:global(:root[data-theme='light']) .dot {
+  background: rgba(0, 0, 0, 0.12);
+}
+
+:global(:root[data-theme='light']) .dotActive {
+  background: rgba(0, 0, 0, 0.5);
+}
+
+/* Scan Card — Slide 0: Scanning */
+:global(:root[data-theme='light']) .scanRow {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+:global(:root[data-theme='light']) .scanSpinner {
+  border-color: rgba(0, 0, 0, 0.1);
+  border-top-color: rgba(0, 0, 0, 0.5);
+}
+
+:global(:root[data-theme='light']) .scanRowTitle {
+  color: #111111;
+}
+
+:global(:root[data-theme='light']) .scanRowSub {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+:global(:root[data-theme='light']) .scanPercent {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+/* Scan Card — Slide 1: Issues */
+:global(:root[data-theme='light']) .issueHeader {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+:global(:root[data-theme='light']) .issueHeaderTitle {
+  color: #111111;
+}
+
+:global(:root[data-theme='light']) .issueHeaderSub {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+:global(:root[data-theme='light']) .issueRow {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+:global(:root[data-theme='light']) .issueRowTitle {
+  color: rgba(0, 0, 0, 0.8);
+}
+
+:global(:root[data-theme='light']) .issueRowSub {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+:global(:root[data-theme='light']) .issueRowMoney {
+  color: #16a34a;
+}
+
+:global(:root[data-theme='light']) .issueTag {
+  color: rgba(0, 0, 0, 0.3);
+}
+
+:global(:root[data-theme='light']) .issueBrandIcon {
+  background: rgba(0, 0, 0, 0.04);
+  color: rgba(0, 0, 0, 0.5);
+}
+
+:global(:root[data-theme='light']) .issueBrandIcon[data-brand='youtube'] {
+  background: rgba(255, 0, 0, 0.08);
+  color: #cc0000;
+}
+
+:global(:root[data-theme='light']) .issueBrandIcon[data-brand='spotify'] {
+  background: rgba(30, 185, 84, 0.08);
+  color: #1db954;
+}
+
+:global(:root[data-theme='light']) .brandText {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+/* Scan Card — Slide 2: Royalties */
+:global(:root[data-theme='light']) .royaltyHeader {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+:global(:root[data-theme='light']) .royaltyHeaderTitle {
+  color: #111111;
+}
+
+:global(:root[data-theme='light']) .royaltyHeaderSub {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+:global(:root[data-theme='light']) .revenueCard {
+  background: rgba(245, 158, 11, 0.06);
+  border-color: rgba(245, 158, 11, 0.18);
+}
+
+:global(:root[data-theme='light']) .revenueAmount {
+  color: #111111;
+}
+
+:global(:root[data-theme='light']) .revenueRowLabel {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+:global(:root[data-theme='light']) .revenueRowValue {
+  color: #111111;
+}
+
+:global(:root[data-theme='light']) .revenueBar {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+:global(:root[data-theme='light']) .revenueLabel {
+  color: #d97706;
+}
+
+:global(:root[data-theme='light']) .royaltyFooter {
+  color: rgba(0, 0, 0, 0.35);
+}
+
+/* Registration Card — Step Indicators */
+:global(:root[data-theme='light']) .regStep span {
+  color: rgba(0, 0, 0, 0.3);
+}
+
+:global(:root[data-theme='light']) .regStepActive span {
+  color: #111111;
+}
+
+:global(:root[data-theme='light']) .regStepIcon {
+  background: rgba(0, 0, 0, 0.04);
+  color: rgba(0, 0, 0, 0.25);
+}
+
+:global(:root[data-theme='light']) .regStepIconActive {
+  background: rgba(0, 0, 0, 0.1);
+  color: #111111;
+}
+
+/* Registration Card — Slide 0: Select */
+:global(:root[data-theme='light']) .regPanel {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+:global(:root[data-theme='light']) .regPanelHeader {
+  color: #111111;
+}
+
+:global(:root[data-theme='light']) .regPanelCount {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+:global(:root[data-theme='light']) .workItem {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+:global(:root[data-theme='light']) .workItemSelected {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+:global(:root[data-theme='light']) .workIcon {
+  color: rgba(0, 0, 0, 0.2);
+}
+
+:global(:root[data-theme='light']) .workIconSelected {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+:global(:root[data-theme='light']) .workTitle {
+  color: rgba(0, 0, 0, 0.8);
+}
+
+:global(:root[data-theme='light']) .workSub {
+  color: rgba(0, 0, 0, 0.35);
+}
+
+:global(:root[data-theme='light']) .workCopy {
+  color: rgba(0, 0, 0, 0.15);
+}
+
+/* Registration Card — Slide 1: Submit */
+:global(:root[data-theme='light']) .submitRow {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+:global(:root[data-theme='light']) .submitSpinner {
+  color: rgba(0, 0, 0, 0.45);
+}
+
+:global(:root[data-theme='light']) .submitRowTitle {
+  color: #111111;
+}
+
+:global(:root[data-theme='light']) .submitRowSub {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+:global(:root[data-theme='light']) .submitPercent {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+:global(:root[data-theme='light']) .checklistLabel {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+:global(:root[data-theme='light']) .checklistDot {
+  background: rgba(0, 0, 0, 0.15);
+}
+
+:global(:root[data-theme='light']) .checklistText {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+:global(:root[data-theme='light']) .checklistCheck {
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+/* Registration Card — Slide 2: Register */
+:global(:root[data-theme='light']) .registerHeader {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+:global(:root[data-theme='light']) .registerHeaderTitle {
+  color: #111111;
+}
+
+:global(:root[data-theme='light']) .registerHeaderSub {
+  color: rgba(0, 0, 0, 0.4);
+}
+
+:global(:root[data-theme='light']) .societyRow {
+  background: rgba(0, 0, 0, 0.02);
+  border-color: rgba(0, 0, 0, 0.06);
+}
+
+:global(:root[data-theme='light']) .societyRowDone {
+  background: rgba(34, 197, 94, 0.06);
+  border-color: rgba(34, 197, 94, 0.18);
+}
+
+:global(:root[data-theme='light']) .societyCode {
+  color: rgba(0, 0, 0, 0.35);
+}
+
+:global(:root[data-theme='light']) .societyName {
+  color: rgba(0, 0, 0, 0.8);
+}
+
+:global(:root[data-theme='light']) .societySub {
+  color: rgba(0, 0, 0, 0.35);
+}
+
+:global(:root[data-theme='light']) .societyRowDone .societySub {
+  color: #16a34a;
+}
+
+:global(:root[data-theme='light']) .societyCheck {
+  border-color: rgba(0, 0, 0, 0.1);
+}
+
+/* ═══════════ Responsive ═══════════ */
+@media (max-width: 1024px) {
+  .stepsGrid {
+    gap: 24px;
+  }
+
+  .stepTitle {
+    font-size: 20px;
+  }
+
+  .stepDescription {
+    font-size: 13px;
+  }
+}
+
+@media (max-width: 900px) {
+  .section {
+    padding: 60px 16px 40px;
+  }
+
+  .sectionTitle {
+    font-size: 32px;
+    margin-bottom: 48px;
+  }
+
+  .stepsGrid {
+    grid-template-columns: 1fr;
+    gap: 32px;
+    max-width: 100%;
+    margin: 0;
+  }
+
+  .stepColumn {
+    align-items: flex-end;
+    max-width: 280px;
+    margin-left: auto;
+    margin-right: 0;
+  }
+
+  .stepColumn:nth-child(2) {
+    align-items: flex-start;
+    margin-left: 0;
+    margin-right: auto;
+  }
+
+  .stepColumn:nth-child(3) {
+    align-items: flex-end;
+    margin-left: auto;
+    margin-right: 0;
+  }
+
+  .stepCard {
+    height: 380px;
+  }
+
+  .iframeWrap {
+    width: 100%;
+    max-width: 280px;
+    height: 380px;
+    border-radius: 16px;
+  }
+
+  .cardIframe {
+    transform: scale(0.667);
+    transform-origin: top left;
+  }
+
+  .darkCard {
+    max-width: 280px;
+    padding: 20px 14px 16px;
+    border-radius: 16px;
+  }
+
+  .darkCardTitle {
+    font-size: 16px;
+    margin-bottom: 8px;
+  }
+
+  .darkCardSubtitle {
+    font-size: 10px;
+    margin-bottom: 12px;
+    line-height: 1.5;
+  }
+
+  .stepNumber {
+    font-size: 40px;
+  }
+
+  /* Scan card internals */
+  .scanRow {
+    gap: 8px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    margin-bottom: 10px;
+  }
+
+  .scanSpinner {
+    width: 18px;
+    height: 18px;
+  }
+
+  .scanRowTitle {
+    font-size: 11px;
+  }
+
+  .scanRowSub {
+    font-size: 9px;
+  }
+
+  .scanPercent {
+    font-size: 12px;
+  }
+
+  /* Issue slide internals */
+  .issueHeader {
+    gap: 8px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    margin-bottom: 6px;
+  }
+
+  .issueHeaderIcon {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+  }
+
+  .issueHeaderTitle {
+    font-size: 11px;
+  }
+
+  .issueHeaderSub {
+    font-size: 9px;
+  }
+
+  .issueList {
+    gap: 4px;
+  }
+
+  .issueRow {
+    gap: 6px;
+    padding: 8px 10px;
+    border-radius: 8px;
+  }
+
+  .issueBrandIcon {
+    width: 20px;
+    height: 20px;
+    border-radius: 5px;
+  }
+
+  .issueRowTitle {
+    font-size: 10px;
+  }
+
+  .issueRowSub,
+  .issueRowMoney {
+    font-size: 8.5px;
+  }
+
+  .issueTag {
+    font-size: 7px;
+  }
+
+  .brandText {
+    font-size: 6.5px;
+  }
+
+  /* Royalty slide internals */
+  .royaltyHeader {
+    gap: 8px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    margin-bottom: 8px;
+  }
+
+  .royaltyHeaderIcon {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+  }
+
+  .royaltyHeaderTitle {
+    font-size: 11px;
+  }
+
+  .royaltyHeaderSub {
+    font-size: 9px;
+  }
+
+  .revenueCard {
+    border-radius: 10px;
+    padding: 12px 10px;
+  }
+
+  .revenueLabel {
+    font-size: 9px;
+    margin-bottom: 2px;
+  }
+
+  .revenueAmount {
+    font-size: 26px;
+    margin-bottom: 10px;
+  }
+
+  .revenueRowLabel {
+    font-size: 10px;
+  }
+
+  .revenueRowValue {
+    font-size: 10px;
+  }
+
+  .revenueBar {
+    height: 3px;
+    margin-bottom: 8px;
+  }
+
+  .royaltyFooter {
+    font-size: 9px;
+    margin-top: 8px;
+  }
+
+  /* Registration card internals */
+  .regSteps {
+    margin-bottom: 12px;
+  }
+
+  .regStep {
+    gap: 4px;
+  }
+
+  .regStep span {
+    font-size: 8.5px;
+  }
+
+  .regStepIcon {
+    width: 32px;
+    height: 32px;
+  }
+
+  .regPanel {
+    border-radius: 10px;
+    padding: 10px 12px 8px;
+    margin-bottom: 6px;
+  }
+
+  .regPanelHeader {
+    font-size: 11px;
+  }
+
+  .regPanelCount {
+    font-size: 9px;
+    margin-bottom: 6px;
+  }
+
+  .worksList {
+    gap: 4px;
+  }
+
+  .workItem {
+    gap: 6px;
+    padding: 8px 10px;
+    border-radius: 8px;
+  }
+
+  .workTitle {
+    font-size: 10.5px;
+  }
+
+  .workSub {
+    font-size: 8.5px;
+  }
+
+  /* Submit slide */
+  .submitRow {
+    gap: 8px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    margin-bottom: 8px;
+  }
+
+  .submitSpinner {
+    width: 22px;
+    height: 22px;
+  }
+
+  .submitRowTitle {
+    font-size: 11px;
+  }
+
+  .submitRowSub {
+    font-size: 9px;
+  }
+
+  .submitPercent {
+    font-size: 12px;
+  }
+
+  .checklistLabel {
+    font-size: 10px;
+    margin-top: 10px;
+    margin-bottom: 6px;
+  }
+
+  .checklist {
+    gap: 5px;
+  }
+
+  .checklistItem {
+    gap: 6px;
+  }
+
+  .checklistDot {
+    width: 4px;
+    height: 4px;
+  }
+
+  .checklistText {
+    font-size: 10px;
+  }
+
+  .checklistCheck {
+    width: 16px;
+    height: 16px;
+  }
+
+  /* Register slide */
+  .registerHeader {
+    gap: 8px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    margin-bottom: 6px;
+  }
+
+  .registerHeaderIcon {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+  }
+
+  .registerHeaderTitle {
+    font-size: 11px;
+  }
+
+  .registerHeaderSub {
+    font-size: 9px;
+  }
+
+  .societyList {
+    gap: 4px;
+  }
+
+  .societyRow {
+    gap: 6px;
+    padding: 8px 10px;
+    border-radius: 8px;
+  }
+
+  .societyCode {
+    font-size: 9px;
+    width: 18px;
+  }
+
+  .societyName {
+    font-size: 10.5px;
+  }
+
+  .societySub {
+    font-size: 8.5px;
+  }
+
+  .societyCheck {
+    width: 18px;
+    height: 18px;
+  }
+
+  /* Dots */
+  .carouselDots {
+    padding-top: 12px;
+    gap: 4px;
+  }
+
+  .dot {
+    width: 5px;
+    height: 5px;
+  }
+
+  .dotActive {
+    width: 18px;
+    height: 5px;
+  }
+}
+
+@media (max-width: 480px) {
+  .section {
+    padding: 40px 12px 32px;
+  }
+
+  .sectionTitle {
+    font-size: 24px;
+    margin-bottom: 28px;
+  }
+
+  .stepsGrid {
+    gap: 24px;
+  }
+
+  .stepColumn {
+    max-width: 240px;
+  }
+
+  .stepNumber {
+    font-size: 32px;
+  }
+
+  .stepCard {
+    height: 340px;
+  }
+
+  .iframeWrap {
+    max-width: 240px;
+    height: 340px;
+    border-radius: 12px;
+  }
+
+  .cardIframe {
+    transform: scale(0.571);
+    transform-origin: top left;
+  }
+
+  .darkCard {
+    max-width: 240px;
+    padding: 16px 12px 14px;
+    border-radius: 12px;
+  }
+
+  .darkCardTitle {
+    font-size: 14px;
+    margin-bottom: 6px;
+  }
+
+  .darkCardSubtitle {
+    font-size: 9px;
+    margin-bottom: 10px;
+  }
+
+  /* Further shrink internals */
+  .scanRow,
+  .issueHeader,
+  .royaltyHeader,
+  .submitRow,
+  .registerHeader {
+    padding: 8px 10px;
+    gap: 6px;
+  }
+
+  .issueHeaderIcon,
+  .royaltyHeaderIcon,
+  .registerHeaderIcon {
+    width: 24px;
+    height: 24px;
+  }
+
+  .issueRow,
+  .workItem,
+  .societyRow {
+    padding: 6px 8px;
+  }
+
+  .revenueAmount {
+    font-size: 22px;
+    margin-bottom: 8px;
+  }
+
+  .revenueRowLabel,
+  .revenueRowValue {
+    font-size: 9px;
+  }
+
+  .regStepIcon {
+    width: 28px;
+    height: 28px;
+  }
+
+  .regStep span {
+    font-size: 8px;
+  }
+}

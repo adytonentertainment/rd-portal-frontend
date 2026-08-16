@@ -1,0 +1,178 @@
+.shell {
+  margin-left: var(--sidebar-width, 72px);
+  width: calc(100% - var(--sidebar-width, 72px));
+  box-sizing: border-box;
+  padding: 32px 40px 64px;
+  font-family: var(--font-body);
+  color: var(--text);
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 24px;
+}
+
+.headerLeft {
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  font-size: 36px;
+  font-weight: 700;
+  color: var(--text);
+  margin: 0 0 8px 0;
+  font-family: var(--font-body);
+}
+
+.subtitle {
+  font-size: 15px;
+  color: var(--soft-text);
+  margin: 0;
+}
+
+.searchBox {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  width: 300px;
+}
+
+.searchInput {
+  flex: 1;
+  border: none;
+  background: transparent;
+  font-size: 14px;
+  color: var(--text);
+  outline: none;
+}
+
+.searchInput::placeholder {
+  color: var(--soft-text);
+}
+
+.searchIcon {
+  color: var(--soft-text);
+}
+
+.tableWrapper {
+  background: var(--card-bg);
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  overflow: hidden;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.table th {
+  text-align: left;
+  padding: 14px 16px;
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--soft-text);
+  border-bottom: 1px solid var(--border);
+  background: var(--card-bg);
+}
+
+.table td {
+  padding: 14px 16px;
+  font-size: 14px;
+  color: var(--text);
+  border-bottom: 1px solid var(--border-subtle, var(--border));
+}
+
+.table tr:last-child td {
+  border-bottom: none;
+}
+
+.workTitle {
+  font-weight: 500;
+}
+
+.writers {
+  color: var(--soft-text);
+  font-size: 13px;
+}
+
+.code {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--soft-text);
+}
+
+.statusPill {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.statusActive {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+
+.statusSubpub {
+  background: rgba(59, 130, 246, 0.15);
+  color: #3b82f6;
+}
+
+.statusArchived {
+  background: rgba(107, 114, 128, 0.15);
+  color: #6b7280;
+}
+
+.registrations {
+  display: flex;
+  gap: 4px;
+  flex-wrap: wrap;
+}
+
+.regChip {
+  padding: 3px 8px;
+  border-radius: 6px;
+  font-size: 10px;
+  font-weight: 600;
+  background: var(--border);
+  color: var(--text);
+}
+
+.splitBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px 10px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.splitComplete {
+  background: rgba(16, 185, 129, 0.15);
+  color: #10b981;
+}
+
+.splitIncomplete {
+  background: rgba(245, 158, 11, 0.15);
+  color: #f59e0b;
+}
+
+.noResults {
+  padding: 48px 24px;
+  text-align: center;
+  color: var(--soft-text);
+  font-size: 15px;
+}

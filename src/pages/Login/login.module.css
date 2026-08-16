@@ -1,0 +1,116 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+
+/* Scoped CSS variables — match FreeAudit aesthetic */
+.loginScope {
+  --text: #d4d4d4;
+  --soft-text: #737373;
+  --background: #000000;
+  --card-bg: transparent;
+  --border: #262626;
+  --border-hover: #404040;
+  --accent: #4ade80;
+  --accent-dim: rgba(74, 222, 128, 0.15);
+  --accent-text: #000000;
+  --error: #f87171;
+  --muted-text: #525252;
+  --hover-bg: #0a0a0a;
+
+  --font: 'JetBrains Mono', monospace;
+  --radius: 4px;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--text);
+}
+
+:global(:root[data-theme='light']) .loginScope {
+  --text: #1a1a1a;
+  --soft-text: #6b6b6b;
+  --background: #f5f3ef;
+  --card-bg: transparent;
+  --border: #d6d3cd;
+  --border-hover: #a8a5a0;
+  --accent: #111111;
+  --accent-dim: rgba(0, 0, 0, 0.06);
+  --accent-text: #ffffff;
+  --error: #dc2626;
+  --muted-text: #8a8a8a;
+  --hover-bg: #eae7e1;
+}
+
+/* HeroUI overrides scoped to login */
+.loginScope :global(.nextui-card),
+.loginScope :global([class*='Card']) {
+  box-shadow: none !important;
+}
+
+.loginScope :global(input) {
+  font-family: var(--font) !important;
+}
+
+.loginScope :global([data-slot='input-wrapper']) {
+  border-radius: var(--radius) !important;
+}
+
+.errorMessage {
+  background-color: rgba(239, 68, 68, 0.06);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  border-radius: var(--radius);
+  color: var(--error);
+  font-size: 13px;
+  padding: 12px;
+  text-align: center;
+  width: fit-content;
+  margin: 1rem auto;
+}
+
+.linkButton {
+  background: none;
+  border: none;
+  color: var(--text);
+  font-size: 13px;
+  font-weight: 500;
+  font-family: var(--font);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+  padding: 0;
+  transition: color 150ms var(--ease);
+}
+
+.linkButton:hover {
+  color: var(--accent);
+}
+
+.loginHeading {
+  font-size: 16px;
+  font-weight: 500;
+  font-family: var(--font);
+  color: var(--text);
+  text-align: center;
+  letter-spacing: -0.01em;
+}
+
+/* Mobile-specific styles for login page */
+@media (max-width: 768px) {
+  .loginScope {
+    padding: 12px !important;
+    min-height: 0 !important;
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    box-sizing: border-box;
+  }
+
+  .loginScope :global(input) {
+    font-size: 16px !important; /* Prevent iOS zoom */
+  }
+
+  .loginHeading {
+    font-size: 15px !important;
+    margin-bottom: 16px !important;
+  }
+}

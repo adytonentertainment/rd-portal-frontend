@@ -1,0 +1,420 @@
+.export-modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.export-modal {
+  background: var(--surface);
+  border-radius: var(--radius-xl);
+  width: 90%;
+  max-width: 500px;
+  max-height: 85vh;
+  display: flex;
+  flex-direction: column;
+  box-shadow: none;
+  border: 1px solid var(--border);
+  animation: slideUp 0.3s ease;
+}
+
+:root[data-theme='light'] .export-modal {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  box-shadow: none;
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.export-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+:root[data-theme='light'] .export-modal-header {
+  border-bottom: 1px solid var(--border);
+}
+
+.export-modal-title {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.export-modal-title .modal-title-icon {
+  color: #FF6B00;
+  font-size: 22px;
+}
+
+.export-modal-title h2 {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  color: #fff;
+}
+
+:root[data-theme='light'] .export-modal-title h2 {
+  color: #000000;
+}
+
+.modal-close-btn {
+  background: rgba(255, 255, 255, 0.1);
+  border: none;
+  color: #fff;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+}
+
+:root[data-theme='light'] .modal-close-btn {
+  background: rgba(0, 0, 0, 0.1);
+  color: #000000;
+}
+
+.modal-close-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+:root[data-theme='light'] .modal-close-btn:hover {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+.export-modal-content {
+  padding: 20px 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.export-section {
+  margin-bottom: 24px;
+}
+
+.export-section:last-child {
+  margin-bottom: 0;
+}
+
+.section-label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.7);
+  margin-bottom: 12px;
+}
+
+:root[data-theme='light'] .section-label {
+  color: rgba(0, 0, 0, 0.7);
+}
+
+.section-label svg {
+  color: #FF6B00;
+}
+
+.period-type-toggle {
+  display: flex;
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 4px;
+  border-radius: 8px;
+}
+
+:root[data-theme='light'] .period-type-toggle {
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.toggle-btn {
+  flex: 1;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+:root[data-theme='light'] .toggle-btn {
+  color: rgba(0, 0, 0, 0.6);
+}
+
+.toggle-btn.active {
+  background: #FF6B00;
+  color: #fff;
+}
+
+.toggle-btn:hover:not(.active) {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+:root[data-theme='light'] .toggle-btn:hover:not(.active) {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.period-actions {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 8px;
+}
+
+.period-action-btn {
+  padding: 6px 12px;
+  font-size: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  color: #fff;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.period-action-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+:root[data-theme='light'] .period-action-btn {
+  background: rgba(0, 0, 0, 0.05);
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  color: #000;
+}
+
+:root[data-theme='light'] .period-action-btn:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.periods-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  max-height: 200px;
+  overflow-y: auto;
+  background: rgba(255, 255, 255, 0.03);
+  border-radius: 8px;
+  padding: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+:root[data-theme='light'] .periods-list {
+  background: rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.no-periods {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 14px;
+  text-align: center;
+  padding: 20px;
+}
+
+:root[data-theme='light'] .no-periods {
+  color: rgba(0, 0, 0, 0.5);
+}
+
+.period-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.period-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+:root[data-theme='light'] .period-item:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+.period-item input[type='checkbox'] {
+  width: 18px;
+  height: 18px;
+  accent-color: #FF6B00;
+  cursor: pointer;
+}
+
+.period-label {
+  color: #fff;
+  font-size: 14px;
+}
+
+:root[data-theme='light'] .period-label {
+  color: #000000;
+}
+
+.user-dropdown {
+  width: 100%;
+  padding: 12px 16px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.05);
+  color: #fff;
+  font-size: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+:root[data-theme='light'] .user-dropdown {
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  color: #000000;
+}
+
+.user-dropdown:hover {
+  border-color: rgba(255, 255, 255, 0.2);
+}
+
+:root[data-theme='light'] .user-dropdown:hover {
+  border-color: rgba(0, 0, 0, 0.3);
+}
+
+.user-dropdown:focus {
+  outline: none;
+  border-color: #FF6B00;
+}
+
+.export-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.export-option {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+:root[data-theme='light'] .export-option {
+  background: rgba(0, 0, 0, 0.03);
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.export-option:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+:root[data-theme='light'] .export-option:hover {
+  background: rgba(0, 0, 0, 0.08);
+}
+
+.export-option input[type='checkbox'] {
+  width: 18px;
+  height: 18px;
+  accent-color: #FF6B00;
+  cursor: pointer;
+}
+
+.export-option span {
+  color: #fff;
+  font-size: 14px;
+}
+
+:root[data-theme='light'] .export-option span {
+  color: #000000;
+}
+
+.export-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 24px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+:root[data-theme='light'] .export-modal-footer {
+  border-top: 1px solid var(--border);
+}
+
+.cancel-btn {
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: transparent;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+:root[data-theme='light'] .cancel-btn {
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  color: #000000;
+}
+
+.cancel-btn:hover {
+  background: rgba(255, 255, 255, 0.1);
+}
+
+:root[data-theme='light'] .cancel-btn:hover {
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.export-modal-footer .export-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  border: none;
+  background: #FF6B00;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.export-modal-footer .export-btn:hover:not(:disabled) {
+  background: #FF8C00;
+}
+
+.export-modal-footer .export-btn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}

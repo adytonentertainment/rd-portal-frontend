@@ -1,0 +1,243 @@
+/* Client-import resolution queue (Writer-Scale UX PRD, US-B2). Shares the
+   admin palette CSS vars. */
+
+.shell {
+  margin-left: var(--sidebar-width, 72px);
+  width: calc(100% - var(--sidebar-width, 72px));
+  box-sizing: border-box;
+  padding: 32px 40px 64px;
+  min-height: 100vh;
+  color: var(--text);
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: none;
+  border: none;
+  color: var(--soft-text);
+  font-size: 13px;
+  cursor: pointer;
+  margin-bottom: 16px;
+}
+.back:hover {
+  color: var(--text);
+}
+
+.header {
+  margin-bottom: 20px;
+}
+.title {
+  font-size: 30px;
+  font-weight: 700;
+  margin: 0;
+}
+.subtitle {
+  margin: 6px 0 0;
+  color: var(--soft-text);
+  font-size: 14px;
+}
+.statusTag {
+  text-transform: capitalize;
+  color: var(--soft-text);
+}
+
+.pageError {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+  padding: 10px 14px;
+  border-radius: 10px;
+  margin-bottom: 14px;
+  font-size: 14px;
+}
+
+.tabs {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 8px 14px;
+  color: var(--soft-text);
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.tabActive {
+  color: var(--text);
+  border-color: var(--accent);
+  background: rgba(255, 255, 255, 0.03);
+}
+.tabCount {
+  font-size: 12px;
+  background: rgba(148, 163, 184, 0.16);
+  color: inherit;
+  padding: 1px 8px;
+  border-radius: 999px;
+}
+
+.card {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+}
+.stateBox {
+  padding: 40px;
+  text-align: center;
+  color: var(--soft-text);
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 14px 18px;
+  border-bottom: 1px solid var(--border);
+  flex-wrap: wrap;
+}
+.row:last-child {
+  border-bottom: none;
+}
+.rowMain {
+  min-width: 0;
+  flex: 1;
+}
+.rowName {
+  font-size: 15px;
+  font-weight: 600;
+}
+.rowMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 4px;
+  font-size: 12.5px;
+  color: var(--soft-text);
+}
+.suggestBox {
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--text);
+}
+.confPill {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: #f59e0b;
+  background: rgba(245, 158, 11, 0.14);
+  padding: 2px 7px;
+  border-radius: 6px;
+}
+.soft {
+  color: var(--soft-text);
+}
+
+.rowActions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.codeInput {
+  background: var(--input-bg, rgba(255, 255, 255, 0.04));
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  color: var(--text);
+  font-size: 13px;
+  width: 230px;
+  outline: none;
+}
+.codeInput:focus {
+  border-color: var(--accent);
+}
+
+.primaryBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--accent);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.primaryBtn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+.secondaryBtn {
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 13px;
+  cursor: pointer;
+}
+.secondaryBtn:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.unlistedRow {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 12px 18px;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+.unlistedRow:last-child {
+  border-bottom: none;
+}
+.code {
+  font-family: var(--font-mono, monospace);
+  background: rgba(148, 163, 184, 0.12);
+  padding: 3px 8px;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 18px;
+}
+.pageButton {
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 7px 14px;
+  color: var(--text);
+  font-size: 13px;
+  cursor: pointer;
+}
+.pageButton:disabled {
+  opacity: 0.4;
+  cursor: default;
+}
+.pageInfo {
+  color: var(--soft-text);
+  font-size: 13px;
+}

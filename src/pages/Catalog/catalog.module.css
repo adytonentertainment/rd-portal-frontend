@@ -1,0 +1,940 @@
+/* Main Container - CSS Grid Layout */
+.catalog {
+  position: relative;
+  display: flex;
+  flex-direction: row;
+  gap: 20px;
+  height: 100vh;
+  width: calc(100% - var(--sidebar-width, 72px));
+  max-width: calc(100% - var(--sidebar-width, 72px));
+  padding: 24px;
+  z-index: 10;
+  overflow-x: hidden;
+  background: var(--background);
+}
+
+/* Responsive Breakpoints */
+@media (max-width: 1200px) {
+  .catalog {
+    flex-direction: column;
+    gap: 12px;
+    overflow-y: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  .catalog {
+    flex-direction: column !important;
+    gap: 2px !important;
+    padding: 1px !important;
+    height: auto !important;
+    min-height: 100vh !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+    box-sizing: border-box !important;
+  }
+}
+
+/* Chart Section */
+.catalogChart {
+  width: 100%;
+  max-height: none !important;
+  flex: 1;
+  min-height: 0; /* Critical: allows flex child to shrink below content size */
+  contain: layout style;
+}
+
+@media (max-width: 768px) {
+  .catalogChart {
+    height: 180px !important;
+    min-height: 180px !important;
+    max-height: 220px !important;
+    flex: none !important;
+  }
+}
+
+/* Left Side - Analytics Panel */
+.catalogLeft {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-width: 0;
+  overflow: hidden;
+  height: 100%;
+}
+
+.catalogLeft > div:first-child {
+  background: var(--panel-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  flex: 1.5;
+  min-height: 350px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transition: all 200ms cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: var(--shadow-sm);
+}
+
+@media (max-width: 1200px) {
+  .catalogLeft {
+    width: 100%;
+    height: auto;
+    overflow: visible;
+  }
+}
+
+@media (max-width: 768px) {
+  .catalogLeft {
+    width: 100vw !important;
+    max-width: calc(100vw - 2px) !important;
+    height: auto !important;
+    max-height: 35vh !important;
+    overflow: visible !important;
+    flex-shrink: 0 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+
+  .catalogLeft > div:first-child {
+    min-height: 150px !important;
+    height: auto !important;
+    max-height: 35vh !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding: 4px !important;
+    border-radius: 3px !important;
+  }
+}
+
+.catalogLeftNavigation {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 0.7rem;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .catalogLeftNavigation {
+    flex-direction: column !important;
+    align-items: stretch !important;
+    gap: 4px !important;
+    margin-bottom: 6px !important;
+  }
+
+  .catalogLeftNavigation button {
+    font-size: 11px !important;
+    padding: 6px 8px !important;
+    min-height: 32px !important;
+  }
+}
+
+/* Stats Section */
+.stats {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  margin: 0;
+}
+
+.statsControl {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  margin-bottom: 6px;
+}
+
+.statsPanels {
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 12px;
+  flex-shrink: 0;
+  margin: 0;
+  contain: layout;
+}
+
+.statsPanels > * {
+  flex: 1 1 0;
+  min-width: 0;
+}
+
+@media (max-width: 1200px) {
+  .statsPanels > * {
+    flex: 1 1 0;
+    min-width: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .statsPanels {
+    flex-direction: column !important;
+    gap: 4px !important;
+  }
+
+  .statsPanels > * {
+    flex: 1 1 auto !important;
+    min-width: 100% !important;
+    padding: 8px 6px !important;
+    min-height: 60px !important;
+  }
+
+  .statsPanels .text-3xl {
+    font-size: 16px !important;
+  }
+}
+
+/* Stat Card Styling - Polished Design */
+.statsPanels > * {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px 14px;
+  min-height: 100px;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  transition: all 250ms cubic-bezier(0.22, 1, 0.36, 1);
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.statsPanels > *:hover {
+  background: var(--hover-overlay);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+  border-color: var(--soft-text);
+}
+
+.statsPanels .text-3xl {
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: bold;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+@media (max-width: 768px) {
+  .statsPanels .text-3xl {
+    font-size: 20px;
+  }
+
+  /* Better touch targets */
+  .catalogLeftNavigation button,
+  .catalogRightNavigation button {
+    min-height: 44px;
+    padding: 12px 16px;
+    font-size: 14px;
+  }
+
+  /* Improved spacing */
+  .catalogLeft > div:first-child,
+  .catalogRight > div:first-child {
+    padding: 12px;
+  }
+}
+
+.statsPanels .text-sm {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--soft-text);
+  margin-bottom: 4px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.statsPanels .text-xs {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 2px 4px;
+  border-radius: 3px;
+  background: var(--surface);
+  color: #22c55e;
+}
+
+/* Performer Cards Grid */
+.performerCardsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  flex-shrink: 0;
+  min-height: 100px;
+  height: auto;
+  transform: translateZ(0);
+  contain: layout;
+}
+
+.performerCardsGrid > * {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  transition: all 250ms cubic-bezier(0.22, 1, 0.36, 1);
+  position: relative;
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.performerCardsGrid > *:hover {
+  background: var(--hover-overlay);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.performerCardsGrid h3 {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 8px;
+  color: var(--soft-text);
+  flex-shrink: 0;
+  font-weight: 400;
+}
+
+/* Performer Track Styling - Fixed Grid Layout */
+.performerCardsGrid .catalogItem {
+  padding: 8px 12px !important;
+  background: var(--card-bg) !important;
+  border: 1px solid var(--border) !important;
+  border-radius: var(--radius-md) !important;
+  height: auto !important;
+  min-height: 60px !important;
+  display: grid !important;
+  grid-template-columns: 36px 1fr auto !important;
+  grid-template-rows: 1fr !important;
+  gap: 10px !important;
+  align-items: center !important;
+  contain: layout style !important;
+  transition: all 150ms cubic-bezier(0.22, 1, 0.36, 1) !important;
+  margin-bottom: 6px !important;
+}
+
+.performerCardsGrid .catalogItem:hover {
+  background: var(--hover-overlay) !important;
+  border-color: var(--accent) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+}
+
+.performerCardsGrid .catalogItem .MuiCheckbox-root {
+  display: none !important;
+  width: 0 !important;
+  height: 0 !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.performerCardsGrid .catalogItem .catalogItemArtists span,
+.performerCardsGrid .catalogItem .catalogItemArtists .MuiTooltip-root {
+  display: none;
+}
+
+.performerCardsGrid .catalogItem .catalogItemArtists {
+  display: block;
+}
+
+.performerCardsGrid .catalogItem .catalogItemImage {
+  width: 32px !important;
+  height: 32px !important;
+  flex-shrink: 0 !important;
+  grid-column: 1 !important;
+}
+
+.performerCardsGrid .catalogItem .catalogItemImage img {
+  width: 32px;
+  height: 32px;
+  border-radius: var(--radius-md);
+}
+
+.performerCardsGrid .catalogItem .catalogItemTitle {
+  font-size: 11px !important;
+  display: flex !important;
+  flex-direction: column !important;
+  justify-content: center !important;
+  min-width: 0 !important;
+  flex: 1 !important;
+  gap: 2px !important;
+  grid-column: 2 !important;
+  overflow: hidden !important;
+}
+
+.performerCardsGrid .catalogItem .catalogItemTitle > div:first-child {
+  font-weight: 600 !important;
+  font-size: 11px !important;
+  white-space: nowrap !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  color: var(--text) !important;
+  line-height: 1.3 !important;
+}
+
+.performerCardsGrid .catalogItem .catalogItemArtists {
+  font-size: 9px !important;
+  line-height: 1.2 !important;
+  white-space: normal !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+  color: var(--soft-text) !important;
+  display: -webkit-box !important;
+  -webkit-line-clamp: 2 !important;
+  -webkit-box-orient: vertical !important;
+}
+
+.performerCardsGrid .catalogItem button {
+  font-family: var(--font-mono) !important;
+  font-size: 10px !important;
+  font-weight: 500 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+  padding: 4px 8px !important;
+  white-space: nowrap !important;
+  border-radius: var(--radius-md) !important;
+  align-self: center !important;
+  justify-self: end !important;
+}
+
+.performerCardsGrid .catalogItem > div:nth-child(5) {
+  font-size: 8px !important;
+  line-height: 1.3 !important;
+  text-align: right !important;
+  color: var(--soft-text) !important;
+  display: none !important;
+}
+
+@media (max-width: 768px) {
+  .performerCardsGrid {
+    grid-template-columns: 1fr;
+    height: auto;
+  }
+
+  .performerCardsGrid h3 {
+    font-size: 11px;
+  }
+}
+
+/* Right Side - Tracks Panel */
+.catalogRight {
+  width: 50%;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  min-width: 0;
+  overflow: hidden;
+  height: 100%;
+  background: var(--panel-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px;
+  transition: all 200ms cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: var(--shadow-sm);
+}
+
+@media (max-width: 1200px) {
+  .catalogRight {
+    width: 100%;
+    height: auto;
+    max-height: none;
+    flex-shrink: 0;
+  }
+}
+
+@media (max-width: 768px) {
+  .catalogRight {
+    width: 100vw !important;
+    max-width: calc(100vw - 2px) !important;
+    height: auto !important;
+    min-height: 250px !important;
+    max-height: none !important;
+    overflow-y: auto !important;
+    overflow-x: hidden !important;
+    -webkit-overflow-scrolling: touch !important;
+    flex-shrink: 0 !important;
+    padding: 4px !important;
+    border-radius: 3px !important;
+  }
+
+  /* Make catalog container scrollable with momentum on iOS */
+  .catalog {
+    -webkit-overflow-scrolling: touch !important;
+  }
+}
+
+.catalogRightNavigation {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 10px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+  .catalogRightNavigation {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
+  }
+
+  /* Fix catalog items on mobile */
+  .catalogItem {
+    grid-template-columns: 1fr !important;
+    gap: 4px !important;
+    padding: 6px !important;
+    font-size: 11px !important;
+  }
+
+  .catalogItem > * {
+    grid-column: 1 !important;
+  }
+
+  /* Stack track info vertically */
+  .trackInfo {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 2px !important;
+  }
+
+  /* Adjust font sizes */
+  .trackTitle {
+    font-size: 12px !important;
+  }
+
+  .trackArtist {
+    font-size: 10px !important;
+  }
+
+  /* Make claim button smaller on mobile */
+  .claimButton {
+    width: 100% !important;
+    justify-content: center !important;
+    font-size: 11px !important;
+    padding: 6px 8px !important;
+    min-height: 32px !important;
+  }
+}
+
+.catalogTable {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  padding-right: 5px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  flex: 1;
+  min-height: 0;
+  width: 100%;
+  transform: translateZ(0);
+  -webkit-overflow-scrolling: touch;
+  contain: layout style paint;
+}
+
+.catalogTable::-webkit-scrollbar {
+  width: 8px;
+}
+
+.catalogTable::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 4px;
+}
+
+.catalogTable::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 4px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+.catalogTable::-webkit-scrollbar-thumb:hover {
+  background: var(--soft-text);
+  border: 2px solid transparent;
+  background-clip: padding-box;
+}
+
+/* Catalog Item Styling - Polished Table Row */
+.catalogItem {
+  position: relative;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  padding: 10px 14px;
+  min-height: 56px;
+  display: grid;
+  grid-template-columns: 16px 44px 1fr auto 85px;
+  gap: 12px;
+  align-items: center;
+  flex-shrink: 0;
+  width: 100%;
+  overflow: hidden;
+  will-change: transform;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-font-smoothing: subpixel-antialiased;
+  contain: layout style;
+  transition: all 200ms cubic-bezier(0.22, 1, 0.36, 1);
+  margin-bottom: 6px;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Track options button (three dots) */
+.trackOptionsButton {
+  position: relative;
+  z-index: 1000 !important;
+  cursor: pointer !important;
+  pointer-events: auto !important;
+  flex-shrink: 0 !important;
+  min-width: 40px !important;
+  height: 40px !important;
+}
+
+.catalogItem:hover {
+  background: var(--hover-overlay);
+  border-color: var(--soft-text);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.catalogItem:active {
+  transform: translateY(0) scale(0.995);
+  box-shadow: var(--shadow-sm);
+}
+
+.catalogItemInfringing {
+  border-left: 3px solid rgba(239, 68, 68, 0.9);
+}
+
+.catalogItemImage {
+  width: 44px;
+  height: 44px;
+  flex: 0 0 auto;
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.catalogItemImage img {
+  border-radius: var(--radius-md);
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.catalogItemTitle {
+  text-align: left;
+  font-family: var(--font-body);
+  font-size: 13px;
+  color: var(--text);
+  font-weight: 600;
+  min-width: 0;
+  flex: 1;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+}
+
+.catalogItemTitle > div:first-child {
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  margin-bottom: 0;
+  font-weight: 600;
+  font-size: 13px;
+  line-height: 1.4;
+  color: var(--text);
+  letter-spacing: -0.01em;
+}
+
+.catalogItemArtists {
+  font-size: 11px;
+  color: var(--soft-text);
+  margin-top: 0;
+  margin-bottom: 0;
+  font-weight: 400;
+  line-height: 1.3;
+}
+
+/* Dropdown offset */
+.dropdown-offset {
+  top: -1.15rem;
+}
+
+/* Modal Styling - Polished Design */
+.deleteConfirmationModal {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 1px solid var(--border);
+  padding: 32px;
+  background: var(--panel-bg);
+  border-radius: var(--radius-xl);
+  max-height: 80%;
+  min-width: 400px;
+  box-shadow: var(--shadow-lg);
+  animation: verax-scale-in 250ms cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+@media (max-width: 768px) {
+  .deleteConfirmationModal {
+    min-width: 90%;
+    padding: 20px;
+  }
+}
+
+/* Custom Scrollbar */
+.catalogLeft::-webkit-scrollbar,
+.catalogRight::-webkit-scrollbar {
+  width: 6px;
+}
+
+.catalogLeft::-webkit-scrollbar-track,
+.catalogRight::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.catalogLeft::-webkit-scrollbar-thumb,
+.catalogRight::-webkit-scrollbar-thumb {
+  background: var(--border);
+  border-radius: 3px;
+}
+
+.catalogLeft::-webkit-scrollbar-thumb:hover,
+.catalogRight::-webkit-scrollbar-thumb:hover {
+  background: var(--soft-text);
+}
+
+/* Track options button - three dots menu */
+.catalogRight .track-options-button {
+  position: relative;
+  z-index: 1000;
+  cursor: pointer;
+  pointer-events: auto;
+  flex-shrink: 0;
+}
+
+/* Button Styling - Flat Design */
+.catalog
+  button:not(.glasButton):not(.audit-button-cyan):not(.clear-button-red):not([data-claim-revenue]):not(
+    [data-green-cta]
+  ):not([data-blue-cta]),
+.catalogRight
+  button:not(.glasButton):not(.audit-button-cyan):not(.clear-button-red):not([data-claim-revenue]):not(
+    [data-green-cta]
+  ):not([data-blue-cta]),
+.catalogLeft
+  button:not(.glasButton):not(.audit-button-cyan):not(.clear-button-red):not([data-claim-revenue]):not(
+    [data-green-cta]
+  ):not([data-blue-cta]) {
+  position: relative;
+  z-index: 100;
+  background: var(--surface) !important;
+  color: var(--text) !important;
+  border: 1px solid var(--border) !important;
+  font-family: var(--font-mono) !important;
+  font-size: 11px !important;
+  font-weight: 500 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+  border-radius: var(--radius-md) !important;
+  transition: all 150ms cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+
+.catalog
+  button:not(.glasButton):not(.audit-button-cyan):not(.clear-button-red):not([data-claim-revenue]):not(
+    [data-green-cta]
+  ):not([data-blue-cta]):hover,
+.catalogRight
+  button:not(.glasButton):not(.audit-button-cyan):not(.clear-button-red):not([data-claim-revenue]):not(
+    [data-green-cta]
+  ):not([data-blue-cta]):hover,
+.catalogLeft
+  button:not(.glasButton):not(.audit-button-cyan):not(.clear-button-red):not([data-claim-revenue]):not(
+    [data-green-cta]
+  ):not([data-blue-cta]):hover {
+  background: var(--hover-overlay) !important;
+}
+
+/* Green CTA Button - Free Actions - Flat Design */
+button[data-green-cta='true'],
+.catalog button[data-green-cta='true'],
+.catalogLeft button[data-green-cta='true'] {
+  background: #10b981 !important;
+  color: #ffffff !important;
+  border: 1px solid #059669 !important;
+  border-radius: var(--radius-md) !important;
+  font-family: var(--font-mono) !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+  transition: all 150ms cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+
+button[data-green-cta='true']:hover,
+.catalog button[data-green-cta='true']:hover,
+.catalogLeft button[data-green-cta='true']:hover {
+  background: #059669 !important;
+  color: #ffffff !important;
+}
+
+/* Blue CTA Button - Upgrade/Paid Actions - Flat Design */
+button[data-blue-cta='true'],
+.catalog button[data-blue-cta='true'],
+.catalogLeft button[data-blue-cta='true'] {
+  background: #3b82f6 !important;
+  color: #ffffff !important;
+  border: 1px solid #2563eb !important;
+  border-radius: var(--radius-md) !important;
+  font-family: var(--font-mono) !important;
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.06em !important;
+  transition: all 150ms cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+
+button[data-blue-cta='true']:hover,
+.catalog button[data-blue-cta='true']:hover,
+.catalogLeft button[data-blue-cta='true']:hover {
+  background: #2563eb !important;
+  color: #ffffff !important;
+}
+
+/* Specific button styling for red/delete buttons - Flat Design */
+.catalog button[style*='dc2626'],
+.catalogRight button[style*='dc2626'],
+.catalog button.clear-button-red,
+.catalogRight button.clear-button-red,
+.catalogLeft button.clear-button-red {
+  background: #dc2626 !important;
+  color: #ffffff !important;
+  border: 1px solid #b91c1c !important;
+  border-radius: var(--radius-md) !important;
+}
+
+.catalog button.clear-button-red:hover,
+.catalogRight button.clear-button-red:hover,
+.catalogLeft button.clear-button-red:hover {
+  background: #b91c1c !important;
+}
+
+/* Specific button styling for cyan/audit buttons - Flat Design */
+.catalog button.audit-button-cyan,
+.catalogRight button.audit-button-cyan,
+.catalogLeft button.audit-button-cyan {
+  background: #14b8a6 !important;
+  color: #ffffff !important;
+  border: 1px solid #0d9488 !important;
+  border-radius: var(--radius-md) !important;
+}
+
+.catalog button.audit-button-cyan:hover,
+.catalogRight button.audit-button-cyan:hover,
+.catalogLeft button.audit-button-cyan:hover {
+  background: #0d9488 !important;
+  color: #ffffff !important;
+}
+
+/* Text Visibility - Theme Aware */
+.catalog,
+.catalogLeft,
+.catalogRight {
+  color: var(--text);
+}
+
+/* Ensure inputs and text fields are visible - Flat Design */
+.catalog input,
+.catalogRight input {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  font-family: var(--font-body);
+  transition: border-color 150ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.catalog input::placeholder,
+.catalogRight input::placeholder {
+  color: var(--soft-text);
+}
+
+.catalog input:focus,
+.catalogRight input:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+
+/* Animations */
+@keyframes verax-fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Animation class for CTA buttons */
+.ctaSlideIn {
+  animation: verax-fade-in 300ms cubic-bezier(0.22, 1, 0.36, 1);
+  animation-fill-mode: both;
+}
+
+/* Staggered fade-in for catalog items */
+.catalogTable .catalogItem {
+  animation: catalogItemIn 350ms cubic-bezier(0.22, 1, 0.36, 1);
+  animation-fill-mode: both;
+}
+
+@keyframes catalogItemIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.catalogTable .catalogItem:nth-child(1) { animation-delay: 0.02s; }
+.catalogTable .catalogItem:nth-child(2) { animation-delay: 0.05s; }
+.catalogTable .catalogItem:nth-child(3) { animation-delay: 0.08s; }
+.catalogTable .catalogItem:nth-child(4) { animation-delay: 0.11s; }
+.catalogTable .catalogItem:nth-child(5) { animation-delay: 0.14s; }
+.catalogTable .catalogItem:nth-child(6) { animation-delay: 0.17s; }
+.catalogTable .catalogItem:nth-child(7) { animation-delay: 0.2s; }
+.catalogTable .catalogItem:nth-child(8) { animation-delay: 0.23s; }
+.catalogTable .catalogItem:nth-child(9) { animation-delay: 0.26s; }
+.catalogTable .catalogItem:nth-child(10) { animation-delay: 0.29s; }
+.catalogTable .catalogItem:nth-child(11) { animation-delay: 0.32s; }
+.catalogTable .catalogItem:nth-child(12) { animation-delay: 0.35s; }

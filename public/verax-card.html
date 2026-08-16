@@ -1,0 +1,1044 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Verax – Connect Your Catalog</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html, body {
+        min-height: 100vh;
+        display: flex;
+        background: #000000;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .card {
+        position: relative;
+        width: 420px;
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        background: #000000;
+        border-radius: 24px;
+        padding: 44px 32px 32px;
+        overflow: hidden;
+        border: 1px solid rgba(255, 255, 255, 0.05);
+      }
+
+      /* Decorative blobs top-right */
+      .blob1 {
+        position: absolute;
+        top: -50px;
+        right: -30px;
+        width: 170px;
+        height: 170px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.035);
+        pointer-events: none;
+      }
+
+      .blob2 {
+        position: absolute;
+        top: -10px;
+        right: -70px;
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.025);
+        pointer-events: none;
+      }
+
+      /* Header */
+      .card h2 {
+        font-size: 28px;
+        font-weight: 700;
+        color: #eeeef0;
+        line-height: 1.15;
+        margin-bottom: 14px;
+        position: relative;
+        z-index: 1;
+        letter-spacing: -0.3px;
+      }
+
+      .card .subtitle {
+        font-size: 14.5px;
+        line-height: 1.6;
+        color: rgba(255, 255, 255, 0.35);
+        margin-bottom: 28px;
+        max-width: 330px;
+        position: relative;
+        z-index: 1;
+        font-weight: 400;
+      }
+
+      .card .subtitle strong {
+        color: rgba(255, 255, 255, 0.8);
+        font-weight: 700;
+      }
+
+      /* Carousel */
+      .carousel {
+        position: relative;
+        flex: 1;
+        overflow: hidden;
+        z-index: 1;
+      }
+
+      .slide {
+        position: absolute;
+        inset: 0;
+        opacity: 0;
+        transform: translateX(16px);
+        transition:
+          opacity 0.45s ease,
+          transform 0.45s ease;
+        pointer-events: none;
+        display: flex;
+        flex-direction: column;
+      }
+
+      .slide.active {
+        opacity: 1;
+        transform: translateX(0);
+        pointer-events: auto;
+      }
+
+      /* Slide header */
+      .slide-header {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 16px;
+        background: rgba(255, 255, 255, 0.045);
+        border-radius: 14px;
+        margin-bottom: 10px;
+      }
+
+      .slide-icon {
+        width: 38px;
+        height: 38px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.055);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+      }
+
+      .slide-icon svg {
+        width: 17px;
+        height: 17px;
+        color: rgba(255, 255, 255, 0.55);
+      }
+
+      .slide-header-text h3 {
+        font-size: 14.5px;
+        font-weight: 700;
+        color: #eeeef0;
+        line-height: 1.2;
+      }
+
+      .slide-header-text span {
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.28);
+        font-weight: 400;
+      }
+
+      .check-icon {
+        margin-left: auto;
+        color: #4ade80;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+      }
+
+      /* Slide body */
+      .slide-body {
+        flex: 1;
+        background: rgba(255, 255, 255, 0.02);
+        border-radius: 14px;
+        padding: 18px 18px;
+        border: 1px solid rgba(255, 255, 255, 0.035);
+      }
+
+      /* ===== SLIDE 1: Import ===== */
+      .progress-bar-track {
+        width: 100%;
+        height: 3.5px;
+        background: rgba(255, 255, 255, 0.06);
+        border-radius: 4px;
+        margin-bottom: 16px;
+        overflow: hidden;
+      }
+
+      .progress-bar-fill {
+        height: 100%;
+        width: 0%;
+        background: linear-gradient(90deg, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0.85));
+        border-radius: 4px;
+        transition: width 1.5s ease;
+      }
+
+      .song-row {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 11px 14px;
+        margin-bottom: 6px;
+        border-radius: 10px;
+        background: rgba(255, 255, 255, 0.02);
+        border: 1px solid rgba(255, 255, 255, 0.03);
+        opacity: 0;
+        transform: translateY(8px);
+        transition:
+          opacity 0.4s ease,
+          transform 0.4s ease;
+      }
+
+      .song-row:last-child {
+        margin-bottom: 0;
+      }
+      .song-row.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .song-icon {
+        width: 30px;
+        height: 30px;
+        border-radius: 7px;
+        flex-shrink: 0;
+        object-fit: cover;
+      }
+
+      .song-info {
+        flex: 1;
+      }
+      .song-info .song-title {
+        font-size: 13.5px;
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.8);
+      }
+      .song-info .song-artist {
+        font-size: 11.5px;
+        color: rgba(255, 255, 255, 0.25);
+        font-weight: 400;
+      }
+
+      .song-check {
+        color: #4ade80;
+        opacity: 0;
+        transform: scale(0.5);
+        transition:
+          opacity 0.3s ease,
+          transform 0.3s ease;
+      }
+
+      .song-check.visible {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      /* ===== SLIDE 2: Revenue ===== */
+      .revenue-label {
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.28);
+        text-transform: uppercase;
+        letter-spacing: 0.6px;
+        margin-bottom: 6px;
+        font-weight: 500;
+      }
+
+      .revenue-amount {
+        font-size: 34px;
+        font-weight: 800;
+        color: #eeeef0;
+        line-height: 1;
+        letter-spacing: -1.5px;
+      }
+
+      .revenue-change {
+        font-size: 12.5px;
+        color: #4ade80;
+        font-weight: 600;
+        margin-top: 5px;
+        margin-bottom: 18px;
+      }
+
+      .platform-row {
+        display: flex;
+        align-items: center;
+        padding: 9px 0;
+        border-top: 1px solid rgba(255, 255, 255, 0.04);
+        opacity: 0;
+        transform: translateY(6px);
+        transition:
+          opacity 0.4s ease,
+          transform 0.4s ease;
+      }
+
+      .platform-row.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      .platform-name {
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.4);
+        width: 95px;
+        font-weight: 500;
+      }
+
+      .platform-bar-track {
+        flex: 1;
+        height: 3.5px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 4px;
+        margin: 0 14px;
+        overflow: hidden;
+      }
+
+      .platform-bar-fill {
+        height: 100%;
+        border-radius: 4px;
+        width: 0%;
+        transition: width 1s ease;
+        background: rgba(255, 255, 255, 0.55);
+      }
+
+      .platform-bar-fill.apple {
+        background: rgba(255, 255, 255, 0.35);
+      }
+      .platform-bar-fill.youtube {
+        background: rgba(255, 255, 255, 0.2);
+      }
+
+      .platform-amount {
+        font-size: 13px;
+        font-weight: 700;
+        color: rgba(255, 255, 255, 0.6);
+        width: 58px;
+        text-align: right;
+      }
+
+      /* ===== SLIDE 3: Analytics ===== */
+      .analytics-header {
+        display: flex;
+        align-items: baseline;
+        gap: 12px;
+        margin-bottom: 12px;
+      }
+
+      .analytics-number {
+        font-size: 34px;
+        font-weight: 800;
+        color: #eeeef0;
+        letter-spacing: -1.5px;
+      }
+
+      .analytics-change {
+        font-size: 12.5px;
+        color: #4ade80;
+        font-weight: 600;
+      }
+
+      .chart-container {
+        position: relative;
+        height: 155px;
+      }
+      .chart-container svg {
+        width: 100%;
+        height: 100%;
+      }
+
+      .chart-grid {
+        stroke: rgba(255, 255, 255, 0.055);
+        stroke-width: 0.5;
+        stroke-dasharray: 3 4;
+      }
+
+      .chart-line {
+        fill: none;
+        stroke: #eeeef0;
+        stroke-width: 2;
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-dasharray: 500;
+        stroke-dashoffset: 500;
+        transition: stroke-dashoffset 2s ease;
+      }
+
+      .chart-line.drawn {
+        stroke-dashoffset: 0;
+      }
+
+      .chart-area {
+        opacity: 0;
+        transition: opacity 1.2s ease 0.4s;
+      }
+      .chart-area.visible {
+        opacity: 1;
+      }
+
+      .chart-dot {
+        transition: opacity 0.3s ease;
+      }
+      .chart-dot.visible {
+        opacity: 1;
+      }
+
+      .chart-label {
+        font-size: 9.5px;
+        fill: rgba(255, 255, 255, 0.2);
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-weight: 500;
+      }
+
+      .chart-y-label {
+        font-size: 9px;
+        fill: rgba(255, 255, 255, 0.15);
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-weight: 500;
+      }
+
+      /* Dots */
+      .carousel-dots {
+        display: flex;
+        justify-content: center;
+        gap: 6px;
+        margin-top: 20px;
+        position: relative;
+        z-index: 1;
+      }
+
+      .dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.12);
+        transition: all 0.3s ease;
+        cursor: pointer;
+      }
+
+      .dot.active {
+        width: 24px;
+        background: rgba(255, 255, 255, 0.55);
+      }
+
+      /* ===== LIGHT MODE ===== */
+      body.light, html:has(body.light) {
+        background: #ffffff;
+      }
+      body.light .card {
+        background: #ffffff;
+        border-color: #e2ddd5;
+      }
+      body.light .blob1,
+      body.light .blob2 {
+        background: rgba(0, 0, 0, 0.025);
+      }
+      body.light .card h2 {
+        color: #111111;
+      }
+      body.light .subtitle {
+        color: rgba(0, 0, 0, 0.45);
+      }
+      body.light .subtitle strong {
+        color: rgba(0, 0, 0, 0.8);
+      }
+      body.light .slide-header {
+        background: rgba(0, 0, 0, 0.04);
+      }
+      body.light .slide-icon {
+        background: rgba(0, 0, 0, 0.05);
+      }
+      body.light .slide-icon svg {
+        color: rgba(0, 0, 0, 0.45);
+      }
+      body.light .slide-header-text h3 {
+        color: #111111;
+      }
+      body.light .slide-header-text span {
+        color: rgba(0, 0, 0, 0.4);
+      }
+      body.light .slide-body {
+        background: rgba(0, 0, 0, 0.02);
+        border-color: rgba(0, 0, 0, 0.06);
+      }
+      body.light .progress-bar-track {
+        background: rgba(0, 0, 0, 0.06);
+      }
+      body.light .progress-bar-fill {
+        background: linear-gradient(90deg, rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.6));
+      }
+      body.light .song-row {
+        background: rgba(0, 0, 0, 0.02);
+        border-color: rgba(0, 0, 0, 0.05);
+      }
+      body.light .song-icon {
+        background: rgba(0, 0, 0, 0.04);
+      }
+      body.light .song-icon svg {
+        color: rgba(0, 0, 0, 0.3);
+      }
+      body.light .song-title {
+        color: rgba(0, 0, 0, 0.8);
+      }
+      body.light .song-artist {
+        color: rgba(0, 0, 0, 0.35);
+      }
+      body.light .check-icon {
+        color: #16a34a;
+      }
+      body.light .song-check {
+        color: #16a34a;
+      }
+      body.light .revenue-label {
+        color: rgba(0, 0, 0, 0.4);
+      }
+      body.light .revenue-amount {
+        color: #111111;
+      }
+      body.light .revenue-change {
+        color: #16a34a;
+      }
+      body.light .platform-row {
+        border-top-color: rgba(0, 0, 0, 0.06);
+      }
+      body.light .platform-name {
+        color: rgba(0, 0, 0, 0.45);
+      }
+      body.light .platform-bar-track {
+        background: rgba(0, 0, 0, 0.06);
+      }
+      body.light .platform-bar-fill {
+        background: rgba(0, 0, 0, 0.5);
+      }
+      body.light .platform-bar-fill.apple {
+        background: rgba(0, 0, 0, 0.3);
+      }
+      body.light .platform-bar-fill.youtube {
+        background: rgba(0, 0, 0, 0.18);
+      }
+      body.light .platform-amount {
+        color: rgba(0, 0, 0, 0.55);
+      }
+      body.light .analytics-number {
+        color: #111111;
+      }
+      body.light .analytics-change {
+        color: #16a34a;
+      }
+      body.light .chart-grid {
+        stroke: rgba(0, 0, 0, 0.07);
+      }
+      body.light .chart-line {
+        stroke: #111111;
+      }
+      body.light .chart-label {
+        fill: rgba(0, 0, 0, 0.25);
+      }
+      body.light .chart-y-label {
+        fill: rgba(0, 0, 0, 0.2);
+      }
+      body.light .dot {
+        background: rgba(0, 0, 0, 0.12);
+      }
+      body.light .dot.active {
+        background: rgba(0, 0, 0, 0.5);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="card">
+      <div class="blob1"></div>
+      <div class="blob2"></div>
+
+      <h2>Connect your catalog.</h2>
+      <p class="subtitle">
+        Upload your catalog and import your statements. <strong>Verax</strong> maps everything across platforms, societies,
+        and territories automatically.
+      </p>
+
+      <div class="carousel">
+        <!-- SLIDE 1: Catalog Import -->
+        <div class="slide active" data-slide="0">
+          <div class="slide-header">
+            <div class="slide-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                <polyline points="17 8 12 3 7 8" />
+                <line x1="12" y1="3" x2="12" y2="15" />
+              </svg>
+            </div>
+            <div class="slide-header-text">
+              <h3>Importing catalog</h3>
+              <span id="importStatus">Syncing metadata...</span>
+            </div>
+            <svg class="check-icon" id="importCheck" width="20" height="20" viewBox="0 0 20 20" fill="none">
+              <path
+                d="M6 10l3 3 5-5"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              />
+            </svg>
+          </div>
+          <div class="slide-body">
+            <div class="progress-bar-track">
+              <div class="progress-bar-fill" id="progressFill"></div>
+            </div>
+            <div class="song-row" id="song1">
+              <img class="song-icon" src="The_Weeknd_-_Blinding_Lights.png" alt="Blinding Lights" />
+              <div class="song-info">
+                <div class="song-title">Blinding Lights</div>
+                <div class="song-artist">The Weeknd</div>
+              </div>
+              <svg class="song-check" id="check1" width="18" height="18" viewBox="0 0 18 18" fill="none">
+                <path
+                  d="M5 9l3 3 5-5"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </div>
+            <div class="song-row" id="song2">
+              <img class="song-icon" src="album-levitating.png" alt="Levitating" />
+              <div class="song-info">
+                <div class="song-title">Levitating</div>
+                <div class="song-artist">Dua Lipa</div>
+              </div>
+              <svg class="song-check" id="check2" width="18" height="18" viewBox="0 0 18 18" fill="none">
+                <path
+                  d="M5 9l3 3 5-5"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </div>
+            <div class="song-row" id="song3">
+              <img class="song-icon" src="album-as-it-was.png" alt="As It Was" />
+              <div class="song-info">
+                <div class="song-title">As It Was</div>
+                <div class="song-artist">Harry Styles</div>
+              </div>
+              <svg class="song-check" id="check3" width="18" height="18" viewBox="0 0 18 18" fill="none">
+                <path
+                  d="M5 9l3 3 5-5"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        <!-- SLIDE 2: Revenue Dashboard -->
+        <div class="slide" data-slide="1">
+          <div class="slide-header">
+            <div class="slide-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                <line x1="12" y1="1" x2="12" y2="23" />
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+              </svg>
+            </div>
+            <div class="slide-header-text">
+              <h3>Revenue Dashboard</h3>
+              <span>This month</span>
+            </div>
+          </div>
+          <div class="slide-body">
+            <div>
+              <div class="revenue-label">Total Earnings</div>
+              <div class="revenue-amount" id="revenueNum">$0</div>
+              <div class="revenue-change">+18.2% from last month</div>
+            </div>
+            <div class="platform-row" id="plat1">
+              <span class="platform-name">Spotify</span>
+              <div class="platform-bar-track"><div class="platform-bar-fill spotify" id="bar1"></div></div>
+              <span class="platform-amount">$4,200</span>
+            </div>
+            <div class="platform-row" id="plat2">
+              <span class="platform-name">Apple Music</span>
+              <div class="platform-bar-track"><div class="platform-bar-fill apple" id="bar2"></div></div>
+              <span class="platform-amount">$2,850</span>
+            </div>
+            <div class="platform-row" id="plat3">
+              <span class="platform-name">YouTube</span>
+              <div class="platform-bar-track"><div class="platform-bar-fill youtube" id="bar3"></div></div>
+              <span class="platform-amount">$1,400</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- SLIDE 3: Stream Analytics -->
+        <div class="slide" data-slide="2">
+          <div class="slide-header">
+            <div class="slide-icon">
+              <svg
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                stroke-width="2"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+              >
+                <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+              </svg>
+            </div>
+            <div class="slide-header-text">
+              <h3>Stream Analytics</h3>
+              <span>Last 6 months</span>
+            </div>
+          </div>
+          <div class="slide-body">
+            <div class="analytics-header">
+              <span class="analytics-number" id="streamNum">0</span>
+              <span class="analytics-change">+26% growth</span>
+            </div>
+            <div class="chart-container">
+              <svg viewBox="0 0 300 140">
+                <!-- Horizontal grid lines -->
+                <line class="chart-grid" x1="42" y1="10" x2="288" y2="10" />
+                <line class="chart-grid" x1="42" y1="34" x2="288" y2="34" />
+                <line class="chart-grid" x1="42" y1="58" x2="288" y2="58" />
+                <line class="chart-grid" x1="42" y1="82" x2="288" y2="82" />
+                <line class="chart-grid" x1="42" y1="106" x2="288" y2="106" />
+
+                <!-- Vertical grid lines -->
+                <line class="chart-grid" x1="42" y1="10" x2="42" y2="106" />
+                <line class="chart-grid" x1="91" y1="10" x2="91" y2="106" />
+                <line class="chart-grid" x1="140" y1="10" x2="140" y2="106" />
+                <line class="chart-grid" x1="189" y1="10" x2="189" y2="106" />
+                <line class="chart-grid" x1="238" y1="10" x2="238" y2="106" />
+                <line class="chart-grid" x1="288" y1="10" x2="288" y2="106" />
+
+                <!-- Y axis labels -->
+                <text class="chart-y-label" x="36" y="14" text-anchor="end">120k</text>
+                <text class="chart-y-label" x="36" y="38" text-anchor="end">90k</text>
+                <text class="chart-y-label" x="36" y="62" text-anchor="end">60k</text>
+                <text class="chart-y-label" x="36" y="86" text-anchor="end">30k</text>
+                <text class="chart-y-label" x="36" y="110" text-anchor="end">0k</text>
+
+                <!-- Area fill -->
+                <defs>
+                  <linearGradient id="areaGrad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="rgba(255,255,255,0.06)" />
+                    <stop offset="100%" stop-color="rgba(255,255,255,0)" />
+                  </linearGradient>
+                </defs>
+
+                <path
+                  class="chart-area"
+                  id="chartArea"
+                  d="M42,88 L91,82 L140,68 L189,48 L238,22 L288,10 L288,106 L42,106 Z"
+                  fill="url(#areaGrad)"
+                />
+
+                <!-- Straight line segments -->
+                <path class="chart-line" id="chartLine" d="M42,88 L91,82 L140,68 L189,48 L238,22 L288,10" />
+
+                <!-- Data point dots -->
+                <circle
+                  class="chart-dot"
+                  cx="42"
+                  cy="88"
+                  r="3"
+                  fill="#000000"
+                  stroke="#eeeef0"
+                  stroke-width="1.5"
+                  opacity="0"
+                />
+                <circle
+                  class="chart-dot"
+                  cx="91"
+                  cy="82"
+                  r="3"
+                  fill="#000000"
+                  stroke="#eeeef0"
+                  stroke-width="1.5"
+                  opacity="0"
+                />
+                <circle
+                  class="chart-dot"
+                  cx="140"
+                  cy="68"
+                  r="3"
+                  fill="#000000"
+                  stroke="#eeeef0"
+                  stroke-width="1.5"
+                  opacity="0"
+                />
+                <circle
+                  class="chart-dot"
+                  cx="189"
+                  cy="48"
+                  r="3"
+                  fill="#000000"
+                  stroke="#eeeef0"
+                  stroke-width="1.5"
+                  opacity="0"
+                />
+                <circle
+                  class="chart-dot"
+                  cx="238"
+                  cy="22"
+                  r="3"
+                  fill="#000000"
+                  stroke="#eeeef0"
+                  stroke-width="1.5"
+                  opacity="0"
+                />
+                <circle
+                  class="chart-dot"
+                  cx="288"
+                  cy="10"
+                  r="3"
+                  fill="#000000"
+                  stroke="#eeeef0"
+                  stroke-width="1.5"
+                  opacity="0"
+                />
+
+                <!-- X axis labels -->
+                <text class="chart-label" x="42" y="122" text-anchor="middle">Jan</text>
+                <text class="chart-label" x="91" y="122" text-anchor="middle">Feb</text>
+                <text class="chart-label" x="140" y="122" text-anchor="middle">Mar</text>
+                <text class="chart-label" x="189" y="122" text-anchor="middle">Apr</text>
+                <text class="chart-label" x="238" y="122" text-anchor="middle">May</text>
+                <text class="chart-label" x="288" y="122" text-anchor="middle">Jun</text>
+              </svg>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="carousel-dots">
+        <div class="dot active" data-dot="0"></div>
+        <div class="dot" data-dot="1"></div>
+        <div class="dot" data-dot="2"></div>
+      </div>
+    </div>
+
+    <script>
+      /* Theme detection from parent app */
+      function applyTheme(theme) {
+        const isLight = theme === 'light';
+        document.body.classList.toggle('light', isLight);
+        /* SVG inline attributes can't be styled via CSS, update them directly */
+        document.querySelectorAll('.chart-dot').forEach((dot) => {
+          dot.setAttribute('fill', isLight ? '#ffffff' : '#000000');
+          dot.setAttribute('stroke', isLight ? '#111111' : '#eeeef0');
+        });
+        const stops = document.querySelectorAll('#areaGrad stop');
+        if (stops.length === 2) {
+          stops[0].setAttribute('stop-color', isLight ? 'rgba(0,0,0,0.06)' : 'rgba(255,255,255,0.06)');
+          stops[1].setAttribute('stop-color', isLight ? 'rgba(0,0,0,0)' : 'rgba(255,255,255,0)');
+        }
+      }
+
+      try {
+        const parentRoot = window.parent.document.documentElement;
+        applyTheme(parentRoot.getAttribute('data-theme'));
+        new MutationObserver(() => {
+          applyTheme(parentRoot.getAttribute('data-theme'));
+        }).observe(parentRoot, { attributes: true, attributeFilter: ['data-theme'] });
+      } catch (e) {
+        /* cross-origin fallback: stays dark */
+      }
+
+      const slides = document.querySelectorAll('.slide');
+      const dots = document.querySelectorAll('.dot');
+      let current = 0;
+      let slideTimeout;
+
+      function goToSlide(index) {
+        slides[current].classList.remove('active');
+        dots[current].classList.remove('active');
+        current = index;
+        slides[current].classList.add('active');
+        dots[current].classList.add('active');
+        animateSlide(current);
+      }
+
+      function animateSlide(index) {
+        clearTimeout(slideTimeout);
+        if (index === 0) animateImport();
+        else if (index === 1) animateRevenue();
+        else if (index === 2) animateAnalytics();
+      }
+
+      function animateImport() {
+        const fill = document.getElementById('progressFill');
+        const songs = ['song1', 'song2', 'song3'].map((id) => document.getElementById(id));
+        const checks = ['check1', 'check2', 'check3'].map((id) => document.getElementById(id));
+        const importStatus = document.getElementById('importStatus');
+        const importCheck = document.getElementById('importCheck');
+
+        fill.style.transition = 'none';
+        fill.style.width = '0%';
+        songs.forEach((s) => s.classList.remove('visible'));
+        checks.forEach((c) => c.classList.remove('visible'));
+        importStatus.textContent = 'Syncing metadata...';
+        importCheck.style.opacity = '0';
+
+        requestAnimationFrame(() => {
+          fill.style.transition = 'width 3.5s ease';
+          fill.style.width = '100%';
+        });
+
+        setTimeout(() => songs[0].classList.add('visible'), 400);
+        setTimeout(() => checks[0].classList.add('visible'), 800);
+        setTimeout(() => songs[1].classList.add('visible'), 1000);
+        setTimeout(() => checks[1].classList.add('visible'), 1400);
+        setTimeout(() => songs[2].classList.add('visible'), 1600);
+        setTimeout(() => checks[2].classList.add('visible'), 2000);
+        setTimeout(() => {
+          importStatus.textContent = 'Complete';
+          importCheck.style.opacity = '1';
+        }, 3000);
+
+        slideTimeout = setTimeout(() => goToSlide(1), 5000);
+      }
+
+      function animateRevenue() {
+        const numEl = document.getElementById('revenueNum');
+        const plats = ['plat1', 'plat2', 'plat3'].map((id) => document.getElementById(id));
+        const bars = ['bar1', 'bar2', 'bar3'].map((id) => document.getElementById(id));
+        const barWidths = ['85%', '58%', '30%'];
+
+        numEl.textContent = '$0';
+        plats.forEach((p) => p.classList.remove('visible'));
+        bars.forEach((b) => {
+          b.style.transition = 'none';
+          b.style.width = '0%';
+        });
+
+        const target = 8450,
+          duration = 1500;
+        let revStart = null;
+        function countUp(now) {
+          if (revStart === null) revStart = now;
+          const progress = Math.min((now - revStart) / duration, 1);
+          const eased = 1 - Math.pow(1 - progress, 3);
+          numEl.textContent = '$' + Math.round(target * eased).toLocaleString();
+          if (progress < 1) requestAnimationFrame(countUp);
+        }
+        requestAnimationFrame(countUp);
+
+        setTimeout(() => {
+          plats[0].classList.add('visible');
+          bars[0].style.transition = 'width 1s ease';
+          bars[0].style.width = barWidths[0];
+        }, 400);
+        setTimeout(() => {
+          plats[1].classList.add('visible');
+          bars[1].style.transition = 'width 1s ease';
+          bars[1].style.width = barWidths[1];
+        }, 700);
+        setTimeout(() => {
+          plats[2].classList.add('visible');
+          bars[2].style.transition = 'width 1s ease';
+          bars[2].style.width = barWidths[2];
+        }, 1000);
+
+        slideTimeout = setTimeout(() => goToSlide(2), 5000);
+      }
+
+      function animateAnalytics() {
+        const numEl = document.getElementById('streamNum');
+        const chartLine = document.getElementById('chartLine');
+        const chartArea = document.getElementById('chartArea');
+        const chartDots = document.querySelectorAll('.chart-dot');
+
+        numEl.textContent = '0';
+        chartLine.classList.remove('drawn');
+        chartArea.classList.remove('visible');
+        chartDots.forEach((d) => d.classList.remove('visible'));
+
+        const target = 120,
+          duration = 1500;
+        let strStart = null;
+        function countUp(now) {
+          if (strStart === null) strStart = now;
+          const progress = Math.min((now - strStart) / duration, 1);
+          const eased = 1 - Math.pow(1 - progress, 3);
+          numEl.textContent = Math.round(target * eased).toLocaleString() + 'K';
+          if (progress < 1) requestAnimationFrame(countUp);
+        }
+        requestAnimationFrame(countUp);
+
+        setTimeout(() => chartLine.classList.add('drawn'), 200);
+        setTimeout(() => chartArea.classList.add('visible'), 600);
+        chartDots.forEach((dot, i) => {
+          setTimeout(() => dot.classList.add('visible'), 600 + i * 200);
+        });
+
+        slideTimeout = setTimeout(() => goToSlide(0), 5000);
+      }
+
+      let running = false;
+
+      function resetToIdle() {
+        clearTimeout(slideTimeout);
+        running = false;
+        /* Reset to slide 0 idle state */
+        slides.forEach((s) => s.classList.remove('active'));
+        dots.forEach((d) => d.classList.remove('active'));
+        slides[0].classList.add('active');
+        dots[0].classList.add('active');
+        current = 0;
+        /* Reset slide 0 content */
+        const fill = document.getElementById('progressFill');
+        fill.style.transition = 'none';
+        fill.style.width = '0%';
+        ['song1', 'song2', 'song3'].forEach((id) => document.getElementById(id).classList.remove('visible'));
+        ['check1', 'check2', 'check3'].forEach((id) => document.getElementById(id).classList.remove('visible'));
+        document.getElementById('importStatus').textContent = 'Syncing metadata...';
+        document.getElementById('importCheck').style.opacity = '0';
+      }
+
+      function startAnimation() {
+        if (running) return;
+        running = true;
+        resetToIdle();
+        requestAnimationFrame(() => animateImport());
+      }
+
+      dots.forEach((dot) => {
+        dot.addEventListener('click', () => {
+          clearTimeout(slideTimeout);
+          goToSlide(parseInt(dot.dataset.dot));
+        });
+      });
+
+      /* Listen for start/stop messages from parent */
+      window.addEventListener('message', (e) => {
+        if (e.data === 'start') startAnimation();
+        else if (e.data === 'stop') resetToIdle();
+      });
+
+      /* Auto-start if already active (parent sends start on mount) */
+      startAnimation();
+    </script>
+  </body>
+</html>

@@ -1,0 +1,100 @@
+{
+  "project": "RD Admin · Statement Data Integration UI (Phase 1 frontend)",
+  "branchName": "ralph/statement-admin-ui",
+  "description": "Wire the existing RD admin dashboard to the new statement-ingestion backend (PRD-statement-data-integration.md §8-9). Admin dumps loose PDF+XLSX files in one place; system sorts by writer/period/type; validation findings gate the workflow. All live behavior behind REACT_APP_STATEMENTS_LIVE so the demo (mocks) keeps working untouched. Backend may lag — every screen degrades gracefully.",
+  "userStories": [
+    {
+      "id": "FE-001",
+      "title": "Feature flag + statements API client module",
+      "description": "As a developer, I need a single API client for the new backend and a feature flag so live behavior can ship dark.",
+      "acceptanceCriteria": [
+        "src/config/featureFlags.js exports statementsLive (true when process.env.REACT_APP_STATEMENTS_LIVE === '1')",
+        "src/api/statementsAdmin.js exports axios-based functions matching PRD §9 Phase-1 subset: createUpload(files, onProgress), getUpload(id), listBatches(params), getBatch(id), listFindings(batchId, params), waiveFinding(id, reason), acknowledgeFinding(id), listBatchStatements(batchId, params), getStatement(id), getStatementLines(id, page, pageSize), revalidateBatch(batchId)",
+        "createUpload posts multipart FormData with many files to POST {REACT_APP_BACKEND_URL}/admin/statements/uploads and reports upload progress via onProgress callback",
+        "All functions normalize errors to {status, message, detail} and never throw raw axios errors; a small unit test file under src/api/__tests__/ runs green via CI=true npx react-scripts test --watchAll=false",
+        "npm run lint exits 0; dev server still compiles (curl 200 + no ERROR in /tmp/verax_rd_frontend.log)"
+      ],
+      "priority": 1,
+      "passes": false,
+      "notes": "No UI in this story. Check verax_backend app/routers/ for the real router prefix if it exists already; PRD §9 paths are /admin/statements/uploads, /admin/statements/batches/{id}, /admin/findings/{id}/waive, etc. Auth: existing axios patterns in src/pages/Revenue/Revenue.jsx show how auth headers are attached — reuse."
+    },
+    {
+      "id": "FE-002",
+      "title": "Upload screen: dump loose files, watch sort progress",
+      "description": "As an admin, I drag ALL my statement files (hundreds, unsorted PDF+XLSX) into one drop zone and watch the system sort them by writer/period/type.",
+      "acceptanceCriteria": [
+        "AdminStatementUpload page (flag on): drop zone accepts many files at once (multiple + webkitdirectory not required; multi-select and drag-drop folder contents OK), shows queued count and total size before submit",
+        "Submit calls createUpload with progress bar; on 202 shows upload_id and starts polling getUpload(id) every 2s",
+        "Poll renders pipeline stage + counters from upload stats (sorted/parsed/failed/remaining) and stops on terminal status (done/failed)",
+        "Sort summary panel after completion: derived batches (period+catalog+statement count), writer count, and an 'unsortable files' list by filename with reason — never silently hidden",
+        "Backend unreachable → inline error banner with retry; flag off → existing mock behavior unchanged",
+        "npm run lint exits 0; dev server compiles; route noted in progress log for spot-check"
+      ],
+      "priority": 2,
+      "passes": false,
+      "notes": "PRD §6 upload model + §8 AdminStatementUpload row. Reuse the existing drop-zone UI in AdminStatementUpload.jsx/AdminUploadModal.jsx — restyle minimally, don't rebuild."
+    },
+    {
+      "id": "FE-003",
+      "title": "Batches list wired to live API",
+      "description": "As an admin, I see every ingested batch (period, catalog, status, finding counts) instead of mock statements.",
+      "acceptanceCriteria": [
+        "AdminStatements page (flag on) lists batches from listBatches(): columns label/period, catalog, statement count, lifecycle status chip (uploaded|parsing|parsed|validating|needs_review|approved|distributed), blocker/warning counts",
+        "Status filter dropdown and period filter wired to query params; loading skeleton; empty state ('No batches yet — upload statements'); unreachable-backend banner",
+        "Row click navigates to /admin/statements/:batchId (batch detail route registered)",
+        "Flag off → page renders exactly as before (mock list)",
+        "npm run lint exits 0; dev server compiles; route noted in progress log"
+      ],
+      "priority": 3,
+      "passes": false,
+      "notes": "PRD §8 table: AdminStatements becomes the Batches list. Keep the existing visual language (status chips already exist in the mock UI)."
+    },
+    {
+      "id": "FE-004",
+      "title": "Batch detail: validation findings with waive/acknowledge",
+      "description": "As an admin, I see exactly what's wrong with a batch — grouped, severity-badged findings — and can waive blockers (with reason) or acknowledge warnings, with the result reflected immediately.",
+      "acceptanceCriteria": [
+        "AdminStatementDetail page (flag on) for /admin/statements/:batchId: header with batch label, status, statement count, finding counts by severity",
+        "Findings list grouped by rule level (File integrity / Statement math / other) with severity badges (blocker=red, warning=amber, info=gray), each showing rule_id, message, scope_ref, status",
+        "Waive action on open blockers/warnings opens a modal REQUIRING a reason (submit disabled when empty), calls waiveFinding, refreshes list; acknowledge button on warnings calls acknowledgeFinding",
+        "Waived/resolved findings render struck-through or de-emphasized with waived_by/waived_reason visible on expand",
+        "Revalidate button calls revalidateBatch then re-polls findings",
+        "Replace the existing hardcoded validation issue list in AdminStatementDetail.jsx with this API-driven panel when flag on; flag off → old behavior",
+        "npm run lint exits 0; dev server compiles; route noted in progress log"
+      ],
+      "priority": 4,
+      "passes": false,
+      "notes": "PRD §7.3 severity semantics + §8 AdminStatementDetail row. The old hardcoded blocking/warning arrays in AdminStatementDetail.jsx are the thing being replaced."
+    },
+    {
+      "id": "FE-005",
+      "title": "Batch statements table + statement drill-down",
+      "description": "As an admin, I drill from a batch into any writer's statement and see the official figures, reconciliation status, and line items.",
+      "acceptanceCriteria": [
+        "Batch detail gains a statements table: account code, writer name, calculated, payable, zero-pay reason badge (paid/threshold_carryover/recouped/zero_earnings), detail_sum vs calculated match indicator, parse status",
+        "Clicking a statement opens drill-down (route or slide-over) rendering the account-summary waterfall: calculated → recouped → reserves → carried forward → prev payable → settlement → payable, with each non-null component on its own row",
+        "Paginated line-items table via getStatementLines (server-side pagination controls, page size 50): song/asset, title, country, source, type, units, earnings; handles 10k+ line statements without rendering them all",
+        "Search/filter box on the statements table (by account code or writer name, client-side)",
+        "npm run lint exits 0; dev server compiles; route noted in progress log"
+      ],
+      "priority": 5,
+      "passes": false,
+      "notes": "PRD §8 AdminStatementDetail drill-down + §8.1 earned-vs-paid waterfall (admin-side version). The waterfall explains payable≠calculated cases like El Taiger (6,663 earned but 45,193 paid via carryforward)."
+    },
+    {
+      "id": "FE-006",
+      "title": "Live end-to-end smoke against the real backend",
+      "description": "As the team, we prove the whole Phase-1 slice works: dump real fixture files in the UI, watch them sort/parse/validate, drill into a statement, waive a finding.",
+      "acceptanceCriteria": [
+        "Backend running locally (start it: cd /Users/stevengarcia/VERAX_2/verax_backend && ./start_backend.sh in background, branch ralph/statement-data-integration; skip this story until its US-010 is passes:true in that repo's scripts/ralph/prd.json)",
+        "Scripted smoke via curl or node: create upload with the 14 real fixture files from /Users/stevengarcia/VERAX_2/verax_backend/tests/fixtures/statements/, poll to completion, assert via API: 5 batches, 7 statements, 0 blockers",
+        "Document the click-path for human verification in scripts/ralph/SMOKE.md: upload → batches list shows 5 new batches → open PUB26H1/YT batch → statements table shows C00650 payable 45,193.21 and C00739-New threshold_carryover badge → drill into C00650 waterfall shows carried forward 38,529.94 → lines paginate",
+        "Any contract mismatches found between frontend client and real backend fixed on the frontend side (or noted in progress.txt if backend-side)",
+        "npm run lint exits 0; dev server compiles"
+      ],
+      "priority": 6,
+      "passes": false,
+      "notes": "This story is the integration gate. If backend US-010 isn't done yet, end the iteration WITHOUT marking passes (another iteration will retry later)."
+    }
+  ]
+}

@@ -1,0 +1,117 @@
+{
+  "name": "tunescan_frontend",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@heroui/navbar": "^2.2.27",
+    "@heroui/progress": "^2.2.24",
+    "@heroui/react": "^2.8.7",
+    "@heroui/system": "^2.4.25",
+    "@heroui/theme": "^2.4.25",
+    "@microsoft/clarity": "^1.0.2",
+    "@mui/material": "^6.5.0",
+    "@mui/x-charts": "^7.29.1",
+    "@nivo/core": "^0.99.0",
+    "@nivo/line": "^0.99.0",
+    "@react-oauth/google": "^0.12.1",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.1.0",
+    "@testing-library/user-event": "^14.5.2",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^25.3.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "ajv": "^8.17.1",
+    "ajv-keywords": "^5.1.0",
+    "axios": "^1.7.9",
+    "chart.js": "^4.5.0",
+    "date-fns": "^4.1.0",
+    "exceljs": "^4.4.0",
+    "framer-motion": "^12.23.26",
+    "gsap": "^3.13.0",
+    "jwt-decode": "^4.0.0",
+    "lucide-react": "^0.546.0",
+    "ogl": "^1.0.11",
+    "papaparse": "^5.5.3",
+    "pdfjs-dist": "^4.10.38",
+    "posthog-js": "^1.311.0",
+    "query-string": "^9.1.1",
+    "react": "^19.2.3",
+    "react-chartjs-2": "^5.3.0",
+    "react-dom": "^19.2.3",
+    "react-globe.gl": "^2.37.0",
+    "react-google-recaptcha": "^3.1.0",
+    "react-helmet-async": "^2.0.5",
+    "react-icons": "^5.4.0",
+    "react-router-dom": "^6.28.0",
+    "react-scripts": "5.0.1",
+    "react-switch": "^7.1.0",
+    "react-toastify": "^11.0.2",
+    "react-window": "^2.2.0",
+    "recharts": "^2.15.0",
+    "serve": "^14.2.4",
+    "typescript": "^5.9.3",
+    "url-join": "^5.0.0",
+    "web-vitals": "^4.2.4"
+  },
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "cross-env GENERATE_SOURCEMAP=false NODE_OPTIONS=--max-old-space-size=8192 react-scripts build",
+    "build:prod": "./optimize-build.sh",
+    "build:analyze": "npm run build && npx source-map-explorer 'build/static/js/*.js'",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "serve": "serve -s build",
+    "lint": "eslint .",
+    "fix": "eslint --fix",
+    "lint:fix": "eslint --fix",
+    "prettier": "prettier --write \"./**/*.{js,jsx,mjs,cjs,ts,tsx,json}\"",
+    "clean:logs": "node remove-console-logs.js"
+  },
+  "eslintConfig": {
+    "extends": [
+      "react-app",
+      "react-app/jest"
+    ],
+    "plugins": [
+      "react-hooks"
+    ],
+    "rules": {
+      "no-console": "off",
+      "no-unused-vars": "warn",
+      "react-hooks/rules-of-hooks": "error",
+      "react-hooks/exhaustive-deps": "warn",
+      "prettier/prettier": "off"
+    }
+  },
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  },
+  "devDependencies": {
+    "@types/papaparse": "^5.5.2",
+    "@types/react-google-recaptcha": "^2.1.9",
+    "@typescript-eslint/eslint-plugin": "^8.56.0",
+    "@typescript-eslint/parser": "^8.56.0",
+    "autoprefixer": "^10.4.20",
+    "cross-env": "^7.0.3",
+    "eslint": "^8.57.1",
+    "eslint-config-prettier": "^10.1.5",
+    "eslint-plugin-prettier": "^5.4.1",
+    "eslint-plugin-react-hooks": "^4.6.2",
+    "html-webpack-plugin": "^5.6.4",
+    "postcss": "^8.4.49",
+    "prettier": "^3.5.3",
+    "tailwindcss": "^3.4.17"
+  }
+}

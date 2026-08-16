@@ -1,0 +1,246 @@
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+
+/* Scoped audit CSS variables — override Verax's defaults inside the audit */
+.free-audit-scope {
+  /* Dark mode defaults */
+  --text: #d4d4d4;
+  --soft-text: #737373;
+  --background: #000000;
+  --card-bg: transparent;
+  --panel-bg: #000000;
+  --border: #262626;
+  --border-hover: #404040;
+  --accent: #4ade80;
+  --accent-dim: rgba(74, 222, 128, 0.15);
+  --accent-text: #000000;
+  --success: #4ade80;
+  --error: #f87171;
+  --warning: #fbbf24;
+  --muted-text: #525252;
+  --hover-bg: #0a0a0a;
+
+  --font: 'JetBrains Mono', monospace;
+  --radius: 4px;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+
+  font-family: var(--font);
+  font-size: 13px;
+  font-weight: 400;
+  line-height: 1.6;
+  color: var(--text);
+}
+
+:root[data-theme='light'] .free-audit-scope {
+  --text: #1a1a1a;
+  --soft-text: #6b6b6b;
+  --background: #f5f3ef;
+  --card-bg: transparent;
+  --panel-bg: #f5f3ef;
+  --border: #d6d3cd;
+  --border-hover: #a8a5a0;
+  --accent: #111111;
+  --accent-dim: rgba(0, 0, 0, 0.06);
+  --accent-text: #ffffff;
+  --success: #16a34a;
+  --error: #dc2626;
+  --warning: #d97706;
+  --muted-text: #8a8a8a;
+  --hover-bg: #eae7e1;
+}
+
+.free-audit-scope button {
+  font-family: var(--font);
+}
+
+/* Audit nav */
+.audit-nav {
+  height: auto;
+  min-height: 60px;
+  background: var(--background);
+  border-bottom: 1px solid var(--border);
+}
+
+.audit-nav .audit-logo {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding: 0.5rem 1rem;
+  text-decoration: none;
+  min-height: 52px;
+}
+
+@media (min-width: 768px) {
+  .audit-nav {
+    min-height: 80px;
+  }
+
+  .audit-nav .audit-logo {
+    margin: 0.2rem 1rem;
+    padding: 0.35rem 1rem;
+    min-height: 68px;
+  }
+}
+
+/* App layout styles scoped */
+.free-audit-scope .app-container {
+  min-height: calc(100vh - 90px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 24px 12vh;
+  background: var(--background);
+}
+
+.free-audit-scope .content-wrapper {
+  width: 100%;
+  max-width: 560px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--panel-bg);
+}
+
+.free-audit-scope .audit-header {
+  padding: 40px 40px 36px;
+  border-bottom: 1px solid var(--border);
+}
+
+.free-audit-scope .audit-header h1 {
+  font-size: 24px;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 12px;
+  letter-spacing: -0.02em;
+  line-height: 1.3;
+}
+
+.free-audit-scope .audit-header p {
+  font-size: 13px;
+  color: var(--muted-text);
+  font-weight: 400;
+}
+
+.free-audit-scope .progress-bar {
+  height: 2px;
+  background: var(--border);
+  position: relative;
+}
+
+.free-audit-scope .progress-fill {
+  height: 100%;
+  background: var(--accent);
+  transition: width 0.3s var(--ease);
+}
+
+.free-audit-scope .step-container {
+  padding: 40px;
+  min-height: 320px;
+  animation: auditFadeIn 0.25s var(--ease);
+}
+
+@keyframes auditFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.free-audit-scope .step-title {
+  font-size: 16px;
+  font-weight: 500;
+  margin-bottom: 32px;
+  color: var(--text);
+  text-align: center;
+  letter-spacing: -0.01em;
+}
+
+@media (max-width: 768px) {
+  .free-audit-scope {
+    height: 100vh;
+    height: 100dvh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .free-audit-scope .audit-nav {
+    min-height: 44px;
+    flex-shrink: 0;
+  }
+
+  .free-audit-scope .audit-nav .audit-logo {
+    min-height: 40px;
+    padding: 4px 12px;
+  }
+
+  .free-audit-scope .audit-nav .audit-logo img {
+    max-width: 55px !important;
+    max-height: 55px !important;
+  }
+
+  .free-audit-scope .app-container {
+    padding: 12px 16px;
+    min-height: 0;
+    flex: 1;
+    overflow: hidden;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .free-audit-scope .content-wrapper {
+    max-height: 100%;
+    overflow: hidden;
+  }
+
+  .free-audit-scope .audit-header {
+    padding: 12px 16px;
+  }
+
+  .free-audit-scope .audit-header h1 {
+    font-size: 15px;
+    margin-bottom: 4px;
+  }
+
+  .free-audit-scope .audit-header p {
+    font-size: 11px;
+  }
+
+  .free-audit-scope .step-title {
+    font-size: 14px;
+    margin-bottom: 14px;
+  }
+
+  .free-audit-scope .step-container {
+    padding: 16px;
+    min-height: 0;
+  }
+}
+
+@media (max-width: 480px) {
+  .free-audit-scope .app-container {
+    padding: 8px 10px;
+  }
+
+  .free-audit-scope .audit-header {
+    padding: 10px 14px;
+  }
+
+  .free-audit-scope .audit-header h1 {
+    font-size: 14px;
+    margin-bottom: 2px;
+  }
+
+  .free-audit-scope .step-container {
+    padding: 14px;
+    min-height: 0;
+  }
+
+  .free-audit-scope .step-title {
+    font-size: 13px;
+    margin-bottom: 10px;
+  }
+}
