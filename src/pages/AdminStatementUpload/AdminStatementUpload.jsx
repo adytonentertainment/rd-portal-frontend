@@ -6,7 +6,7 @@ import Sidebar from '../../components/Sidebar/Sidebar';
 import { useIsAdmin } from '../../utils/auth';
 import { addStatement, generateStatementId, SOURCES } from '../../mocks/statementsAdminData';
 import { statementsLive } from '../../config/featureFlags';
-import { createUpload, getUpload } from '../../api/statementsAdmin';
+import { createUpload, resumeUpload, getUpload } from '../../api/statementsAdmin';
 import { deriveSortPreview } from '../../utils/statementFilenames';
 import styles from './adminStatementUpload.module.css';
 
@@ -177,6 +177,9 @@ const LiveStatementUpload = () => {
   // phase: select | uploading | processing | done | failed
   const [phase, setPhase] = useState('select');
   const [uploadPct, setUploadPct] = useState(0);
+  // Set when a transfer fails partway: the files already on the server can
+  // be kept and only the missing ones re-sent.
+  const [resumeId, setResumeId] = useState(null);
   const [upload, setUpload] = useState(null);
   const [preview, setPreview] = useState(null);
   const [error, setError] = useState(null);
@@ -225,21 +228,30 @@ const LiveStatementUpload = () => {
     addFiles(e.dataTransfer.files);
   };
 
-  const handleSubmit = async () => {
+  const runUpload = async (resumeId) => {
     setError(null);
     setUploadPct(0);
     setPhase('uploading');
     setPreview(deriveSortPreview(queued.map((f) => f.name)));
     try {
-      const created = await createUpload(queued, setUploadPct);
+      const created = resumeId
+        ? await resumeUpload(resumeId, queued, setUploadPct)
+        : await createUpload(queued, setUploadPct);
       setUpload(created);
+      setResumeId(null);
       setPollPaused(false);
       setPhase('processing');
     } catch (err) {
+      // Keep the upload id. Losing it was what made every interruption
+      // unrecoverable: the files were safe on the server, but nothing could
+      // name the upload, so the only option was re-sending 2 GB from zero.
+      if (err?.upload_id) setResumeId(err.upload_id);
       setError(err);
       setPhase('select');
     }
   };
+
+  const handleSubmit = () => runUpload(null);
 
   const reset = () => {
     setQueued([]);
@@ -248,6 +260,7 @@ const LiveStatementUpload = () => {
     setPreview(null);
     setError(null);
     setUploadPct(0);
+    setResumeId(null);
     setPollPaused(false);
   };
 
@@ -266,7 +279,12 @@ const LiveStatementUpload = () => {
           <FaExclamationTriangle />
           <div className={styles.errorBannerText}>
             <strong>{error.status === 0 ? 'Backend unreachable' : 'Upload error'}</strong>
-            <span>{error.message}</span>
+            <span>{incompleteDetail(error) || error.message}</span>
+            {resumeId && (
+              <span className={styles.mutedNote}>
+                Files already sent are kept on the server — resuming sends only what is missing.
+              </span>
+            )}
           </div>
           <button
             type="button"
@@ -276,11 +294,13 @@ const LiveStatementUpload = () => {
                 setError(null);
                 setPollPaused(false);
               } else {
-                handleSubmit();
+                // Resume rather than restart: re-sending would abandon the
+                // files already uploaded and mint a second upload.
+                runUpload(resumeId);
               }
             }}
           >
-            Retry
+            {resumeId ? 'Resume upload' : 'Retry'}
           </button>
         </div>
       )}
@@ -475,6 +495,19 @@ const LiveStatementUpload = () => {
       )}
     </div>
   );
+};
+
+// The server refuses to finalize an incomplete drop and says exactly what is
+// missing. Show that instead of a bare "conflict".
+const incompleteDetail = (err) => {
+  const d = err?.detail;
+  if (!d || d.error !== 'incomplete_upload') return null;
+  const bits = [];
+  if (d.missing_count) bits.push(`${d.missing_count.toLocaleString()} file(s) never arrived`);
+  if (d.short_count) bits.push(`${d.short_count.toLocaleString()} arrived incomplete`);
+  return `${d.on_disk?.toLocaleString?.() ?? d.on_disk} of ${
+    d.expected?.toLocaleString?.() ?? d.expected
+  } files received — ${bits.join(', ')}. Resume to send the rest.`;
 };
 
 const AdminStatementUpload = () => {

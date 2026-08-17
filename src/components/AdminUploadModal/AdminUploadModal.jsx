@@ -317,7 +317,17 @@ const AdminUploadModal = ({ open, onClose, onComplete }) => {
       batchIds: [],
     });
     try {
-      const { upload_id: uploadId } = await createUpload(incoming);
+      // Progress was previously disabled here entirely: a 2 GB transfer sat on
+      // "uploading" with no feedback, indistinguishable from a hung request.
+      const { upload_id: uploadId } = await createUpload(incoming, (pct, info) =>
+        setLiveUpload((prev) => ({
+          ...prev,
+          status: 'uploading',
+          uploadPct: pct,
+          sentFiles: info?.sentFiles,
+          fileCount: info?.totalFiles ?? prev?.fileCount,
+        }))
+      );
       for (let i = 0; i < 60; i += 1) {
         const res = await getUploadStatements(uploadId);
         const statements = res.statements || [];

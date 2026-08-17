@@ -2,6 +2,7 @@
 import axios from 'axios';
 import {
   createUpload,
+  uploadTuning,
   getUpload,
   getUploadStatements,
   listBatches,
@@ -63,26 +64,72 @@ describe('statementsAdmin URL + method mapping', () => {
 });
 
 describe('createUpload', () => {
-  it('posts multipart FormData with all files and reports progress', async () => {
-    const files = [new File(['a'], 'a.pdf', { type: 'application/pdf' }), new File(['b'], 'b.xlsx')];
-    const onProgress = jest.fn();
-    await createUpload(files, onProgress);
+  // The protocol is now: declare a manifest (no files) -> send batches ->
+  // finalize, with the SERVER verifying completeness. A single request that
+  // both creates the upload and carries files is what made a lost response
+  // mint a duplicate upload holding hundreds of megabytes.
+  const calls = () => axios.mock.calls.map(([c]) => c);
 
-    const config = lastConfig();
-    expect(config.method).toBe('POST');
-    expect(config.url).toBe(`${stripSlash(BASE)}/admin/statements/uploads`);
-    expect(config.data).toBeInstanceOf(FormData);
-    expect(config.data.getAll('files')).toHaveLength(2);
+  it('opens the upload with a manifest and no files', async () => {
+    const files = [new File(['a'], 'a.pdf'), new File(['b'], 'b.xlsx')];
+    await createUpload(files);
 
-    config.onUploadProgress({ loaded: 50, total: 200 });
-    expect(onProgress).toHaveBeenCalledWith(25, { loaded: 50, total: 200 });
+    const open = calls()[0];
+    expect(open.method).toBe('POST');
+    expect(open.url).toBe(`${stripSlash(BASE)}/admin/statements/uploads?finalize=false`);
+    expect(open.data).not.toBeInstanceOf(FormData);
+    expect(open.data.files.map((f) => f.name)).toEqual(['a.pdf', 'b.xlsx']);
   });
 
-  it('does not call onProgress when total is unknown', async () => {
+  it('sends the files as batches and then finalizes', async () => {
+    await createUpload([new File(['a'], 'a.pdf'), new File(['b'], 'b.xlsx')]);
+    const urls = calls().map((c) => c.url.replace(stripSlash(BASE), ''));
+    expect(urls[0]).toBe('/admin/statements/uploads?finalize=false');
+    expect(urls).toContain('/admin/statements/uploads/undefined/files');
+    expect(urls[urls.length - 1]).toBe('/admin/statements/uploads/undefined/finalize');
+  });
+
+  it('reports progress as batches land', async () => {
     const onProgress = jest.fn();
     await createUpload([new File(['a'], 'a.pdf')], onProgress);
-    lastConfig().onUploadProgress({ loaded: 50 });
-    expect(onProgress).not.toHaveBeenCalled();
+    expect(onProgress).toHaveBeenCalled();
+    const [pct, info] = onProgress.mock.calls[onProgress.mock.calls.length - 1];
+    expect(pct).toBe(100);
+    expect(info.totalFiles).toBe(1);
+  });
+
+  it('rejects duplicate filenames before sending anything', async () => {
+    axios.mockClear();
+    await expect(createUpload([new File(['a'], 'same.pdf'), new File(['b'], 'same.pdf')])).rejects.toThrow(
+      /Duplicate filenames/
+    );
+    expect(axios).not.toHaveBeenCalled();
+  });
+
+  it('attaches the upload id to a failure so the transfer can be resumed', async () => {
+    uploadTuning.backoffMs = [1, 1, 1]; // exercise the retry path without the real waits
+    axios.mockReset();
+    axios
+      .mockResolvedValueOnce({ data: { upload_id: 42 } }) // open
+      .mockRejectedValue({ response: { status: 500, data: {} } }); // every batch attempt
+
+    await expect(createUpload([new File(['a'], 'a.pdf')])).rejects.toMatchObject({
+      upload_id: 42,
+      resumable: true,
+    });
+    // open + 4 attempts (1 initial + 3 retries)
+    expect(axios).toHaveBeenCalledTimes(5);
+    uploadTuning.backoffMs = [2000, 6000, 15000];
+  });
+
+  it('does not retry a permanent error', async () => {
+    uploadTuning.backoffMs = [1, 1, 1];
+    axios.mockReset();
+    axios.mockResolvedValueOnce({ data: { upload_id: 7 } }).mockRejectedValue({ response: { status: 409, data: {} } });
+
+    await expect(createUpload([new File(['a'], 'a.pdf')])).rejects.toMatchObject({ status: 409 });
+    expect(axios).toHaveBeenCalledTimes(2); // open + one attempt, no retries
+    uploadTuning.backoffMs = [2000, 6000, 15000];
   });
 });
 

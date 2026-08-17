@@ -43,64 +43,185 @@ const request = async (config) => {
   }
 };
 
-// Files per request. A real drop is ~5,200 files / ~2 GB; sending that as one
-// body invites proxy timeouts and means a single dropped connection loses the
-// whole transfer. Batching keeps each request small and independently
-// retryable — the server writes files by name, so re-sending a failed batch
-// overwrites rather than duplicates.
-const UPLOAD_BATCH_SIZE = 250;
+// --- statement upload ---------------------------------------------------
+//
+// A real drop is ~5,224 files / 2.08 GB. Three properties matter, in order:
+//
+//   1. A partial drop must never be ingested as a complete royalty period.
+//      The client declares a manifest up front and the SERVER refuses to
+//      finalize until every declared file is present at its declared size.
+//   2. An interruption must be recoverable. The upload id survives every
+//      failure path so the transfer resumes instead of restarting 2 GB.
+//   3. No single request should be enormous. Batching by file COUNT produced
+//      requests from 51 MB to 316 MB against this corpus (median file 0.12 MB,
+//      max 77 MB), each minutes long on the wire and re-sent whole on retry.
 
-const postBatch = (url, batch) => {
+const TARGET_BATCH_BYTES = 24_000_000; // ~90 batches for 2.08 GB
+const MAX_BATCH_FILES = 150; // guard against a long run of tiny files
+const PART_OVERHEAD = 220; // multipart headers per part, approx
+
+// No bytes acknowledged for this long means the connection is dead, not slow.
+// A total timeout is the wrong control: 24 MB is legitimately slow on a poor
+// link, but it is never silent.
+const STALL_MS = 45_000;
+const HARD_CAP_MS = 600_000;
+
+const RETRYABLE = (status) => status === 0 || status === 408 || status === 429 || (status >= 500 && status < 600);
+// Exported so tests can exercise the retry path without waiting 23 real
+// seconds. These are the production values.
+export const uploadTuning = { backoffMs: [2000, 6000, 15000] };
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
+// Pack by bytes, not count. A file larger than the target lands in its own
+// batch — there is no intra-file chunking in this protocol.
+export const buildBatches = (all) => {
+  const batches = [];
+  let cur = [];
+  let bytes = 0;
+  for (const f of all) {
+    const weight = (f.size || 0) + PART_OVERHEAD + (f.name || '').length;
+    if (cur.length && (bytes + weight > TARGET_BATCH_BYTES || cur.length >= MAX_BATCH_FILES)) {
+      batches.push(cur);
+      cur = [];
+      bytes = 0;
+    }
+    cur.push(f);
+    bytes += weight;
+    if (bytes >= TARGET_BATCH_BYTES || cur.length >= MAX_BATCH_FILES) {
+      batches.push(cur);
+      cur = [];
+      bytes = 0;
+    }
+  }
+  if (cur.length) batches.push(cur);
+  return batches;
+};
+
+const postBatch = (url, batch, onBytes) => {
   const form = new FormData();
   batch.forEach((file) => form.append('files', file, file.name));
-  return request({ url, method: 'POST', data: form });
+  const controller = new AbortController();
+  let timer = setTimeout(() => controller.abort(), STALL_MS);
+  return request({
+    url,
+    method: 'POST',
+    data: form,
+    signal: controller.signal,
+    timeout: HARD_CAP_MS,
+    onUploadProgress: (event) => {
+      clearTimeout(timer);
+      timer = setTimeout(() => controller.abort(), STALL_MS);
+      if (onBytes) onBytes(event.loaded, event.total);
+    },
+  }).finally(() => clearTimeout(timer));
+};
+
+// Retry only what is worth retrying. The previous version retried once,
+// immediately and unconditionally — which re-sent 300 MB straight back into a
+// restarting server, and pointlessly retried 404s and 409s that can never
+// succeed.
+const send = async (url, batch, onBytes) => {
+  for (let attempt = 0; ; attempt += 1) {
+    try {
+      return batch === null
+        ? await request({ url, method: 'POST', timeout: 60_000 })
+        : await postBatch(url, batch, onBytes);
+    } catch (err) {
+      const status = err?.status;
+      const backoff = uploadTuning.backoffMs;
+      if (!RETRYABLE(status) || attempt >= backoff.length) throw err;
+      const base = backoff[attempt];
+      await sleep(base * (0.8 + Math.random() * 0.4)); // jitter
+    }
+  }
+};
+
+const preflight = (all) => {
+  const seen = new Set();
+  const dupes = [];
+  all.forEach((f) => {
+    if (seen.has(f.name)) dupes.push(f.name);
+    seen.add(f.name);
+  });
+  if (dupes.length) {
+    throw new Error(
+      `Duplicate filenames would overwrite each other: ${dupes.slice(0, 5).join(', ')}` +
+        (dupes.length > 5 ? ` (+${dupes.length - 5} more)` : '')
+    );
+  }
 };
 
 // POST /admin/statements/uploads — dump many loose files (multipart).
-// Sent in batches: the first opens the upload, the rest are appended, then it
-// is finalized to release it to the ingest worker.
-// onProgress(percent) is called as batches land.
-export const createUpload = async (files, onProgress) => {
+// onProgress(percent, {sentFiles, totalFiles, uploadId}) as batches land.
+export const createUpload = async (files, onProgress, opts = {}) => {
   const all = Array.from(files);
   if (!all.length) throw new Error('No files selected');
+  preflight(all);
 
-  const batches = [];
-  for (let i = 0; i < all.length; i += UPLOAD_BATCH_SIZE) {
-    batches.push(all.slice(i, i + UPLOAD_BATCH_SIZE));
+  const batches = buildBatches(all);
+  let uploadId = opts.resumeUploadId;
+
+  if (!uploadId) {
+    // Deliberately NOT retried and carries no files: this is the only
+    // non-idempotent call, so a lost response must cost an empty row, not a
+    // duplicate upload holding hundreds of megabytes nobody can find.
+    const opened = await request({
+      url: '/admin/statements/uploads?finalize=false',
+      method: 'POST',
+      data: { files: all.map((f) => ({ name: f.name, size: f.size })) },
+      timeout: 60_000,
+    });
+    uploadId = opened.upload_id;
   }
 
-  const report = (done) => {
-    if (onProgress) onProgress(Math.round((done / all.length) * 100));
-  };
-
-  // One batch, retried once — a transient failure shouldn't lose the transfer.
-  const send = async (url, batch) => {
-    try {
-      return await postBatch(url, batch);
-    } catch (err) {
-      if (err?.status === 409) throw err; // upload already processing: don't retry
-      return postBatch(url, batch);
+  let sent = 0;
+  const report = () => {
+    if (onProgress) {
+      onProgress(Math.round((sent / all.length) * 100), {
+        sentFiles: sent,
+        totalFiles: all.length,
+        uploadId,
+      });
     }
   };
+  report();
 
-  const first = await send('/admin/statements/uploads?finalize=false', batches[0]);
-  const uploadId = first.upload_id;
-  let sent = batches[0].length;
-  report(sent);
-
-  for (const batch of batches.slice(1)) {
-    await send(`/admin/statements/uploads/${uploadId}/files`, batch);
-    sent += batch.length;
-    report(sent);
+  try {
+    for (const batch of batches) {
+      await send(`/admin/statements/uploads/${uploadId}/files`, batch);
+      sent += batch.length;
+      report();
+    }
+  } catch (err) {
+    // The id is the whole incident: without it the transfer cannot be resumed
+    // and gigabytes sit stranded on the server with nobody able to name them.
+    err.upload_id = uploadId;
+    err.resumable = true;
+    throw err;
   }
 
-  const finalized = await request({
-    url: `/admin/statements/uploads/${uploadId}/finalize`,
-    method: 'POST',
-  });
-  report(all.length);
+  // Always attempted, and retried like any other call. The server verifies the
+  // manifest and returns 409 with the missing list if anything is short.
+  const finalized = await send(`/admin/statements/uploads/${uploadId}/finalize`, null);
   return { ...finalized, upload_id: uploadId };
 };
+
+// Re-send only what the server says is missing, then finalize.
+export const resumeUpload = async (uploadId, files, onProgress) => {
+  const missing = await request({ url: `/admin/statements/uploads/${uploadId}/missing` });
+  const wanted = new Set([...(missing.missing || []), ...(missing.short || []).map((s) => s.name)]);
+  const outstanding = Array.from(files).filter((f) => wanted.has(f.name));
+  if (!outstanding.length) {
+    const finalized = await send(`/admin/statements/uploads/${uploadId}/finalize`, null);
+    return { ...finalized, upload_id: uploadId };
+  }
+  return createUpload(outstanding, onProgress, { resumeUploadId: uploadId });
+};
+
+export const listUploads = (params = {}) => request({ url: '/admin/statements/uploads', params });
+
+export const getUploadMissing = (id) => request({ url: `/admin/statements/uploads/${id}/missing` });
 
 export const getUpload = (id) => request({ url: `/admin/statements/uploads/${id}` });
 
