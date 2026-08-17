@@ -7,6 +7,7 @@ import { useIsAdmin } from '../../utils/auth';
 import { addStatement, generateStatementId, SOURCES } from '../../mocks/statementsAdminData';
 import { statementsLive } from '../../config/featureFlags';
 import { createUpload, resumeUpload, getUpload } from '../../api/statementsAdmin';
+import IngestActivity from '../../components/IngestActivity/IngestActivity';
 import { deriveSortPreview } from '../../utils/statementFilenames';
 import styles from './adminStatementUpload.module.css';
 
@@ -274,6 +275,8 @@ const LiveStatementUpload = () => {
 
   return (
     <div className={styles.liveContainer}>
+      <IngestActivity />
+
       {error && (
         <div className={styles.errorBanner}>
           <FaExclamationTriangle />

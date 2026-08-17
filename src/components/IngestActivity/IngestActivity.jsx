@@ -1,0 +1,132 @@
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { FaCheck, FaExclamationTriangle, FaSpinner } from 'react-icons/fa';
+import { listUploads } from '../../api/statementsAdmin';
+import styles from './ingestActivity.module.css';
+
+// Live view of every statement upload on the server — transferring, sorting,
+// parsing, done, failed. The upload page only ever showed ITS OWN upload, so a
+// transfer resumed from another tab (or an ingest running server-side) was
+// completely invisible: the admin stared at a dashboard reading $0 with no way
+// to tell "nothing is happening" from "2,613 statements are mid-parse".
+const POLL_MS = 5000;
+
+const fmtTime = (iso) => {
+  if (!iso) return '—';
+  const d = new Date(iso);
+  return Number.isNaN(d.getTime()) ? '—' : d.toLocaleTimeString();
+};
+
+// One upload -> what the admin needs to know about it right now.
+const describe = (u) => {
+  const p = u.progress || {};
+  if (u.status === 'failed') {
+    return { kind: 'failed', label: 'Failed', detail: u.error || 'See upload details' };
+  }
+  if (u.status === 'done') {
+    return {
+      kind: 'done',
+      label: 'Done',
+      detail: `${(p.sorted ?? 0).toLocaleString()} statements ingested`,
+    };
+  }
+  if (u.receiving) {
+    const total = u.expected;
+    return {
+      kind: 'active',
+      label: 'Transferring',
+      detail: total
+        ? `${u.file_count.toLocaleString()} of ${total.toLocaleString()} files received`
+        : `${u.file_count.toLocaleString()} files received`,
+      pct: total ? Math.round((u.file_count / total) * 100) : null,
+    };
+  }
+  if (u.status === 'parsing' && p.parse_total) {
+    const parsed = p.parsed ?? 0;
+    return {
+      kind: 'active',
+      label: 'Parsing',
+      detail:
+        `${parsed.toLocaleString()} of ${p.parse_total.toLocaleString()} statements` +
+        (p.parse_failed ? ` · ${p.parse_failed} failed` : ''),
+      pct: Math.round((parsed / p.parse_total) * 100),
+    };
+  }
+  if (u.status === 'sorting' || (u.status === 'parsing' && !p.parse_total)) {
+    return {
+      kind: 'active',
+      label: u.status === 'sorting' ? 'Sorting' : 'Preparing parse',
+      detail: p.sorted
+        ? `${p.sorted.toLocaleString()} statements in ${p.batches} batch(es)`
+        : `${u.file_count.toLocaleString()} files`,
+      pct: null,
+    };
+  }
+  // uploaded + not receiving = finalized, waiting for the worker to claim it
+  return { kind: 'active', label: 'Queued', detail: 'Waiting for the ingest worker', pct: null };
+};
+
+const IngestActivity = ({ limit = 6, onActiveChange }) => {
+  const [items, setItems] = useState(null); // null = first load
+  const timer = useRef(null);
+  const activeRef = useRef(null);
+
+  const load = useCallback(async () => {
+    try {
+      const res = await listUploads({ limit });
+      const rows = res.items || [];
+      setItems(rows);
+      const anyActive = rows.some((u) => u.status !== 'done' && u.status !== 'failed');
+      // Parent pages refresh their own numbers when an ingest finishes.
+      if (onActiveChange && activeRef.current !== anyActive) {
+        activeRef.current = anyActive;
+        onActiveChange(anyActive);
+      }
+    } catch {
+      /* transient — keep showing the last known state rather than flashing */
+    }
+  }, [limit, onActiveChange]);
+
+  useEffect(() => {
+    load();
+    timer.current = setInterval(load, POLL_MS);
+    return () => clearInterval(timer.current);
+  }, [load]);
+
+  if (items === null) return null; // nothing to say yet
+  if (!items.length) return null; // no uploads ever — stay out of the way
+
+  return (
+    <section className={styles.panel} aria-label="Ingest activity">
+      <div className={styles.head}>Ingest activity</div>
+      <ul className={styles.list}>
+        {items.map((u) => {
+          const d = describe(u);
+          return (
+            <li key={u.upload_id} className={styles.row}>
+              <span className={`${styles.icon} ${styles[d.kind]}`}>
+                {d.kind === 'done' && <FaCheck size={11} />}
+                {d.kind === 'failed' && <FaExclamationTriangle size={11} />}
+                {d.kind === 'active' && <FaSpinner size={11} className={styles.spin} />}
+              </span>
+              <div className={styles.body}>
+                <div className={styles.title}>
+                  Upload #{u.upload_id} · {d.label}
+                  <span className={styles.time}>started {fmtTime(u.uploaded_at)}</span>
+                </div>
+                <div className={styles.detail}>{d.detail}</div>
+                {d.pct != null && (
+                  <div className={styles.barTrack} role="progressbar" aria-valuenow={d.pct}>
+                    <div className={styles.barFill} style={{ width: `${d.pct}%` }} />
+                    <span className={styles.barLabel}>{d.pct}%</span>
+                  </div>
+                )}
+              </div>
+            </li>
+          );
+        })}
+      </ul>
+    </section>
+  );
+};
+
+export default IngestActivity;

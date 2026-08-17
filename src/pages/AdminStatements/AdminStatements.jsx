@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import IngestActivity from '../../components/IngestActivity/IngestActivity';
 import { Helmet } from 'react-helmet-async';
 import { Navigate, useNavigate } from 'react-router-dom';
 import { FaUpload, FaExclamationTriangle } from 'react-icons/fa';
@@ -329,6 +330,7 @@ const AdminStatements = () => {
       <div className="flex flex-col flex-nowrap h-full" style={{ position: 'relative' }}>
         <Sidebar />
         <main className={styles.shell}>
+          <IngestActivity />
           <div className={styles.header}>
             <div className={styles.headerLeft}>
               <h1 className={styles.title}>{statementsLive ? 'Batches' : 'Statements'}</h1>
