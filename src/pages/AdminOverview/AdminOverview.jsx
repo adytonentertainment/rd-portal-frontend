@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import IngestActivity from '../../components/IngestActivity/IngestActivity';
 import {
   FaUpload,
   FaCheck,
@@ -125,6 +126,9 @@ const AdminOverview = () => {
   // client list holds 810. Default stays 'any' so nothing is hidden from the
   // distribution view; the label just tells the truth about what is counted.
   const [membership, setMembership] = useState('any');
+  // True while any upload is transferring/sorting/parsing. Sending is blocked
+  // server-side too — this just explains the disabled button.
+  const [ingestActive, setIngestActive] = useState(false);
   const [confirmReset, setConfirmReset] = useState(false);
   const [resetting, setResetting] = useState(false);
   const [summary, setSummary] = useState(null);
@@ -387,6 +391,17 @@ const AdminOverview = () => {
       <div className="flex flex-col flex-nowrap h-full" style={{ position: 'relative' }}>
         <Sidebar />
         <main className={styles.shell}>
+          {live && (
+            <IngestActivity
+              onActiveChange={(active) => {
+                setIngestActive(active);
+                if (!active) {
+                  loadSummary();
+                  loadLive();
+                }
+              }}
+            />
+          )}
           <div className={styles.header}>
             <div>
               <h1 className={styles.title}>Writers</h1>
@@ -529,14 +544,16 @@ const AdminOverview = () => {
               <div className={styles.summaryAction}>
                 <button
                   className={styles.sendAllBtn}
-                  disabled={!summary.ready_to_send || sending || audit?.ok === false}
+                  disabled={!summary.ready_to_send || sending || audit?.ok === false || ingestActive}
                   onClick={() => setConfirmSendLive(true)}
                   title={
-                    audit?.ok === false
-                      ? 'Ingestion audit failed — statements do not match the source files'
-                      : summary.ready_to_send
-                        ? 'Publish every ready statement to client portals'
-                        : summary.blockers.join(' · ') || 'Nothing staged to send'
+                    ingestActive
+                      ? 'Statements are still ingesting — sending unlocks when parsing finishes'
+                      : audit?.ok === false
+                        ? 'Ingestion audit failed — statements do not match the source files'
+                        : summary.ready_to_send
+                          ? 'Publish every ready statement to client portals'
+                          : summary.blockers.join(' · ') || 'Nothing staged to send'
                   }
                 >
                   <FaPaperPlane size={12} />
