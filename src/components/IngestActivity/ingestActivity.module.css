@@ -33,6 +33,12 @@
 .row:last-child {
   border-bottom: none;
 }
+.row[role='button'] {
+  cursor: pointer;
+}
+.row[role='button']:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
 
 .icon {
   width: 26px;

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FaCheck, FaExclamationTriangle, FaSpinner } from 'react-icons/fa';
 import { listUploads } from '../../api/statementsAdmin';
 import styles from './ingestActivity.module.css';
@@ -20,7 +21,15 @@ const fmtTime = (iso) => {
 const describe = (u) => {
   const p = u.progress || {};
   if (u.status === 'failed') {
-    return { kind: 'failed', label: 'Failed', detail: u.error || 'See upload details' };
+    return {
+      kind: 'failed',
+      label: 'Failed',
+      // A parked/cancelled upload has no error text — say what it means and
+      // what to do, instead of pointing at details that do not exist.
+      detail:
+        u.error ||
+        'Cancelled or interrupted — the files already sent are kept; resume or re-upload from the Upload page.',
+    };
   }
   if (u.status === 'done') {
     return {
@@ -66,6 +75,7 @@ const describe = (u) => {
 };
 
 const IngestActivity = ({ limit = 6, onActiveChange }) => {
+  const navigate = useNavigate();
   const [items, setItems] = useState(null); // null = first load
   const timer = useRef(null);
   const activeRef = useRef(null);
@@ -102,7 +112,15 @@ const IngestActivity = ({ limit = 6, onActiveChange }) => {
         {items.map((u) => {
           const d = describe(u);
           return (
-            <li key={u.upload_id} className={styles.row}>
+            <li
+              key={u.upload_id}
+              className={styles.row}
+              role="button"
+              tabIndex={0}
+              title="Open the Upload page"
+              onClick={() => navigate('/admin/statements/upload')}
+              onKeyDown={(e) => e.key === 'Enter' && navigate('/admin/statements/upload')}
+            >
               <span className={`${styles.icon} ${styles[d.kind]}`}>
                 {d.kind === 'done' && <FaCheck size={11} />}
                 {d.kind === 'failed' && <FaExclamationTriangle size={11} />}
