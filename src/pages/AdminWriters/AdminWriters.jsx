@@ -7,6 +7,8 @@ import { useIsAdmin } from '../../utils/auth';
 import { statementsLive } from '../../config/featureFlags';
 import { listWriters, getWriter, archiveWriter, bulkRemoveWriters, getRosterSummary } from '../../api/writersAdmin';
 import { uploadClientList, applyClientImport } from '../../api/clientImportAdmin';
+import { adminBulkInvite } from '../../api/portal';
+import { assignUnmatchedToClient } from '../../api/writersAdmin';
 import { getWriterRoster, addWriter, removeWriter } from '../../mocks/distributionState';
 import WriterFormModal from './WriterFormModal';
 import InviteDialog from './InviteDialog';
@@ -78,13 +80,28 @@ const AdminWriters = () => {
   // The dashboard's "Fix" link (/admin/writers?fix=1) opens straight into the
   // list of clients that block a send — missing info OR no statements.
   const [searchParams] = useSearchParams();
-  // Bulk cleanup lives ONLY in the needs-attention view: that list is the junk
-  // and blockers, and offering select-all across the whole 810-client roster
-  // invites a catastrophic mis-click.
+  // Selection works anywhere in the roster, because onboarding the roster is
+  // the whole point of inviting in bulk. The DESTRUCTIVE bulk action stays
+  // pinned to the needs-attention view: select-all across 810 clients next to
+  // a Remove button is a catastrophic mis-click waiting to happen, while the
+  // same gesture next to Invite just sends email.
   const [selectedIds, setSelectedIds] = useState(() => new Set());
   const [bulkBusy, setBulkBusy] = useState(false);
   const [bulkResult, setBulkResult] = useState(null);
   const [confirmBulk, setConfirmBulk] = useState(false);
+  // The "did you mean X?" confirmation. Clicking the guess must ASK, never
+  // assign: linking the wrong one hands a client's royalties to someone else.
+  const [linking, setLinking] = useState(null);
+  const [linkBusy, setLinkBusy] = useState(false);
+  const [linkError, setLinkError] = useState(null);
+  const [confirmInvite, setConfirmInvite] = useState(false);
+  const [inviteResult, setInviteResult] = useState(null);
+  // Off by default — re-running the batch to catch newly added addresses
+  // must not mail everyone who already has a live link a second time.
+  const [resendPending, setResendPending] = useState(false);
+  // "Show only who is missing data" — sits with the client / commission-partner
+  // filters, because the question is always "missing for WHICH group".
+  const [dataGapOnly, setDataGapOnly] = useState(false);
   const [needsFixOnly, setNeedsFixOnly] = useState(
     searchParams.get('fix') === '1' || searchParams.get('needs_info') === '1'
   );
@@ -144,6 +161,7 @@ const AdminWriters = () => {
         search: debounced,
         status: 'active',
         needsFix: needsFixOnly ? true : undefined,
+        dataGap: dataGapOnly ? true : undefined,
       });
       if (reqId === reqRef.current) setData(res);
     } catch (err) {
@@ -151,7 +169,7 @@ const AdminWriters = () => {
     } finally {
       if (reqId === reqRef.current) setLoading(false);
     }
-  }, [debounced, page, pageSize, needsFixOnly]);
+  }, [debounced, page, pageSize, needsFixOnly, dataGapOnly]);
 
   useEffect(() => {
     load();
@@ -161,7 +179,7 @@ const AdminWriters = () => {
   // no longer see must not still be armed for deletion.
   useEffect(() => {
     setSelectedIds(new Set());
-  }, [needsFixOnly, page, pageSize, debounced]);
+  }, [needsFixOnly, dataGapOnly, page, pageSize, debounced]);
 
   // Roster totals come from the client list's two sheets (a person on both is
   // counted in each), so they don't equal the table's row count — which also
@@ -177,8 +195,9 @@ const AdminWriters = () => {
   const total = data?.total || 0;
   const totalPages = Math.max(1, Math.ceil(total / pageSize));
 
-  // Checkboxes exist only in the needs-attention cleanup view.
-  const bulkMode = statementsLive && needsFixOnly;
+  // Checkboxes anywhere in the live roster; Remove only in the cleanup view.
+  const bulkMode = statementsLive;
+  const canBulkRemove = needsFixOnly;
   const selectableIds = items.map((w) => w.id);
   const selectedOnPage = selectableIds.filter((id) => selectedIds.has(id));
   const allOnPageSelected = selectableIds.length > 0 && selectedOnPage.length === selectableIds.length;
@@ -208,6 +227,24 @@ const AdminWriters = () => {
   const selectedRows = items.filter((w) => selectedIds.has(w.id));
   const selectedHoldingMoney = selectedRows.filter((w) => (w.account_count || 0) > 0);
 
+  // Why each selected client would or wouldn't get mail. Mirrors the order the
+  // backend skips in, so the confirmation promises exactly what happens — "412
+  // selected" means nothing when 90 of them have no address on file.
+  const inviteBucket = (w) => {
+    if (w.is_house_account) return 'house';
+    if (w.status === 'offboarded') return 'offboarded';
+    if (!w.primary_email) return 'noEmail';
+    if (w.portal_status === 'active') return 'active';
+    if (w.portal_status === 'invited') return 'pending';
+    return 'send';
+  };
+  const buckets = selectedRows.reduce((acc, w) => {
+    const b = inviteBucket(w);
+    (acc[b] = acc[b] || []).push(w);
+    return acc;
+  }, {});
+  const willEmail = (buckets.send || []).length + (resendPending ? (buckets.pending || []).length : 0);
+
   const handleBulkRemove = async () => {
     setConfirmBulk(false);
     setBulkBusy(true);
@@ -219,6 +256,23 @@ const AdminWriters = () => {
       await load();
     } catch (err) {
       setError(err?.message || 'Could not remove the selected clients.');
+    } finally {
+      setBulkBusy(false);
+    }
+  };
+
+  const handleBulkInvite = async () => {
+    setConfirmInvite(false);
+    setBulkBusy(true);
+    setError(null);
+    try {
+      const res = await adminBulkInvite([...selectedIds], { resendPending });
+      setInviteResult(res);
+      clearSelection();
+      setResendPending(false);
+      await load();
+    } catch (err) {
+      setError(err?.message || 'Could not send the invites.');
     } finally {
       setBulkBusy(false);
     }
@@ -360,6 +414,27 @@ const AdminWriters = () => {
                 {needsFixOnly ? 'Showing: needs attention' : 'Needs attention'}
               </button>
             )}
+            {statementsLive && (
+              /* Applies across clients AND commission partners — both are payees,
+                 and a partner missing half their data is as much a hole as a
+                 client missing all of it. Partial is the one that hides: the
+                 roster says "has statements" and only one revenue type arrived. */
+              <button
+                className={styles.inviteButton}
+                style={
+                  dataGapOnly
+                    ? { background: 'var(--error)' }
+                    : { background: 'transparent', color: 'var(--text)', border: '1px solid var(--border)' }
+                }
+                onClick={() => {
+                  setPage(1);
+                  setDataGapOnly((v) => !v);
+                }}
+                title="Payees with no statement data, or only some of the revenue types they are expected to have"
+              >
+                {dataGapOnly ? 'Showing: missing data' : 'Missing data'}
+              </button>
+            )}
           </div>
 
           {error && <div className={styles.pageError}>{error}</div>}
@@ -368,15 +443,33 @@ const AdminWriters = () => {
             <div className={styles.bulkBar}>
               <span className={styles.bulkCount}>
                 {selectedIds.size} selected
-                {selectedHoldingMoney.length > 0 &&
+                {(buckets.noEmail || []).length > 0 && ` · ${(buckets.noEmail || []).length} with no email`}
+                {(buckets.active || []).length > 0 && ` · ${(buckets.active || []).length} already in`}
+                {(buckets.pending || []).length > 0 && ` · ${(buckets.pending || []).length} invite pending`}
+                {canBulkRemove &&
+                  selectedHoldingMoney.length > 0 &&
                   ` · ${selectedHoldingMoney.length} hold statement accounts and will be offboarded, not deleted`}
               </span>
               <button className={styles.secondaryBtn} onClick={clearSelection} disabled={bulkBusy}>
                 Clear
               </button>
-              <button className={styles.dangerBtn} onClick={() => setConfirmBulk(true)} disabled={bulkBusy}>
-                {bulkBusy ? 'Removing…' : `Remove ${selectedIds.size}`}
+              <button
+                className={styles.primaryBtn}
+                onClick={() => setConfirmInvite(true)}
+                disabled={bulkBusy || willEmail === 0}
+                title={
+                  willEmail === 0
+                    ? 'None of the selected clients can be emailed — see the counts on the left'
+                    : 'Email each selected client an invite to their portal'
+                }
+              >
+                {bulkBusy ? 'Working…' : `Invite ${willEmail}`}
               </button>
+              {canBulkRemove && (
+                <button className={styles.dangerBtn} onClick={() => setConfirmBulk(true)} disabled={bulkBusy}>
+                  {bulkBusy ? 'Removing…' : `Remove ${selectedIds.size}`}
+                </button>
+              )}
             </div>
           )}
 
@@ -453,7 +546,7 @@ const AdminWriters = () => {
                           )}
                           {w.is_unmatched && (
                             <span
-                              className={`${styles.pill} ${styles.pillNone}`}
+                              className={`${styles.pill} ${styles.pillBlocking}`}
                               style={{ marginLeft: 8 }}
                               title="No client on your list claims this statement account — add them to the client list and re-import, or edit to assign manually"
                             >
@@ -462,12 +555,33 @@ const AdminWriters = () => {
                           )}
                           {w.no_statements && !w.is_unmatched && (
                             <span
-                              className={`${styles.pill} ${styles.pillNone}`}
+                              className={`${styles.pill} ${styles.pillBlocking}`}
                               style={{ marginLeft: 8 }}
                               title="On the roster but has no statements — upload one or remove them"
                             >
                               No statements
                             </span>
+                          )}
+                          {/* The account's own name off the statement filename, plus
+                              the closest client to it. A proposal, never applied —
+                              a wrong merge sends one client's royalties to another. */}
+                          {w.is_unmatched && (w.account_name || w.suggested_client) && (
+                            <div className={styles.unmatchedHint}>
+                              {w.account_name && <span>Statement name: {w.account_name}</span>}
+                              {w.suggested_client && (
+                                <button
+                                  type="button"
+                                  className={styles.suggestLink}
+                                  onClick={() => {
+                                    setLinkError(null);
+                                    setLinking(w);
+                                  }}
+                                  title={`${Math.round(w.suggested_client.score * 100)}% name match — click to review and confirm`}
+                                >
+                                  Did you mean {w.suggested_client.name}?
+                                </button>
+                              )}
+                            </div>
                           )}
                         </td>
                         <td className={styles.soft}>{w.payee_name || '—'}</td>
@@ -627,6 +741,128 @@ const AdminWriters = () => {
                 Done
               </button>
             </footer>
+          </div>
+        </div>
+      )}
+
+      {linking && (
+        <div className={styles.overlay} onClick={() => !linkBusy && setLinking(null)}>
+          <div className={styles.confirmModal} onClick={(e) => e.stopPropagation()}>
+            <h3 className={styles.confirmTitle}>Link this account to {linking.suggested_client.name}?</h3>
+            <p className={styles.confirmBody}>
+              The statements filed under <strong>{linking.account_name || linking.canonical_name}</strong> would become{' '}
+              <strong>{linking.suggested_client.name}</strong>&apos;s — visible to them in their portal, and counted as
+              theirs from now on.
+            </p>
+            <p className={styles.linkMatchNote}>
+              Matched on name only, {Math.round(linking.suggested_client.score * 100)}% similar. Nothing else has been
+              checked — if these are two different people, linking them sends one client&apos;s royalties to the other.
+            </p>
+            {linkError && <div className={styles.formError}>{linkError}</div>}
+            <div className={styles.confirmActions}>
+              <button className={styles.secondaryBtn} onClick={() => setLinking(null)} disabled={linkBusy}>
+                No, leave it unmatched
+              </button>
+              <button
+                className={styles.primaryBtn}
+                disabled={linkBusy}
+                onClick={async () => {
+                  setLinkBusy(true);
+                  setLinkError(null);
+                  try {
+                    await assignUnmatchedToClient(linking.id, linking.suggested_client.id);
+                    setLinking(null);
+                    await load();
+                  } catch (err) {
+                    setLinkError(err?.message || 'Could not link that account.');
+                  } finally {
+                    setLinkBusy(false);
+                  }
+                }}
+              >
+                {linkBusy ? 'Linking…' : `Yes, it's ${linking.suggested_client.name}`}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {confirmInvite && (
+        <div className={styles.overlay} onClick={() => setConfirmInvite(false)}>
+          <div className={styles.confirmModal} onClick={(e) => e.stopPropagation()}>
+            <h3 className={styles.confirmTitle}>Email {willEmail} client(s) an invite?</h3>
+            <p className={styles.confirmBody}>
+              Each one gets a single email at their primary contact address, in their own language, with a link that
+              expires in 14 days. Sending is paced, so a large batch takes a few minutes to go out.
+            </p>
+            {((buckets.noEmail || []).length > 0 ||
+              (buckets.active || []).length > 0 ||
+              (buckets.pending || []).length > 0 ||
+              (buckets.house || []).length > 0 ||
+              (buckets.offboarded || []).length > 0) && (
+              <p className={styles.confirmBody}>
+                Not emailed:{' '}
+                {[
+                  (buckets.noEmail || []).length && `${buckets.noEmail.length} with no address on file`,
+                  (buckets.active || []).length && `${buckets.active.length} already using the portal`,
+                  !resendPending && (buckets.pending || []).length && `${buckets.pending.length} already invited`,
+                  (buckets.house || []).length && `${buckets.house.length} house account(s)`,
+                  (buckets.offboarded || []).length && `${buckets.offboarded.length} offboarded`,
+                ]
+                  .filter(Boolean)
+                  .join(' · ')}
+                .
+              </p>
+            )}
+            {(buckets.pending || []).length > 0 && (
+              <label className={styles.confirmBody} style={{ display: 'flex', gap: 8, alignItems: 'flex-start' }}>
+                <input type="checkbox" checked={resendPending} onChange={(e) => setResendPending(e.target.checked)} />
+                <span>
+                  Also re-send to the {buckets.pending.length} with an invite already pending — for the spam-folder
+                  case. This issues a new link and the old one stops working.
+                </span>
+              </label>
+            )}
+            <div className={styles.confirmActions}>
+              <button className={styles.secondaryBtn} onClick={() => setConfirmInvite(false)}>
+                Cancel
+              </button>
+              <button className={styles.primaryBtn} onClick={handleBulkInvite} disabled={willEmail === 0}>
+                Send {willEmail} invite(s)
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {inviteResult && (
+        <div className={styles.overlay} onClick={() => setInviteResult(null)}>
+          <div className={styles.confirmModal} onClick={(e) => e.stopPropagation()}>
+            <h3 className={styles.confirmTitle}>{inviteResult.queued.length} invite(s) on their way</h3>
+            <p className={styles.confirmBody}>
+              They send in the background — the roster shows “Invited” as each one goes out, and any that bounce show
+              the reason on that client&apos;s invite dialog.
+            </p>
+            {inviteResult.skipped.length > 0 && (
+              <p className={styles.confirmBody}>
+                {/* The skip reasons ARE the work list: fix these, run it again. */}
+                {inviteResult.skipped.length} skipped —{' '}
+                {Object.entries(
+                  inviteResult.skipped.reduce((acc, s) => {
+                    acc[s.reason] = (acc[s.reason] || 0) + 1;
+                    return acc;
+                  }, {})
+                )
+                  .map(([reason, n]) => `${n} ${reason}`)
+                  .join(' · ')}
+                .
+              </p>
+            )}
+            <div className={styles.confirmActions}>
+              <button className={styles.primaryBtn} onClick={() => setInviteResult(null)}>
+                Close
+              </button>
+            </div>
           </div>
         </div>
       )}

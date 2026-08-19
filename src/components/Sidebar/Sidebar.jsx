@@ -311,7 +311,7 @@ const Sidebar = () => {
             <div className={styles.itemIcon}>
               <FaCog size={18} />
             </div>
-            <span className={styles.itemLabel}>Settings</span>
+            <span className={styles.itemLabel}>{t('nav.settings')}</span>
           </button>
         </Tooltip>
 
@@ -320,7 +320,7 @@ const Sidebar = () => {
             <div className={styles.itemIcon}>
               <FaSignOutAlt size={18} />
             </div>
-            <span className={styles.itemLabel}>Sign Out</span>
+            <span className={styles.itemLabel}>{t('nav.signOut')}</span>
           </button>
         </Tooltip>
       </div>

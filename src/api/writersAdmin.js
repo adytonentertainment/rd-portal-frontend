@@ -15,6 +15,8 @@ export const listWriters = ({
   status = '',
   needsInfo,
   needsFix,
+  includeUnmatched,
+  dataGap,
   membership,
 } = {}) => {
   const params = { page, page_size: pageSize };
@@ -23,6 +25,12 @@ export const listWriters = ({
   if (status) params.status = status;
   if (needsInfo != null) params.needs_info = needsInfo;
   if (needsFix != null) params.needs_fix = needsFix;
+  // Only payees whose statement data is missing or partial — the toggle next
+  // to the client / commission-partner filters.
+  if (dataGap != null) params.data_gap = dataGap;
+  // Fold unmatched statement accounts into the same list as the clients, rather
+  // than answering for them in a separate panel.
+  if (includeUnmatched != null) params.include_unmatched = includeUnmatched;
   // 'client' | 'commission_partner' | 'any' — the roster holds both, and they
   // are different things: 810 clients vs 78 commission partners.
   if (membership) params.membership = membership;
@@ -65,6 +73,16 @@ export const revokeInvite = (id, inviteId) =>
   request({ url: `/admin/writers/${id}/invites/${inviteId}/revoke`, method: 'POST' });
 
 // POST /admin/writers/reset-all → DEV/testing: wipe all client + statement data
+// Accept a "did you mean X?" guess: hand the unmatched account's statements to
+// that client. Only an unmatched row can be assigned, and never one whose
+// statements have already gone out — the backend enforces both.
+export const assignUnmatchedToClient = (writerId, targetWriterId) =>
+  request({
+    url: `/admin/writers/${writerId}/assign`,
+    method: 'POST',
+    data: { target_writer_id: targetWriterId },
+  });
+
 export const resetAllData = () => request({ url: '/admin/writers/reset-all', method: 'POST' });
 
 // GET /admin/writers/summary → roster-wide rollup for the dashboard header

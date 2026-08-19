@@ -18,11 +18,19 @@ describe('portal translations', () => {
   });
 
   it('actually translates — Spanish is not a copy of English', () => {
-    // Codes like EN/ES are legitimately identical; prose must not be.
+    // Codes like EN/ES are legitimately identical; prose must not be. So is a
+    // word Spanish already uses unchanged — "Legal" is the Spanish word, and
+    // the Spanish-language music industry says "streaming", not "transmisión".
+    // Anything NEW landing in this list is an untranslated string, not a cognate.
     const identical = Object.keys(translations.en).filter(
       (k) => translations.en[k] === translations.es[k] && translations.en[k].length > 4
     );
-    expect(identical.sort()).toEqual(['lang.switchToEnglish', 'lang.switchToSpanish']);
+    expect(identical.sort()).toEqual([
+      'access.role.legal',
+      'income.streaming',
+      'lang.switchToEnglish',
+      'lang.switchToSpanish',
+    ]);
   });
 
   it('keeps the same placeholders in both languages', () => {

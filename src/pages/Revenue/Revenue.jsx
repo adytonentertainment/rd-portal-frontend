@@ -3204,9 +3204,7 @@ const Revenue = () => {
             <div>
               <h1 className="revenue-title">{isLivePortal ? t('earnings.title') : 'Earnings'}</h1>
               <p className="revenue-subtitle">
-                {isLivePortal
-                  ? 'Where your royalties came from. Charts below show gross earnings by source — your net payable is above.'
-                  : 'Track your income across all platforms and territories'}
+                {isLivePortal ? t('earnings.subtitleLive') : 'Track your income across all platforms and territories'}
               </p>
               {isWriterView && writerDistributedPeriods.length > 0 && (
                 <div
@@ -3229,7 +3227,7 @@ const Revenue = () => {
                       marginRight: 4,
                     }}
                   >
-                    Period
+                    {t('earnings.period')}
                   </span>
                   {writerDistributedPeriods.map((p) => {
                     const active = selectedPeriods.includes(p);
@@ -3427,7 +3425,7 @@ const Revenue = () => {
                   style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%' }}
                 >
                   <div className="summary-label" style={{ marginBottom: '6px' }}>
-                    Top 3 Platforms
+                    {t('earnings.topPlatforms')}
                   </div>
                   {isFreeTier ? (
                     <>
@@ -3506,7 +3504,7 @@ const Revenue = () => {
                   style={{ display: 'flex', flexDirection: 'column', justifyContent: 'space-between', height: '100%' }}
                 >
                   <div className="summary-label" style={{ marginBottom: '6px' }}>
-                    Top 3 Territories
+                    {t('earnings.topTerritories')}
                   </div>
                   {isFreeTier ? (
                     <>
@@ -3753,7 +3751,7 @@ const Revenue = () => {
                     <FaMusic style={{ color: '#0EA5E9' }} />
                   </div>
                   <div className="summary-content">
-                    <div className="summary-label">Works</div>
+                    <div className="summary-label">{t('earnings.works')}</div>
                     <div className="summary-value">
                       {(effectiveClientHasData ? getWorksCount(effectiveClientId) : 0).toLocaleString()}
                     </div>
@@ -3771,7 +3769,7 @@ const Revenue = () => {
             {/* Revenue Over Time */}
             <div className="chart-card chart-large">
               <div className="chart-header">
-                <h3>Revenue Over Time</h3>
+                <h3>{t('earnings.revenueOverTime')}</h3>
                 <div style={{ display: 'flex', flexDirection: 'column', gap: '12px', alignItems: 'flex-end' }}>
                   <div
                     style={{
@@ -3943,7 +3941,7 @@ const Revenue = () => {
                       className="year-nav-btn"
                       onClick={() => navigateYearRange('prev')}
                       disabled={!canNavigatePrev}
-                      title="Previous years"
+                      title={t('earnings.prevYears')}
                     >
                       <FaChevronLeft />
                     </button>
@@ -3954,7 +3952,7 @@ const Revenue = () => {
                       className="year-nav-btn"
                       onClick={() => navigateYearRange('next')}
                       disabled={!canNavigateNext}
-                      title="Next years"
+                      title={t('earnings.nextYears')}
                     >
                       <FaChevronRight />
                     </button>
@@ -3966,19 +3964,19 @@ const Revenue = () => {
             {/* Revenue by Source */}
             <div className="chart-card">
               <div className="chart-header">
-                <h3>Revenue by Source</h3>
+                <h3>{t('earnings.revenueBySource')}</h3>
                 <div className="source-toggle">
                   <button
                     className={sourceViewMode === 'incomeType' ? 'active' : ''}
                     onClick={() => setSourceViewMode('incomeType')}
                   >
-                    Income Type
+                    {t('earnings.incomeType')}
                   </button>
                   <button
                     className={sourceViewMode === 'organization' ? 'active' : ''}
                     onClick={() => setSourceViewMode('organization')}
                   >
-                    Organization
+                    {t('earnings.organization')}
                   </button>
                 </div>
               </div>
@@ -4005,7 +4003,7 @@ const Revenue = () => {
                       color: currentTheme === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)',
                     }}
                   >
-                    No data to display
+                    {t('earnings.noData')}
                   </div>
                 ) : (
                   <>
@@ -4092,9 +4090,9 @@ const Revenue = () => {
             {/* Territory Performance */}
             <div className="territory-section" style={{ marginBottom: 0 }}>
               <div className="section-header">
-                <h3>Revenue by Territory</h3>
+                <h3>{t('earnings.revenueByTerritory')}</h3>
                 <p style={{ fontSize: '12px', color: 'var(--muted-text)', marginTop: '4px' }}>
-                  Interactive globe showing revenue distribution
+                  {t('earnings.globeAlt')}
                 </p>
               </div>
               <div
@@ -4175,7 +4173,7 @@ const Revenue = () => {
                         flexShrink: 0,
                       }}
                     >
-                      Top 10 Countries by Revenue
+                      {t('earnings.topCountries')}
                     </h4>
                     <div
                       style={{
@@ -4341,9 +4339,9 @@ const Revenue = () => {
             {/* Revenue by Platform */}
             <div className="territory-section" style={{ marginBottom: 0 }}>
               <div className="section-header">
-                <h3>Revenue by Platform</h3>
+                <h3>{t('earnings.revenueByPlatform')}</h3>
                 <p style={{ fontSize: '12px', color: 'var(--muted-text)', marginTop: '4px' }}>
-                  Revenue breakdown by DSP
+                  {t('earnings.platformSubtitle')}
                 </p>
               </div>
               <div
@@ -4369,7 +4367,7 @@ const Revenue = () => {
                       color: currentTheme === 'dark' ? 'rgba(255, 255, 255, 0.5)' : 'rgba(0, 0, 0, 0.5)',
                     }}
                   >
-                    No data to display
+                    {t('earnings.noData')}
                   </div>
                 ) : (
                   <>
@@ -4467,7 +4465,7 @@ const Revenue = () => {
               {activeTransactionTab === 'top-songs' ? (
                 <input
                   type="text"
-                  placeholder="Search song name…"
+                  placeholder={t('earnings.searchSong')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="filter-select"
@@ -4476,7 +4474,7 @@ const Revenue = () => {
               ) : (
                 <button className="filter-btn" onClick={() => setShowFilters(!showFilters)}>
                   <FaFilter />
-                  Filters
+                  {t('earnings.filters')}
                 </button>
               )}
             </div>
@@ -4488,16 +4486,16 @@ const Revenue = () => {
                   onChange={(e) => setFilterSource(e.target.value)}
                   className="filter-select"
                 >
-                  <option value="all">All Income Types</option>
-                  <option value="streaming">Streaming</option>
-                  <option value="download">Download</option>
-                  <option value="physical">Physical</option>
-                  <option value="performance">Performance</option>
-                  <option value="mechanical">Mechanical</option>
-                  <option value="sync">Sync</option>
-                  <option value="merchandise">Merchandise</option>
-                  <option value="live">Live</option>
-                  <option value="other">Other</option>
+                  <option value="all">{t('earnings.allIncomeTypes')}</option>
+                  <option value="streaming">{t('income.streaming')}</option>
+                  <option value="download">{t('income.download')}</option>
+                  <option value="physical">{t('income.physical')}</option>
+                  <option value="performance">{t('income.performance')}</option>
+                  <option value="mechanical">{t('income.mechanical')}</option>
+                  <option value="sync">{t('income.sync')}</option>
+                  <option value="merchandise">{t('income.merchandise')}</option>
+                  <option value="live">{t('income.live')}</option>
+                  <option value="other">{t('income.other')}</option>
                 </select>
                 {/* Payment Sources Multi-Select */}
                 <div className="payment-sources-filter" style={{ position: 'relative' }}>
@@ -4572,7 +4570,7 @@ const Revenue = () => {
                             fontWeight: '500',
                           }}
                         >
-                          Select All
+                          {t('earnings.selectAll')}
                         </button>
                         <button
                           onClick={() => setSelectedPaymentSources([])}
@@ -4588,7 +4586,7 @@ const Revenue = () => {
                             fontWeight: '500',
                           }}
                         >
-                          Deselect All
+                          {t('earnings.deselectAll')}
                         </button>
                       </div>
 
@@ -4659,16 +4657,17 @@ const Revenue = () => {
                   onChange={(e) => setFilterTerritory(e.target.value)}
                   className="filter-select"
                 >
-                  <option value="all">All Territories</option>
-                  {revenueByTerritory.map((t) => (
-                    <option key={t.code} value={t.code}>
-                      {t.name}
+                  <option value="all">{t('earnings.allTerritories')}</option>
+                  {/* not `t` — that is the translate function in this scope */}
+                  {revenueByTerritory.map((territory) => (
+                    <option key={territory.code} value={territory.code}>
+                      {territory.name}
                     </option>
                   ))}
                 </select>
                 <input
                   type="text"
-                  placeholder="Search songs, artists, sources..."
+                  placeholder={t('earnings.searchSongs')}
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
                   className="filter-select"
@@ -4685,10 +4684,10 @@ const Revenue = () => {
                   <table>
                     <thead>
                       <tr>
-                        <th>Date</th>
-                        <th>Source</th>
-                        <th>Payment Sources</th>
-                        <th>Territory</th>
+                        <th>{t('table.date')}</th>
+                        <th>{t('table.source')}</th>
+                        <th>{t('table.paymentSources')}</th>
+                        <th>{t('table.territory')}</th>
                         <th
                           onClick={() => {
                             if (sortByAmount === 'desc') setSortByAmount('asc');
@@ -4696,11 +4695,11 @@ const Revenue = () => {
                             else setSortByAmount('desc');
                           }}
                           style={{ cursor: 'pointer', userSelect: 'none' }}
-                          title="Click to sort by amount"
+                          title={t('earnings.sortByAmount')}
                         >
-                          Amount {sortByAmount === 'desc' ? '↓' : sortByAmount === 'asc' ? '↑' : ''}
+                          {t('table.amount')} {sortByAmount === 'desc' ? '↓' : sortByAmount === 'asc' ? '↑' : ''}
                         </th>
-                        <th>Status</th>
+                        <th>{t('table.status')}</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -4748,41 +4747,45 @@ const Revenue = () => {
                 {filteredTransactions.length > 0 && (
                   <div className="pagination-controls" data-theme={currentTheme}>
                     <div className="pagination-info">
-                      Showing {startIndex + 1}-{Math.min(endIndex, filteredTransactions.length)} of{' '}
-                      {filteredTransactions.length} transactions ({totalPages} pages total)
+                      {t('earnings.showingRange', {
+                        from: startIndex + 1,
+                        to: Math.min(endIndex, filteredTransactions.length),
+                        total: filteredTransactions.length,
+                        pages: totalPages,
+                      })}
                     </div>
                     <div className="pagination-buttons">
                       <button className="pagination-btn" onClick={() => setCurrentPage(1)} disabled={currentPage === 1}>
-                        First
+                        {t('earnings.first')}
                       </button>
                       <button
                         className="pagination-btn"
                         onClick={() => setCurrentPage((prev) => Math.max(1, prev - 1))}
                         disabled={currentPage === 1}
                       >
-                        Previous
+                        {t('earnings.previous')}
                       </button>
                       <span className="pagination-current">
-                        Page {currentPage} of {totalPages}
+                        {t('earnings.pageOf', { page: currentPage, pages: totalPages })}
                       </span>
                       <button
                         className="pagination-btn"
                         onClick={() => setCurrentPage((prev) => Math.min(totalPages, prev + 1))}
                         disabled={currentPage === totalPages}
                       >
-                        Next
+                        {t('earnings.next')}
                       </button>
                       <button
                         className="pagination-btn"
                         onClick={() => setCurrentPage(totalPages)}
                         disabled={currentPage === totalPages}
                       >
-                        Last
+                        {t('earnings.last')}
                       </button>
                     </div>
                     <div className="pagination-per-page">
                       <label>
-                        Per page:
+                        {t('earnings.perPage')}
                         <select value={itemsPerPage} onChange={(e) => setItemsPerPage(Number(e.target.value))}>
                           <option value={25}>25</option>
                           <option value={50}>50</option>
@@ -4799,7 +4802,7 @@ const Revenue = () => {
               <div className="top-songs-list">
                 {topEarningSongs.length === 0 ? (
                   <div className="empty-state">
-                    <p>No songs found with the current filters.</p>
+                    <p>{t('earnings.noSongs')}</p>
                   </div>
                 ) : (
                   <div className="songs-grid">

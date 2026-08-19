@@ -708,3 +708,44 @@
   font-size: 13px;
   color: var(--soft-text);
 }
+
+/* Blocking state, red: an unmatched account or a payee with no statements now
+   stops a distribution, so it must not read like the grey "informational"
+   pills next to it. */
+.pillBlocking {
+  background: rgba(229, 72, 77, 0.14);
+  color: #e5484d;
+}
+
+/* "Statement name: X · Did you mean Y?" under an unmatched row. */
+.unmatchedHint {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+  font-size: 11.5px;
+  color: var(--soft-text);
+}
+
+.suggestLink {
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 11.5px;
+  color: var(--accent);
+  cursor: pointer;
+  font-family: var(--font-body);
+  text-decoration: underline;
+}
+
+/* The match is a name similarity and nothing more — say so where the decision
+   is actually made, not in a tooltip nobody opens. */
+.linkMatchNote {
+  margin: 10px 0 0 0;
+  padding: 9px 11px;
+  border-left: 2px solid #e5484d;
+  background: rgba(229, 72, 77, 0.07);
+  color: var(--soft-text);
+  font-size: 12.5px;
+}

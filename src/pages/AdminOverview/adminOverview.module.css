@@ -762,3 +762,102 @@
   gap: 6px;
   margin-left: auto;
 }
+
+/* --- Unmatched statement accounts, on the dashboard ----------------------- */
+/* Red, because this is money held back: it is a blocker, not a note. */
+.unmatchedPanel {
+  border: 1px solid rgba(229, 72, 77, 0.35);
+  background: rgba(229, 72, 77, 0.06);
+  border-radius: 12px;
+  padding: 14px 16px;
+  margin-bottom: 16px;
+}
+
+.unmatchedHead {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  color: #e5484d;
+  font-size: 13.5px;
+  margin-bottom: 10px;
+}
+
+.unmatchedSub {
+  color: var(--soft-text);
+  font-weight: 400;
+  font-size: 12.5px;
+}
+
+.unmatchedAll {
+  margin-left: auto;
+  background: none;
+  border: none;
+  color: #e5484d;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-body);
+}
+
+.unmatchedList {
+  display: flex;
+  flex-direction: column;
+}
+
+.unmatchedRow {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 7px 0;
+  border-top: 1px solid rgba(229, 72, 77, 0.16);
+  font-size: 13px;
+  flex-wrap: wrap;
+}
+
+.unmatchedName {
+  color: var(--text);
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.unmatchedCode {
+  color: var(--soft-text);
+  font-family: var(--font-mono);
+  font-size: 11.5px;
+}
+
+.unmatchedGuess {
+  background: none;
+  border: none;
+  padding: 0;
+  color: var(--accent);
+  font-size: 12.5px;
+  cursor: pointer;
+  font-family: var(--font-body);
+  text-decoration: underline;
+}
+
+.unmatchedNoGuess {
+  color: var(--soft-text);
+  font-size: 12.5px;
+  font-style: italic;
+}
+
+.unmatchedRow .issueFixBtn {
+  margin-left: auto;
+}
+
+.unmatchedMore {
+  padding-top: 8px;
+  color: var(--soft-text);
+  font-size: 12.5px;
+}
+
+/* A payee with no statements at all — red, because the send is gated on it. */
+.statusBlocking {
+  background: rgba(229, 72, 77, 0.14);
+  color: #e5484d;
+  border: 1px solid rgba(229, 72, 77, 0.3);
+}
+

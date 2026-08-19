@@ -3,6 +3,8 @@ import { Helmet } from 'react-helmet-async';
 import { FaFileInvoiceDollar, FaDownload, FaHourglassHalf } from 'react-icons/fa';
 import Sidebar from '../../components/Sidebar/Sidebar';
 import { listMyWriters, listMyStatements, downloadMyStatementPdf } from '../../api/portal';
+import { useLanguage } from '../../i18n/LanguageContext';
+import AccessPanel from './AccessPanel';
 import '../Revenue/revenue.css';
 import styles from './writerStatements.module.css';
 
@@ -38,6 +40,7 @@ const periodRank = (period) => {
 // publisher has actually distributed to them. No demo data, no persona — the
 // backend scopes everything to whoever the Bearer token belongs to.
 const LiveWriterStatements = () => {
+  const { t } = useLanguage();
   const [writers, setWriters] = useState([]);
   const [statements, setStatements] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -55,7 +58,7 @@ const LiveWriterStatements = () => {
         setWriters(Array.isArray(ws) ? ws : []);
         setStatements(Array.isArray(sts) ? sts : []);
       } catch (err) {
-        if (!cancelled) setError(err?.message || 'Could not load your statements.');
+        if (!cancelled) setError(err?.message || t('statements.loadError'));
       } finally {
         if (!cancelled) setLoading(false);
       }
@@ -101,7 +104,7 @@ const LiveWriterStatements = () => {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     } catch (err) {
-      setError(err?.message || 'That statement could not be downloaded.');
+      setError(err?.message || t('statements.downloadError'));
     } finally {
       setDownloadingId(null);
     }
@@ -118,16 +121,14 @@ const LiveWriterStatements = () => {
         <div className="revenue-content">
           <div className="revenue-header">
             <div>
-              <h1 className="revenue-title">Statements</h1>
+              <h1 className="revenue-title">{t('statements.title')}</h1>
               <p className="revenue-subtitle">
-                {writerName
-                  ? `Royalty statements distributed to ${writerName} by your publisher.`
-                  : 'Download the royalty statements your publisher has distributed to you.'}
+                {writerName ? t('statements.subtitleNamed', { name: writerName }) : t('statements.subtitle')}
               </p>
             </div>
             {statements.length > 0 && (
               <div className={styles.totalPill}>
-                <span className={styles.totalLabel}>Total distributed</span>
+                <span className={styles.totalLabel}>{t('statements.totalDistributed')}</span>
                 <span className={styles.totalValue}>{fmtMoney(total)}</span>
               </div>
             )}
@@ -139,18 +140,15 @@ const LiveWriterStatements = () => {
             <div className={styles.emptyCard}>
               <FaHourglassHalf size={28} style={{ color: 'var(--accent)' }} />
               <div>
-                <div className={styles.emptyTitle}>Loading your statements…</div>
+                <div className={styles.emptyTitle}>{t('statements.loading')}</div>
               </div>
             </div>
           ) : statements.length === 0 ? (
             <div className={styles.emptyCard}>
               <FaHourglassHalf size={28} style={{ color: 'var(--accent)' }} />
               <div>
-                <div className={styles.emptyTitle}>No statements available yet</div>
-                <div className={styles.emptyBody}>
-                  Your statements are being finalised by your publisher. Once they are distributed they will appear
-                  here, ready to download.
-                </div>
+                <div className={styles.emptyTitle}>{t('statements.emptyTitle')}</div>
+                <div className={styles.emptyBody}>{t('statements.emptyBodyLive')}</div>
               </div>
             </div>
           ) : (
@@ -161,10 +159,10 @@ const LiveWriterStatements = () => {
                   <table className={styles.table}>
                     <thead>
                       <tr>
-                        <th>Statement</th>
-                        <th>Period</th>
-                        <th>Distributed</th>
-                        <th style={{ textAlign: 'right' }}>Amount</th>
+                        <th>{t('statements.colStatement')}</th>
+                        <th>{t('statements.colPeriod')}</th>
+                        <th>{t('statements.colDistributed')}</th>
+                        <th style={{ textAlign: 'right' }}>{t('statements.colAmount')}</th>
                         <th />
                       </tr>
                     </thead>
@@ -189,7 +187,9 @@ const LiveWriterStatements = () => {
                               disabled={downloadingId === s.distribution_id}
                             >
                               <FaDownload size={11} />{' '}
-                              {downloadingId === s.distribution_id ? 'Downloading…' : 'Download PDF'}
+                              {downloadingId === s.distribution_id
+                                ? t('statements.downloading')
+                                : t('statements.download')}
                             </button>
                           </td>
                         </tr>
@@ -200,6 +200,10 @@ const LiveWriterStatements = () => {
               </div>
             ))
           )}
+
+          {writers.map((w) => (
+            <AccessPanel key={w.id} writer={w} />
+          ))}
         </div>
       </div>
     </>

@@ -169,3 +169,151 @@
   color: #f87171;
   font-size: 14px;
 }
+
+/* --- Who has access ------------------------------------------------------- */
+/* Sits below the statements: it is housekeeping, not the reason anyone opened
+   the portal. Guests see the list without the form (the server refuses them
+   either way — this only avoids offering a button that 403s). */
+.accessCard {
+  margin-top: 32px;
+  padding: 20px 22px;
+  background: var(--card-bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+}
+
+.accessHeader {
+  margin-bottom: 14px;
+}
+
+.accessTitle {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.accessSubtitle {
+  margin: 4px 0 0 0;
+  font-size: 12.5px;
+  color: var(--soft-text);
+}
+
+.accessEmpty {
+  font-size: 13px;
+  color: var(--soft-text);
+  padding: 8px 0;
+}
+
+.accessList {
+  list-style: none;
+  margin: 0 0 14px 0;
+  padding: 0;
+}
+
+.accessRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--border-subtle);
+}
+
+.accessRow:last-child {
+  border-bottom: none;
+}
+
+.accessEmail {
+  font-size: 13px;
+  color: var(--text);
+  overflow-wrap: anywhere;
+}
+
+.accessMeta {
+  font-size: 11.5px;
+  color: var(--soft-text);
+  font-family: var(--font-mono);
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+.accessRevoke {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: none;
+  border: none;
+  padding: 4px 6px;
+  font-size: 11.5px;
+  color: var(--danger, #e5484d);
+  cursor: pointer;
+  font-family: var(--font-body);
+}
+
+.accessRevoke:hover {
+  text-decoration: underline;
+}
+
+/* Wraps to one control per line on a phone, which is where most of this
+   roster reads their statements. */
+.accessForm {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.accessInput {
+  flex: 1 1 180px;
+  min-width: 0;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--card-bg);
+  color: var(--text);
+  font-size: 13px;
+  font-family: var(--font-body);
+}
+
+.accessInput:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+.accessSend {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 9px 16px;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-md);
+  background: var(--accent);
+  color: var(--accent-contrast, #0b0b0c);
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-body);
+  white-space: nowrap;
+}
+
+.accessSend:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.accessError {
+  margin-top: 10px;
+  font-size: 12.5px;
+  color: var(--danger, #e5484d);
+}
+
+.accessLinkBox {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.accessLinkRow {
+  display: flex;
+  gap: 8px;
+}

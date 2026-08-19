@@ -58,10 +58,21 @@ const fmtMoney = (n) =>
 // So green requires every expected revenue type to be covered; anything short
 // of that is amber with the outstanding types named.
 const liveCompleteness = (w) => {
+  // An account no client-list row claims. Ranked first: until somebody says who
+  // it belongs to, none of the other questions about it can even be asked.
+  if (w.isUnmatched) {
+    return {
+      kind: 'blocking',
+      label: 'Unmatched account',
+      title: 'No client on your list claims this statement account — assign an owner or add them to the client list',
+    };
+  }
   if (w.needsInfo) {
     return { kind: 'warn', label: `Needs info: ${(w.missingInfo || []).join(', ')}` };
   }
-  if (!w.statementCount) return { kind: 'idle', label: 'No statements' };
+  // Red, not grey: nothing arrived for this payee, so they are getting nothing
+  // this period and the send is gated on it. Grey read as "nothing to do here".
+  if (!w.statementCount) return { kind: 'blocking', label: 'No statements' };
 
   const expected = w.expectedCatalogs || [];
   const covered = new Set(w.coveredCatalogs || []);
@@ -195,6 +206,7 @@ const AdminOverview = () => {
         search: debouncedSearch,
         status: 'active',
         membership,
+        includeUnmatched: true,
       });
       setLiveRows(res.items || []);
       setLiveTotal(res.total || 0);
@@ -290,6 +302,9 @@ const AdminOverview = () => {
         expectedCatalogs: w.expected_catalogs || [],
         needsInfo: w.needs_info,
         missingInfo: w.missing_info || [],
+        isUnmatched: w.is_unmatched,
+        accountName: w.account_name,
+        suggestedClient: w.suggested_client,
         statementCount: w.statement_count || 0,
         pairedCount: w.paired_count || 0,
         reconciledCount: w.reconciled_count || 0,
@@ -717,7 +732,9 @@ const AdminOverview = () => {
                                 ? styles.statusReady
                                 : c.kind === 'warn'
                                   ? styles.statusWarn
-                                  : styles.statusIdle;
+                                  : c.kind === 'blocking'
+                                    ? styles.statusBlocking
+                                    : styles.statusIdle;
                             return (
                               <span
                                 className={`${styles.status} ${cls}`}
@@ -730,6 +747,7 @@ const AdminOverview = () => {
                               >
                                 {c.kind === 'ready' && <FaCheck size={9} />}
                                 {c.kind === 'warn' && <FaClock size={9} />}
+                                {c.kind === 'blocking' && <FaExclamationTriangle size={9} />}
                                 {c.label}
                               </span>
                             );

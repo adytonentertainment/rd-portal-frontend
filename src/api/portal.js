@@ -78,3 +78,14 @@ export const previewInvite = (token) => request({ url: `/portal/invites/${token}
 
 export const acceptInvite = (token, password) =>
   request({ url: '/portal/accept-invite', method: 'POST', data: { token, password } });
+
+// Invite many clients at once — one email each, to their primary contact.
+// The response is a summary, never tokens: a batch of live invite links in the
+// browser would be hundreds of bearer credentials. Per-client links stay in
+// that client's own invite dialog.
+export const adminBulkInvite = (writerIds, { resendPending = false } = {}) =>
+  request({
+    url: '/admin/writers/bulk-invite',
+    method: 'POST',
+    data: { writer_ids: writerIds, resend_pending: resendPending },
+  });
