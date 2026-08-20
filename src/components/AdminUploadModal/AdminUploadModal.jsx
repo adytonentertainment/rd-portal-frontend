@@ -275,6 +275,9 @@ const AdminUploadModal = ({ open, onClose, onComplete }) => {
   const [expanded, setExpanded] = useState({ needsAttention: true, willCreate: false, matched: {} });
   const inputRef = useRef(null);
   const counterRef = useRef(0);
+  // Stops the ingest poll when the modal closes. Without it a long drop keeps
+  // polling after the user has moved on.
+  const pollCancelRef = useRef(false);
 
   useEffect(() => {
     if (!open) {
@@ -283,6 +286,7 @@ const AdminUploadModal = ({ open, onClose, onComplete }) => {
       setBatchIds([]);
       setUploadError(null);
       setLiveUpload(null);
+      pollCancelRef.current = true;
       setFilter('');
       setExpanded({ needsAttention: true, willCreate: false, matched: {} });
       counterRef.current = 0;
@@ -328,7 +332,17 @@ const AdminUploadModal = ({ open, onClose, onComplete }) => {
           fileCount: info?.totalFiles ?? prev?.fileCount,
         }))
       );
-      for (let i = 0; i < 60; i += 1) {
+      // Follow the ingest to its END, however long that takes. This used to be
+      // a fixed 60 ticks at 1.5s — 90 seconds — which is shorter than any real
+      // drop: 2,613 files parse for many minutes, so the loop always expired
+      // while the counts were still zero and then never updated again. The
+      // upload had worked; the screen just stopped watching and said 0 clients,
+      // 0 statements, $0.
+      pollCancelRef.current = false;
+      const startedAt = Date.now();
+      const MAX_MS = 3 * 60 * 60 * 1000; // a full-corpus parse, with room to spare
+      for (let i = 0; ; i += 1) {
+        if (pollCancelRef.current || Date.now() - startedAt > MAX_MS) break;
         const res = await getUploadStatements(uploadId);
         const statements = res.statements || [];
         // distinct real clients this upload created/attached to
@@ -347,7 +361,9 @@ const AdminUploadModal = ({ open, onClose, onComplete }) => {
           batchIds: res.batch_ids || [],
         });
         if (status === 'done' || status === 'failed') break;
-        await sleep(1500);
+        // Tight at first so a small drop feels instant, then ease off — an hour
+        // of parsing does not need 2,400 requests.
+        await sleep(i < 20 ? 1500 : 5000);
       }
     } catch (err) {
       // Surface it — a silent failure looked like "upload did nothing". Common
