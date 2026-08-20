@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FaCheck, FaExclamationTriangle, FaSpinner } from 'react-icons/fa';
+import { FaCheck, FaExclamationTriangle, FaSpinner, FaTimes } from 'react-icons/fa';
 import { listUploads } from '../../api/statementsAdmin';
 import styles from './ingestActivity.module.css';
 
@@ -10,6 +10,14 @@ import styles from './ingestActivity.module.css';
 // completely invisible: the admin stared at a dashboard reading $0 with no way
 // to tell "nothing is happening" from "2,613 statements are mid-parse".
 const POLL_MS = 5000;
+const DISMISS_KEY = 'ingestActivityDismissed';
+
+// What the panel is currently reporting. Dismissal is remembered against THIS,
+// not forever: closing it means "I have seen this", not "never tell me again".
+// A new upload, or one of these changing state, brings the panel back — hiding
+// a live ingest permanently would leave the admin staring at a disabled Send
+// button with nothing on screen explaining why.
+const signatureOf = (rows) => rows.map((u) => `${u.upload_id}:${u.status}`).join('|');
 
 const fmtTime = (iso) => {
   if (!iso) return '—';
@@ -77,6 +85,13 @@ const describe = (u) => {
 const IngestActivity = ({ limit = 6, onActiveChange }) => {
   const navigate = useNavigate();
   const [items, setItems] = useState(null); // null = first load
+  const [dismissed, setDismissed] = useState(() => {
+    try {
+      return localStorage.getItem(DISMISS_KEY) || null;
+    } catch {
+      return null; // private mode — the panel simply stays open
+    }
+  });
   const timer = useRef(null);
   const activeRef = useRef(null);
 
@@ -105,9 +120,32 @@ const IngestActivity = ({ limit = 6, onActiveChange }) => {
   if (items === null) return null; // nothing to say yet
   if (!items.length) return null; // no uploads ever — stay out of the way
 
+  const signature = signatureOf(items);
+  if (dismissed === signature) return null; // closed, and nothing has changed since
+
+  const close = () => {
+    setDismissed(signature);
+    try {
+      localStorage.setItem(DISMISS_KEY, signature);
+    } catch {
+      /* private mode — dismissal lasts for this view only */
+    }
+  };
+
   return (
     <section className={styles.panel} aria-label="Ingest activity">
-      <div className={styles.head}>Ingest activity</div>
+      <div className={styles.head}>
+        <span>Ingest activity</span>
+        <button
+          type="button"
+          className={styles.close}
+          onClick={close}
+          aria-label="Close ingest activity"
+          title="Close — reopens if an upload starts or changes"
+        >
+          <FaTimes size={11} />
+        </button>
+      </div>
       <ul className={styles.list}>
         {items.map((u) => {
           const d = describe(u);

@@ -17,7 +17,12 @@ import VeraxLogo from '../VeraxLogo/VeraxLogo';
 // import GlassButton from '../Buttons/GlassButton/GlassButton';
 import ThemeButton from '../Buttons/ThemeButton/ThemeButton';
 
-const NavBar = () => {
+// `marketingLinks` — Pricing / About / Services point at the public Verax
+// site. Signed-in product pages (Settings) have no business showing them,
+// so they can be switched off there while the marketing pages keep them.
+// `showDashboard` — the Dashboard button points at /catalog, a Verax product
+// page. Nothing in the publisher portal wants it.
+const NavBar = ({ marketingLinks = true, showDashboard = true }) => {
   // Google login temporarily disabled
   // const googleLogin = useGoogleLogin({
   //   onSuccess: async (tokenResponse) => {
@@ -104,22 +109,24 @@ const NavBar = () => {
         <div className="navbar-item">
           <VeraxLogo width={60} />
         </div>
-        <div className="navbar-item">
-          <div className="navbar-links">
-            <TransparentButton className="w-20" onClick={handleGoToPricing}>
-              Pricing
-            </TransparentButton>
-            <TransparentButton className="w-20" onClick={() => handleGoToSection('problems')}>
-              About
-            </TransparentButton>
-            <TransparentButton className="w-20" onClick={() => handleGoToSection('catalog-demo')}>
-              Services
-            </TransparentButton>
+        {marketingLinks && (
+          <div className="navbar-item">
+            <div className="navbar-links">
+              <TransparentButton className="w-20" onClick={handleGoToPricing}>
+                Pricing
+              </TransparentButton>
+              <TransparentButton className="w-20" onClick={() => handleGoToSection('problems')}>
+                About
+              </TransparentButton>
+              <TransparentButton className="w-20" onClick={() => handleGoToSection('catalog-demo')}>
+                Services
+              </TransparentButton>
+            </div>
           </div>
-        </div>
+        )}
         <div className="navbar-item button-cluster">
           {/* Dashboard Button - Only when logged in */}
-          {user && (
+          {showDashboard && user && (
             <div className="cluster-element">
               <NavBarButton text="Dashboard" to="/catalog" />
             </div>

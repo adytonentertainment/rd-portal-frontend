@@ -23,6 +23,10 @@ const InviteAccept = () => {
   const [loading, setLoading] = useState(true);
   const [deadEnd, setDeadEnd] = useState(false);
 
+  // Identity is per client: this login reaches THIS client and no other, so
+  // the username is what tells two portals apart at the sign-in screen when
+  // the same person holds several. Defaulted to the client's name, editable.
+  const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -33,7 +37,10 @@ const InviteAccept = () => {
     (async () => {
       try {
         const res = await previewInvite(token);
-        if (active) setPreview(res);
+        if (active) {
+          setPreview(res);
+          setUsername(res.suggested_username || '');
+        }
       } catch {
         // 400/404/expired/revoked all land here — a friendly dead-end, not a trace.
         if (active) setDeadEnd(true);
@@ -48,6 +55,9 @@ const InviteAccept = () => {
 
   const messageFor = (err) => {
     if (!err) return 'Something went wrong. Please try again.';
+    // 409 = the username belongs to somebody already. Ask again rather than
+    // treating it as a dead end; the rest of what they typed is still good.
+    if (err.status === 409) return err.message || 'That username is taken. Pick another.';
     if (err.status === 0) return 'Cannot reach the server. Please try again in a moment.';
     if (err.status === 400) return err.message || 'This invite link is no longer valid.';
     // 401 = the link is fine, but you must prove the account is yours.
@@ -75,10 +85,14 @@ const InviteAccept = () => {
       );
       return;
     }
+    if (!username.trim()) {
+      setError('Choose a username — this is what you will sign in with.');
+      return;
+    }
     setSubmitting(true);
     setError('');
     try {
-      const res = await acceptInvite(token, preview?.needs_password ? password : undefined);
+      const res = await acceptInvite(token, preview?.needs_password ? password : undefined, username.trim());
       if (res.access_token) {
         localStorage.setItem('token', res.access_token);
         window.location.href = '/earnings';
@@ -126,7 +140,20 @@ const InviteAccept = () => {
 
               {preview.needs_password && !preview.requires_sign_in && (
                 <Input
-                  label={preview.has_login ? 'Your password' : 'Set a password'}
+                  label="Username"
+                  value={username}
+                  onValueChange={setUsername}
+                  isRequired
+                  autoComplete="username"
+                  description={`You'll sign in with this. It is set to ${
+                    preview.writer_name || 'this client'
+                  } so you can tell this portal apart if you hold more than one.`}
+                />
+              )}
+
+              {preview.needs_password && !preview.requires_sign_in && (
+                <Input
+                  label="Set a password"
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onValueChange={setPassword}

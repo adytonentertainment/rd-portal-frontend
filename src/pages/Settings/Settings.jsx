@@ -17,43 +17,18 @@ const Settings = () => {
   const subscriptionContext = useContext(SubscriptionContextProvider);
   const subscription = subscriptionContext?.subscription;
   const { currentTheme } = useContext(ThemeContext);
-  const { selectedClient, selectedClientId, updateClient } = useClientContext();
+  const { selectedClient } = useClientContext();
 
   const [selectedTab, setSelectedTab] = useState('account');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState(null);
   const [userInfo, setUserInfo] = useState(null);
-  const [notificationPrefs, setNotificationPrefs] = useState({
-    // TuneScan notifications
-    scan_complete: { push: true, email: true, web: true },
-    new_match: { push: true, email: true, web: true },
-    unauthorized_use: { push: true, email: true, web: true },
-    // Revenue notifications
-    statement_processed: { push: true, email: true, web: true },
-    revenue_discrepancy: { push: true, email: true, web: true },
-    revenue_spike: { push: true, email: true, web: true },
-    revenue_leak: { push: true, email: true, web: true },
-    // Catalog notifications
-    milestone: { push: true, email: true, web: true },
-    trending: { push: true, email: true, web: true },
-    catalog_update: { push: false, email: true, web: true },
-    // Agreement notifications
-    agreement_parsed: { push: true, email: true, web: true },
-    critical_red_flag: { push: true, email: true, web: true },
-    termination_expiring: { push: true, email: true, web: true },
-    // Reports
-    weekly_report: { push: false, email: true, web: true },
-  });
 
   const oldPasswordRef = useRef();
   const newPasswordRef = useRef();
   const confirmNewPasswordRef = useRef();
   const firstNameRef = useRef();
   const lastNameRef = useRef();
-  const writerIpiRef = useRef();
-  const writerNameRef = useRef();
-  const publisherIpiRef = useRef();
-  const publisherNameRef = useRef();
   const avatarInputRef = useRef();
 
   // Fetch user info on component mount
@@ -81,24 +56,6 @@ const Settings = () => {
           if (firstNameRef.current) firstNameRef.current.value = response.data.first_name || '';
           if (lastNameRef.current) lastNameRef.current.value = response.data.last_name || '';
           setAvatarUrl(response.data.avatar_url);
-
-          // Populate IPI/name fields from selected client or user
-          if (selectedClient) {
-            if (writerIpiRef.current) writerIpiRef.current.value = selectedClient.writer_ipi || '';
-            if (writerNameRef.current) writerNameRef.current.value = selectedClient.writer_name || '';
-            if (publisherIpiRef.current) publisherIpiRef.current.value = selectedClient.publisher_ipi || '';
-            if (publisherNameRef.current) publisherNameRef.current.value = selectedClient.publisher_name || '';
-          } else {
-            if (writerIpiRef.current) writerIpiRef.current.value = response.data.writer_ipi || '';
-            if (writerNameRef.current) writerNameRef.current.value = response.data.writer_name || '';
-            if (publisherIpiRef.current) publisherIpiRef.current.value = response.data.publisher_ipi || '';
-            if (publisherNameRef.current) publisherNameRef.current.value = response.data.publisher_name || '';
-          }
-
-          // Fetch notification preferences
-          if (response.data.notification_preferences) {
-            setNotificationPrefs(response.data.notification_preferences);
-          }
         }
       } catch (error) {
         console.error('Error fetching user info:', error);
@@ -242,29 +199,11 @@ const Settings = () => {
         data: {
           first_name: firstNameRef.current?.value || null,
           last_name: lastNameRef.current?.value || null,
-          // Only save IPI/name to user when no client is selected
-          ...(!selectedClientId && {
-            writer_ipi: writerIpiRef.current?.value || null,
-            writer_name: writerNameRef.current?.value || null,
-            publisher_ipi: publisherIpiRef.current?.value || null,
-            publisher_name: publisherNameRef.current?.value || null,
-          }),
         },
       });
 
-      // Save IPI/name to selected client if one is active
-      if (selectedClientId) {
-        await updateClient(selectedClientId, {
-          writer_ipi: writerIpiRef.current?.value || null,
-          writer_name: writerNameRef.current?.value || null,
-          publisher_ipi: publisherIpiRef.current?.value || null,
-          publisher_name: publisherNameRef.current?.value || null,
-        });
-      }
-
       if (response.status === 200) {
         setUserInfo(response.data);
-        // Clear audit cache so it refetches with new IPI/name
         localStorage.removeItem('verax_audit_cache_v1');
         localStorage.setItem('verax_settings_modified_at', Date.now().toString());
         alert('Account information saved successfully');
@@ -329,7 +268,7 @@ const Settings = () => {
       <Helmet>
         <title>Settings | RD</title>
       </Helmet>
-      <NavBar />
+      <NavBar marketingLinks={false} showDashboard={false} />
       <div className={styles.settingsContainer} data-theme={currentTheme}>
         <div className={styles.settingsWrapper}>
           {/* Sidebar Menu */}
@@ -351,34 +290,6 @@ const Settings = () => {
                   />
                 </svg>
                 Account
-              </button>
-              <button
-                className={`${styles.menuItem} ${selectedTab === 'api' ? styles.menuItemSelected : ''}`}
-                onClick={() => setSelectedTab('api')}
-              >
-                <svg className={styles.menuIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                  />
-                </svg>
-                API Keys
-              </button>
-              <button
-                className={`${styles.menuItem} ${selectedTab === 'notifications' ? styles.menuItemSelected : ''}`}
-                onClick={() => setSelectedTab('notifications')}
-              >
-                <svg className={styles.menuIcon} viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                  />
-                </svg>
-                Notifications
               </button>
             </div>
           </div>
@@ -453,68 +364,6 @@ const Settings = () => {
                     />
                   </div>
 
-                  {selectedClient && (
-                    <p
-                      className={styles.helpText}
-                      style={{ marginBottom: '8px', fontWeight: 500, color: selectedClient.color || 'var(--accent)' }}
-                    >
-                      Editing IPI & publishing info for client: {selectedClient.name}
-                    </p>
-                  )}
-
-                  <div className={styles.formField}>
-                    <label className={styles.label}>
-                      Writer Name <span className={styles.labelOptional}>(Optional)</span>
-                    </label>
-                    <input ref={writerNameRef} className={styles.input} type="text" placeholder="e.g., John Smith" />
-                    <p className={styles.helpText}>Your name as registered with your performing rights organization</p>
-                  </div>
-
-                  <div className={styles.formField}>
-                    <label className={styles.label}>
-                      Writer IPI <span className={styles.labelOptional}>(Optional)</span>
-                    </label>
-                    <input
-                      ref={writerIpiRef}
-                      className={styles.input}
-                      type="text"
-                      placeholder="e.g., 00123456789"
-                      maxLength="11"
-                    />
-                    <p className={styles.helpText}>
-                      Your songwriter IPI number from your performing rights organization (BMI, ASCAP, PRS, SOCAN, etc.)
-                    </p>
-                  </div>
-
-                  <div className={styles.formField}>
-                    <label className={styles.label}>
-                      Publisher Name <span className={styles.labelOptional}>(Optional)</span>
-                    </label>
-                    <input
-                      ref={publisherNameRef}
-                      className={styles.input}
-                      type="text"
-                      placeholder="e.g., My Publishing Company"
-                    />
-                    <p className={styles.helpText}>Your publishing company or entity name</p>
-                  </div>
-
-                  <div className={styles.formField}>
-                    <label className={styles.label}>
-                      Publisher IPI <span className={styles.labelOptional}>(Optional)</span>
-                    </label>
-                    <input
-                      ref={publisherIpiRef}
-                      className={styles.input}
-                      type="text"
-                      placeholder="e.g., 00123456789"
-                      maxLength="11"
-                    />
-                    <p className={styles.helpText}>
-                      Your publisher's IPI number from your performing rights organization
-                    </p>
-                  </div>
-
                   <button className={styles.primaryButton} onClick={handleSaveAccount}>
                     Save Changes
                   </button>
@@ -581,120 +430,6 @@ const Settings = () => {
                       Delete account
                     </button>
                   </div>
-                </div>
-              </div>
-            )}
-
-            {selectedTab === 'api' && (
-              <div className={styles.contentSection}>
-                <div className={styles.header}>
-                  <h1 className={styles.pageTitle}>API Keys</h1>
-                  <p className={styles.pageSubtitle}>Manage your API keys and access tokens</p>
-                </div>
-                <div className={styles.comingSoon}>
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"
-                    />
-                  </svg>
-                  <p>API Keys coming soon</p>
-                </div>
-              </div>
-            )}
-
-            {selectedTab === 'notifications' && (
-              <div className={styles.contentSection}>
-                <div className={styles.header}>
-                  <h1 className={styles.pageTitle}>Notifications</h1>
-                  <p className={styles.pageSubtitle}>Configure how you receive notifications</p>
-                </div>
-
-                <div className={styles.section}>
-                  <h2 className={styles.sectionTitle}>Notification Preferences</h2>
-                  <p className={styles.helpText} style={{ marginBottom: '24px' }}>
-                    Choose how you want to be notified for different events
-                  </p>
-
-                  <div className={styles.notificationTable}>
-                    <table>
-                      <thead>
-                        <tr>
-                          <th>Notification Type</th>
-                          <th>Push</th>
-                          <th>Email</th>
-                          <th>Web</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {Object.entries({
-                          scan_complete: 'TuneScan complete',
-                          new_match: 'New match detected',
-                          unauthorized_use: 'Unauthorized use detected',
-                          statement_processed: 'Revenue statement processed',
-                          revenue_discrepancy: 'Revenue discrepancy found',
-                          revenue_spike: 'Revenue spike detected',
-                          revenue_leak: 'Revenue leak detected',
-                          milestone: 'Streaming milestone reached',
-                          trending: 'Song trending',
-                          catalog_update: 'Catalog updated/synced',
-                          agreement_parsed: 'Agreement analyzed',
-                          critical_red_flag: 'Critical agreement issue',
-                          termination_expiring: 'Termination window closing',
-                          weekly_report: 'Weekly summary report',
-                        }).map(([key, label]) => (
-                          <tr key={key}>
-                            <td className={styles.notificationLabel}>{label}</td>
-                            <td>
-                              <input
-                                type="checkbox"
-                                checked={notificationPrefs[key]?.push || false}
-                                onChange={(e) =>
-                                  setNotificationPrefs((prev) => ({
-                                    ...prev,
-                                    [key]: { ...prev[key], push: e.target.checked },
-                                  }))
-                                }
-                                className={styles.checkbox}
-                              />
-                            </td>
-                            <td>
-                              <input
-                                type="checkbox"
-                                checked={notificationPrefs[key]?.email || false}
-                                onChange={(e) =>
-                                  setNotificationPrefs((prev) => ({
-                                    ...prev,
-                                    [key]: { ...prev[key], email: e.target.checked },
-                                  }))
-                                }
-                                className={styles.checkbox}
-                              />
-                            </td>
-                            <td>
-                              <input
-                                type="checkbox"
-                                checked={notificationPrefs[key]?.web || false}
-                                onChange={(e) =>
-                                  setNotificationPrefs((prev) => ({
-                                    ...prev,
-                                    [key]: { ...prev[key], web: e.target.checked },
-                                  }))
-                                }
-                                className={styles.checkbox}
-                              />
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-
-                  <button className={styles.primaryButton} style={{ marginTop: '24px' }}>
-                    Save Preferences
-                  </button>
                 </div>
               </div>
             )}

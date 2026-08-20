@@ -76,8 +76,10 @@ export const adminResendInvite = (writerId, inviteId) =>
 
 export const previewInvite = (token) => request({ url: `/portal/invites/${token}` });
 
-export const acceptInvite = (token, password) =>
-  request({ url: '/portal/accept-invite', method: 'POST', data: { token, password } });
+// Claiming builds a login for THIS client: its own username, its own password.
+// The same address claiming another client makes a second, separate one.
+export const acceptInvite = (token, password, username) =>
+  request({ url: '/portal/accept-invite', method: 'POST', data: { token, password, username } });
 
 // Invite many clients at once — one email each, to their primary contact.
 // The response is a summary, never tokens: a batch of live invite links in the

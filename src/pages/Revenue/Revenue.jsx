@@ -247,12 +247,23 @@ const Revenue = () => {
   // portal as fully unlocked — their data must never be hidden behind a paywall.
   const isAdminUser = useIsAdmin();
   const { t } = useLanguage();
-  const isLivePortal = statementsLive && !isAdminUser;
-  const isFreeTier = isLivePortal
+  // This is the writer's own earnings page. In a publisher deployment it shows
+  // REAL distributed royalties to whoever is signed in — including an admin, who
+  // was previously dropped into the demo dataset here and shown invented numbers
+  // formatted exactly like real ones. Nothing about a page that reports money
+  // should be fabricated; if there is no data to show, say so.
+  const isLivePortal = statementsLive;
+  // No paywall in a publisher deployment, ever. The blur and "Upgrade to view"
+  // belong to the Verax SaaS product; a writer must never have their own
+  // royalties censored, and an admin must not see a fake upsell over them.
+  const isFreeTier = statementsLive
     ? false
     : !subscription || ['FREE', 'Free', 'ESSENTIAL', 'Essential'].includes(subscription.tier);
   const canExport =
     isLivePortal || (subscription && !['FREE', 'Free', 'ESSENTIAL', 'Essential'].includes(subscription.tier));
+  // True when the signed-in account has no portal identity (admins). Kept
+  // distinct from "no earnings yet", which is a different sentence entirely.
+  const [portalDenied, setPortalDenied] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [upgradeModalFeature, setUpgradeModalFeature] = useState('Revenue');
   // Minimum-payout notice: balances under $200 carry forward instead of paying out.
@@ -360,12 +371,16 @@ const Revenue = () => {
           setUploadedTransactions(all.filter((r) => !r.is_song_row));
           setSongRows(all.filter((r) => r.is_song_row));
           setNetEarnings(earnings || null);
+          setPortalDenied(false);
         }
-      } catch {
+      } catch (err) {
         if (!cancelled) {
           setUploadedTransactions([]);
           setSongRows([]);
           setNetEarnings(null);
+          // 403 = signed in, but this account is not a portal contact — an
+          // admin, typically. Empty zeros would read as "you earned nothing".
+          setPortalDenied(err?.status === 403);
         }
       } finally {
         if (!cancelled) setIsLoading(false);
@@ -3200,6 +3215,21 @@ const Revenue = () => {
           )}
 
           {/* Header */}
+          {/* An admin has no portal identity, so /me/* refuses them. Saying that
+              plainly beats a page of zeros, which reads as "you earned nothing"
+              — and beats the demo dataset that used to fill in here, which read
+              as real money. */}
+          {portalDenied && (
+            <div className="revenue-notice">
+              <strong>This is the writer&apos;s earnings page.</strong> You are signed in as an admin, which has no
+              portal of its own, so there is nothing here to show. Open a client from{' '}
+              <button type="button" className="revenue-notice-link" onClick={() => navigate('/admin/writers')}>
+                the client list
+              </button>{' '}
+              to see their statements.
+            </div>
+          )}
+
           <div className="revenue-header">
             <div>
               <h1 className="revenue-title">{isLivePortal ? t('earnings.title') : 'Earnings'}</h1>
