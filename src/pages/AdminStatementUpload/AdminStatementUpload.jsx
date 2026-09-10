@@ -13,6 +13,10 @@ import styles from './adminStatementUpload.module.css';
 
 const SOURCE_OPTIONS = ['Auto-detect', ...SOURCES];
 
+// Where an in-flight upload id is parked so a tab that dies mid-transfer
+// can still be resumed rather than stranding the files already sent.
+const PENDING_KEY = 'rdPendingUploadId';
+
 // ---------------------------------------------------------------------------
 // Mock upload (flag off) — pre-existing demo behavior, unchanged.
 // ---------------------------------------------------------------------------
@@ -185,8 +189,63 @@ const LiveStatementUpload = () => {
   const [preview, setPreview] = useState(null);
   const [error, setError] = useState(null);
   const [pollPaused, setPollPaused] = useState(false);
+  // An id recovered from a previous tab that died mid-transfer (see PENDING_KEY).
+  const [strandedId, setStrandedId] = useState(null);
 
   const uploadId = upload?.upload_id ?? null;
+
+  // A transfer lives entirely in this tab's JavaScript. Close the tab, reload
+  // it, or follow a link out, and the loop is gone mid-batch: no error is
+  // raised because there is nothing left to raise it in, the files already
+  // sent stay on the server, and the upload sits at 'receiving' until the
+  // server times it out half an hour later. That is exactly the state a
+  // 5,224-file transfer was found in, stuck at 49 files with the browser
+  // making no requests at all. Two guards, because either alone leaves a hole:
+  // ask before the tab goes, and remember the id in case it goes anyway.
+  useEffect(() => {
+    if (phase !== 'uploading') return undefined;
+    const warn = (e) => {
+      e.preventDefault();
+      // Chrome ignores custom text but requires returnValue to be set.
+      e.returnValue = '';
+      return '';
+    };
+    window.addEventListener('beforeunload', warn);
+    return () => window.removeEventListener('beforeunload', warn);
+  }, [phase]);
+
+  // Survives the tab: the id is the only handle on files already uploaded.
+  // Confirm with the server before crying interruption — the id also outlives
+  // a transfer that finished fine in another tab, and telling an admin their
+  // completed upload was interrupted would send them re-dropping 2 GB for
+  // nothing.
+  useEffect(() => {
+    if (phase !== 'select' || resumeId) return undefined;
+    let pending = null;
+    try {
+      pending = localStorage.getItem(PENDING_KEY);
+    } catch {
+      // Private mode / blocked storage: recovery is unavailable, not fatal.
+    }
+    if (!pending) return undefined;
+
+    let cancelled = false;
+    getUpload(pending)
+      .then((data) => {
+        if (cancelled) return;
+        if (TERMINAL_STATUSES.includes(data.status)) clearPending();
+        else setStrandedId(pending);
+      })
+      .catch((err) => {
+        // 404: the upload is gone, so the id is worthless — drop it. Anything
+        // else (offline, 500) may be temporary, so keep it for the next visit.
+        if (cancelled) return;
+        if (err?.status === 404) clearPending();
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [phase, resumeId]);
 
   useEffect(() => {
     if (phase !== 'processing' || !uploadId || pollPaused) return undefined;
@@ -229,17 +288,41 @@ const LiveStatementUpload = () => {
     addFiles(e.dataTransfer.files);
   };
 
+  const clearPending = () => {
+    try {
+      localStorage.removeItem(PENDING_KEY);
+    } catch {
+      // nothing to clean up if storage was never available
+    }
+  };
+
   const runUpload = async (resumeId) => {
     setError(null);
     setUploadPct(0);
     setPhase('uploading');
+    setStrandedId(null);
     setPreview(deriveSortPreview(queued.map((f) => f.name)));
+
+    // Park the id the moment the server issues one, not when the transfer
+    // ends: the whole point is to survive an ending that never happens.
+    const onProgress = (pct, info) => {
+      setUploadPct(pct);
+      if (info?.uploadId) {
+        try {
+          localStorage.setItem(PENDING_KEY, String(info.uploadId));
+        } catch {
+          // Storage unavailable — the transfer itself is unaffected.
+        }
+      }
+    };
+
     try {
       const created = resumeId
-        ? await resumeUpload(resumeId, queued, setUploadPct)
-        : await createUpload(queued, setUploadPct);
+        ? await resumeUpload(resumeId, queued, onProgress)
+        : await createUpload(queued, onProgress);
       setUpload(created);
       setResumeId(null);
+      clearPending();
       setPollPaused(false);
       setPhase('processing');
     } catch (err) {
@@ -262,6 +345,8 @@ const LiveStatementUpload = () => {
     setError(null);
     setUploadPct(0);
     setResumeId(null);
+    setStrandedId(null);
+    clearPending();
     setPollPaused(false);
   };
 
@@ -304,6 +389,33 @@ const LiveStatementUpload = () => {
             }}
           >
             {resumeId ? 'Resume upload' : 'Retry'}
+          </button>
+        </div>
+      )}
+
+      {!error && strandedId && phase === 'select' && (
+        <div className={styles.errorBanner}>
+          <FaExclamationTriangle />
+          <div className={styles.errorBannerText}>
+            <strong>An upload was interrupted</strong>
+            <span>
+              Upload {strandedId} never finished — the tab was closed or reloaded while files were still transferring.
+            </span>
+            <span className={styles.mutedNote}>
+              Everything already sent is still on the server. Drop the same folder again and only the missing files are
+              transferred.
+            </span>
+          </div>
+          <button
+            type="button"
+            className={styles.retryButton}
+            disabled={!queued.length}
+            onClick={() => {
+              setStrandedId(null);
+              runUpload(strandedId);
+            }}
+          >
+            Resume upload
           </button>
         </div>
       )}

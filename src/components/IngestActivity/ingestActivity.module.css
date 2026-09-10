@@ -151,3 +151,25 @@
   color: var(--text);
   background: var(--hover-overlay, rgba(127, 127, 127, 0.12));
 }
+
+/* Offered only on a transfer the browser has clearly stopped feeding. Muted
+   rather than alarming: the files that arrived are kept, so this is closer to
+   dismissing a dead row than to deleting anything. */
+.giveUp {
+  margin-top: 6px;
+  padding: 3px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  color: #b42318;
+  background: #fef3f2;
+  border: 1px solid #fecdca;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.giveUp:hover:not(:disabled) {
+  background: #fee4e2;
+}
+.giveUp:disabled {
+  opacity: 0.6;
+  cursor: default;
+}

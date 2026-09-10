@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaCheck, FaExclamationTriangle, FaSpinner, FaTimes } from 'react-icons/fa';
-import { listUploads } from '../../api/statementsAdmin';
+import { listUploads, cancelUpload } from '../../api/statementsAdmin';
 import styles from './ingestActivity.module.css';
 
 // Live view of every statement upload on the server — transferring, sorting,
@@ -10,6 +10,11 @@ import styles from './ingestActivity.module.css';
 // completely invisible: the admin stared at a dashboard reading $0 with no way
 // to tell "nothing is happening" from "2,613 statements are mid-parse".
 const POLL_MS = 5000;
+// A transfer that has received nothing for this long is not slow, it is over:
+// the browser stopped sending. The server only gives up after 30 minutes, and
+// saying "Transferring" for half an hour while nothing happens is worse than
+// saying nothing — it is the screen actively misleading you.
+const STALLED_AFTER_MS = 90_000;
 const DISMISS_KEY = 'ingestActivityDismissed';
 
 // What the panel is currently reporting. Dismissal is remembered against THIS,
@@ -28,6 +33,32 @@ const fmtTime = (iso) => {
 // One upload -> what the admin needs to know about it right now.
 const describe = (u) => {
   const p = u.progress || {};
+
+  // Mid-transfer and nothing arriving. The files already sent are kept, so the
+  // answer is to re-drop them rather than start over — say that, rather than
+  // leaving a spinner implying it is still working.
+  if (u.receiving && u.status !== 'done' && u.status !== 'failed') {
+    // last_batch_at only exists once a batch has landed. Fall back to the
+    // open time, or an upload whose browser died before its very first batch
+    // would sit on 'Transferring' forever — the one case with nothing at all
+    // to show for it, and so the most confusing.
+    const clock = u.last_batch_at || u.uploaded_at;
+    const last = clock ? new Date(clock).getTime() : null;
+    const idleMs = last ? Date.now() - last : null;
+    if (idleMs !== null && idleMs > STALLED_AFTER_MS) {
+      const mins = Math.floor(idleMs / 60000);
+      return {
+        kind: 'failed',
+        stalled: true,
+        label: 'Stalled',
+        detail:
+          `Nothing received for ${mins >= 1 ? `${mins} min` : 'over a minute'}. ` +
+          `The transfer stopped — ${(p.received ?? u.file_count ?? 0).toLocaleString()} of ` +
+          `${(u.expected ?? 0).toLocaleString()} files arrived and are kept. ` +
+          `Re-drop the same files on the Upload page to carry on from here.`,
+      };
+    }
+  }
   if (u.status === 'failed') {
     return {
       kind: 'failed',
@@ -85,6 +116,7 @@ const describe = (u) => {
 const IngestActivity = ({ limit = 6, onActiveChange }) => {
   const navigate = useNavigate();
   const [items, setItems] = useState(null); // null = first load
+  const [cancelling, setCancelling] = useState({});
   const [dismissed, setDismissed] = useState(() => {
     try {
       return localStorage.getItem(DISMISS_KEY) || null;
@@ -170,6 +202,26 @@ const IngestActivity = ({ limit = 6, onActiveChange }) => {
                   <span className={styles.time}>started {fmtTime(u.uploaded_at)}</span>
                 </div>
                 <div className={styles.detail}>{d.detail}</div>
+                {d.stalled && (
+                  <button
+                    type="button"
+                    className={styles.giveUp}
+                    disabled={!!cancelling[u.upload_id]}
+                    onClick={async (e) => {
+                      // The row navigates; the button must not.
+                      e.stopPropagation();
+                      setCancelling((c) => ({ ...c, [u.upload_id]: true }));
+                      try {
+                        await cancelUpload(u.upload_id);
+                        await load();
+                      } finally {
+                        setCancelling((c) => ({ ...c, [u.upload_id]: false }));
+                      }
+                    }}
+                  >
+                    {cancelling[u.upload_id] ? 'Cancelling…' : 'Give up on this upload'}
+                  </button>
+                )}
                 {d.pct != null && (
                   <div className={styles.barTrack} role="progressbar" aria-valuenow={d.pct}>
                     <div className={styles.barFill} style={{ width: `${d.pct}%` }} />

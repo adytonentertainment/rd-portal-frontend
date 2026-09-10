@@ -56,7 +56,11 @@ const request = async (config) => {
 //      requests from 51 MB to 316 MB against this corpus (median file 0.12 MB,
 //      max 77 MB), each minutes long on the wire and re-sent whole on retry.
 
-const TARGET_BATCH_BYTES = 24_000_000; // ~90 batches for 2.08 GB
+// Smaller than it once was (24 MB). With four lanes running, big batches make
+// a lumpy tail — three lanes idle while one finishes a 24 MB body — and every
+// retry re-sends the whole thing. 8 MB keeps the lanes fed and makes a dropped
+// batch cheap to redo.
+const TARGET_BATCH_BYTES = 8_000_000; // ~90 batches for 2.08 GB
 const MAX_BATCH_FILES = 150; // guard against a long run of tiny files
 const PART_OVERHEAD = 220; // multipart headers per part, approx
 
@@ -67,9 +71,23 @@ const STALL_MS = 45_000;
 const HARD_CAP_MS = 600_000;
 
 const RETRYABLE = (status) => status === 0 || status === 408 || status === 429 || (status >= 500 && status < 600);
-// Exported so tests can exercise the retry path without waiting 23 real
+// Exported so tests can exercise the retry path without waiting for real
 // seconds. These are the production values.
-export const uploadTuning = { backoffMs: [2000, 6000, 15000] };
+//
+// Five attempts, ~110 seconds of patience. Three (~23s) was not enough for the
+// thing that actually happens on a 5,000-file transfer: a deploy restarts the
+// API, or the network hiccups, and the whole upload gives up mid-way with
+// thousands of files still to send. Re-sending one 24 MB batch is cheap; making
+// somebody re-drop 2 GB is not.
+export const uploadTuning = {
+  backoffMs: [2000, 5000, 12000, 30000, 60000],
+  // Lanes, not bandwidth, are what this transfer is short of. The API is in
+  // Ohio and the admin is in Spain: ~110ms round trip. One TCP stream over
+  // that link tops out around window/RTT, measured at 1.6 MB/s — 24 MB taking
+  // a steady 15s per batch, which is a latency ceiling, not a bandwidth one.
+  // Four streams pay the same 110ms in parallel instead of end to end.
+  concurrency: 4,
+};
 
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 
@@ -121,6 +139,16 @@ const postBatch = (url, batch, onBytes) => {
 // immediately and unconditionally — which re-sent 300 MB straight back into a
 // restarting server, and pointlessly retried 404s and 409s that can never
 // succeed.
+// Every batch outcome is logged. Server logs show a transfer ending in one 499
+// with nothing after it, which is consistent with several very different
+// causes — retries dying at the local network layer never reach the server at
+// all, so from Render's side "gave up" and "still trying" look identical.
+// The browser is the only place that knows which, so it says so out loud.
+const logBatch = (event, detail) => {
+  // eslint-disable-next-line no-console
+  console.warn(`[upload] ${event}`, detail);
+};
+
 const send = async (url, batch, onBytes) => {
   for (let attempt = 0; ; attempt += 1) {
     try {
@@ -130,8 +158,19 @@ const send = async (url, batch, onBytes) => {
     } catch (err) {
       const status = err?.status;
       const backoff = uploadTuning.backoffMs;
-      if (!RETRYABLE(status) || attempt >= backoff.length) throw err;
+      const info = {
+        attempt: attempt + 1,
+        status,
+        message: err?.message,
+        detail: err?.detail,
+        files: batch ? batch.length : 0,
+      };
+      if (!RETRYABLE(status) || attempt >= backoff.length) {
+        logBatch(attempt >= backoff.length ? 'gave up after all retries' : 'not retryable, giving up', info);
+        throw err;
+      }
       const base = backoff[attempt];
+      logBatch('batch failed, retrying', { ...info, retryInMs: Math.round(base) });
       await sleep(base * (0.8 + Math.random() * 0.4)); // jitter
     }
   }
@@ -150,6 +189,40 @@ const preflight = (all) => {
         (dupes.length > 5 ? ` (+${dupes.length - 5} more)` : '')
     );
   }
+};
+
+// Send batches down N lanes at once, stopping the moment one fails.
+//
+// Safe to parallelize because the server locks the upload row only AFTER the
+// request body is on disk, so the slow part (the transfer) overlaps and just
+// the stats merge serializes. Batches are independent: files are written by
+// name, so order carries no meaning.
+//
+// On failure the remaining lanes wind down rather than racing on — piling more
+// requests into whatever just broke has never once helped, and it costs the
+// user bandwidth they are already short of.
+export const runLanes = async (batches, sendBatch, lanes) => {
+  let next = 0;
+  let firstError = null;
+  const width = Math.max(1, Math.min(lanes, batches.length));
+
+  const lane = async () => {
+    for (;;) {
+      if (firstError) return;
+      const i = next;
+      next += 1;
+      if (i >= batches.length) return;
+      try {
+        await sendBatch(batches[i], i);
+      } catch (err) {
+        if (!firstError) firstError = err;
+        return;
+      }
+    }
+  };
+
+  await Promise.all(Array.from({ length: width }, lane));
+  if (firstError) throw firstError;
 };
 
 // POST /admin/statements/uploads — dump many loose files (multipart).
@@ -188,11 +261,18 @@ export const createUpload = async (files, onProgress, opts = {}) => {
   report();
 
   try {
-    for (const batch of batches) {
-      await send(`/admin/statements/uploads/${uploadId}/files`, batch);
-      sent += batch.length;
-      report();
-    }
+    const url = `/admin/statements/uploads/${uploadId}/files`;
+    await runLanes(
+      batches,
+      async (batch) => {
+        await send(url, batch);
+        // Lanes finish out of order, so progress is a running total of what
+        // has landed, never an index into the batch list.
+        sent += batch.length;
+        report();
+      },
+      opts.concurrency ?? uploadTuning.concurrency
+    );
   } catch (err) {
     // The id is the whole incident: without it the transfer cannot be resumed
     // and gigabytes sit stranded on the server with nobody able to name them.
@@ -220,6 +300,10 @@ export const resumeUpload = async (uploadId, files, onProgress) => {
 };
 
 export const listUploads = (params = {}) => request({ url: '/admin/statements/uploads', params });
+
+// Give up on a transfer whose browser died. The files that arrived are kept;
+// this only stops the dead upload from blocking every publish for half an hour.
+export const cancelUpload = (id) => request({ url: `/admin/statements/uploads/${id}/cancel`, method: 'POST' });
 
 export const getUploadMissing = (id) => request({ url: `/admin/statements/uploads/${id}/missing` });
 
