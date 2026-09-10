@@ -43,6 +43,39 @@ import {
   distributeAll,
 } from '../../api/writersAdmin';
 import { getIngestionAudit } from '../../api/statementsAdmin';
+
+// The audit blocks sending, so "2 issue(s)" on its own is a dead end: it says
+// stop without saying what to fix. The endpoint already returns the offending
+// rows — the panel simply threw them away and put a JSON blob in a tooltip.
+const AUDIT_CHECKS = {
+  file_identity: {
+    title: 'Statement rows disagree with their own source files',
+    meaning:
+      'The account or period stored for a statement is not the one written on the PDF/XLSX it came from. Re-ingesting the period fixes it.',
+    columns: ['statement_id', 'file', 'db_account', 'db_period'],
+  },
+  account_identity: {
+    title: 'An account name disagrees with the names on its files',
+    meaning:
+      'The account is stored under one display name while its statements are issued to another. Usually a renamed client; check the account is pointed at the right person.',
+    columns: ['account', 'stored_display', 'file_displays'],
+  },
+  exact_owner: {
+    title: 'An account is attributed to the wrong writer',
+    meaning:
+      'Another writer matches this account name exactly. This is money on the wrong person: fix the owner before sending anything.',
+    columns: ['account', 'identity', 'owner', 'rightful'],
+  },
+  distribution_owner: {
+    title: 'A published statement sits on the wrong portal',
+    meaning:
+      'A distribution points at a different writer than the account it came from — someone can see another client\u2019s statement. Unpublish it, fix the owner, re-send.',
+    columns: ['distribution_id', 'account', 'distribution_writer', 'account_writer'],
+  },
+};
+
+const fmtCell = (v) => (Array.isArray(v) ? v.join(', ') : v === null || v === undefined ? '—' : String(v));
+
 import '../Revenue/revenue.css';
 import styles from './adminOverview.module.css';
 
@@ -150,6 +183,7 @@ const AdminOverview = () => {
   const [resetting, setResetting] = useState(false);
   const [summary, setSummary] = useState(null);
   const [audit, setAudit] = useState(null);
+  const [auditOpen, setAuditOpen] = useState(false);
   const [sending, setSending] = useState(false);
   const [sendResult, setSendResult] = useState(null);
   const [showIssues, setShowIssues] = useState(false);
@@ -581,27 +615,26 @@ const AdminOverview = () => {
                   <FaPaperPlane size={12} />
                   {sending ? 'Sending…' : 'Send statement data to all clients'}
                 </button>
-                {audit && (
+                {audit && audit.ok && (
                   <span
                     className={styles.summaryHint}
-                    style={{ color: audit.ok ? 'var(--success, #22c55e)' : '#ef4444' }}
-                    title={
-                      audit.ok
-                        ? `Verified ${audit.checked?.statements?.toLocaleString?.() ?? ''} statements against the source files`
-                        : JSON.stringify(audit.violation_counts)
-                    }
+                    style={{ color: 'var(--success, #22c55e)' }}
+                    title={`Verified ${audit.checked?.statements?.toLocaleString?.() ?? ''} statements against the source files`}
                   >
-                    {audit.ok ? (
-                      <>
-                        <FaCheckCircle size={11} /> Ingestion audit passed
-                      </>
-                    ) : (
-                      <>
-                        <FaExclamationTriangle size={11} /> Ingestion audit failed —{' '}
-                        {Object.values(audit.violation_counts || {}).reduce((a, b) => a + b, 0)} issue(s)
-                      </>
-                    )}
+                    <FaCheckCircle size={11} /> Ingestion audit passed
                   </span>
+                )}
+                {audit && !audit.ok && (
+                  <button
+                    type="button"
+                    className={styles.summaryHint}
+                    style={{ color: '#ef4444', background: 'none', border: 0, cursor: 'pointer', padding: 0 }}
+                    onClick={() => setAuditOpen((v) => !v)}
+                  >
+                    <FaExclamationTriangle size={11} /> Ingestion audit failed —{' '}
+                    {Object.values(audit.violation_counts || {}).reduce((a, b) => a + b, 0)} issue(s){' '}
+                    {auditOpen ? '▲ hide' : '▼ show what'}
+                  </button>
                 )}
                 {(summary.needs_info || 0) +
                   (summary.clients_without_statements || 0) +
@@ -616,6 +649,52 @@ const AdminOverview = () => {
                   </button>
                 )}
               </div>
+            </div>
+          )}
+
+          {audit && !audit.ok && auditOpen && (
+            <div className={styles.auditDetail}>
+              {Object.entries(audit.violation_counts || {})
+                .filter(([, n]) => n > 0)
+                .map(([key, n]) => {
+                  const meta = AUDIT_CHECKS[key] || { title: key, meaning: '', columns: [] };
+                  const rows = (audit.violations || {})[key] || [];
+                  return (
+                    <div key={key} className={styles.auditGroup}>
+                      <div className={styles.auditTitle}>
+                        <FaExclamationTriangle size={11} /> {meta.title} ({n})
+                      </div>
+                      <p className={styles.auditMeaning}>{meta.meaning}</p>
+                      {rows.length > 0 && (
+                        <div className={styles.auditTableWrap}>
+                          <table className={styles.auditTable}>
+                            <thead>
+                              <tr>
+                                {meta.columns.map((c) => (
+                                  <th key={c}>{c.replace(/_/g, ' ')}</th>
+                                ))}
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {rows.map((r, i) => (
+                                <tr key={i}>
+                                  {meta.columns.map((c) => (
+                                    <td key={c}>{fmtCell(r[c])}</td>
+                                  ))}
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                      {n > rows.length && (
+                        <p className={styles.auditMeaning}>
+                          Showing {rows.length} of {n}; the rest follow the same pattern.
+                        </p>
+                      )}
+                    </div>
+                  );
+                })}
             </div>
           )}
 

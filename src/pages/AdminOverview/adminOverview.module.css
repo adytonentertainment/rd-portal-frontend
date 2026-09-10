@@ -861,3 +861,56 @@
   border: 1px solid rgba(229, 72, 77, 0.3);
 }
 
+
+/* The ingestion audit blocks sending, so when it fails it has to say what is
+   wrong, not just how many. */
+.auditDetail {
+  margin: 12px 0 4px;
+  padding: 14px 16px;
+  border: 1px solid #fecdca;
+  border-left: 3px solid #ef4444;
+  border-radius: 8px;
+  background: #fffbfa;
+}
+.auditGroup + .auditGroup {
+  margin-top: 18px;
+  padding-top: 16px;
+  border-top: 1px solid #fee4e2;
+}
+.auditTitle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #b42318;
+}
+.auditMeaning {
+  margin: 6px 0 10px;
+  font-size: 12px;
+  line-height: 1.5;
+  color: #667085;
+}
+.auditTableWrap {
+  overflow-x: auto;
+}
+.auditTable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 12px;
+}
+.auditTable th {
+  text-align: left;
+  padding: 6px 10px 6px 0;
+  font-weight: 600;
+  color: #667085;
+  text-transform: capitalize;
+  white-space: nowrap;
+  border-bottom: 1px solid #fee4e2;
+}
+.auditTable td {
+  padding: 6px 10px 6px 0;
+  color: #101828;
+  vertical-align: top;
+  border-bottom: 1px solid #f9eceb;
+}
