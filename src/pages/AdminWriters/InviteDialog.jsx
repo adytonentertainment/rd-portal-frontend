@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { FaTimes, FaCheck, FaCopy, FaTrash, FaPaperPlane, FaExclamationTriangle } from 'react-icons/fa';
 import { adminInviteToWriter, adminListWriterInvites, adminResendInvite } from '../../api/portal';
-import { revokeInvite } from '../../api/writersAdmin';
+import { revokeInvite, getWriter } from '../../api/writersAdmin';
 import styles from './adminWriters.module.css';
 
 const ROLES = [
@@ -41,6 +41,8 @@ const InviteDialog = ({ writer, onClose, onChanged }) => {
   const [copied, setCopied] = useState(false);
   const [invites, setInvites] = useState([]);
   const [loadingInvites, setLoadingInvites] = useState(true);
+  // Everyone the client list put on this account, not just the first address.
+  const [contacts, setContacts] = useState([]);
 
   const loadInvites = async () => {
     try {
@@ -55,6 +57,13 @@ const InviteDialog = ({ writer, onClose, onChanged }) => {
 
   useEffect(() => {
     loadInvites();
+    // A row can name several people — a manager, an attorney — in one cell, so
+    // the account's contacts are the natural thing to invite. Typing the
+    // address by hand was the only route, which meant the extra contacts were
+    // invisible here even though the import had already recorded them.
+    getWriter(writer.id)
+      .then((w) => setContacts(w?.contacts || []))
+      .catch(() => setContacts([]));
   }, [writer.id]); // eslint-disable-line
 
   const handleSend = async () => {
@@ -120,6 +129,18 @@ const InviteDialog = ({ writer, onClose, onChanged }) => {
     }
   };
 
+  const sameAddress = (a, b) => (a || '').trim().toLowerCase() === (b || '').trim().toLowerCase();
+
+  // What this person's portal access currently is. has_login means they have
+  // claimed THIS client, not merely that the address has a login somewhere.
+  const contactState = (c) => {
+    if (c.has_login) return { label: 'Has access', tone: 'ok' };
+    const inv = invites.find((i) => sameAddress(i.email, c.email));
+    if (inv?.accepted) return { label: 'Has access', tone: 'ok' };
+    if (inv?.active) return { label: 'Invited, not accepted', tone: 'pending' };
+    return { label: 'Not invited', tone: 'none' };
+  };
+
   const pending = invites.filter((i) => i.active && !i.accepted);
   const accepted = invites.filter((i) => i.accepted);
 
@@ -137,6 +158,41 @@ const InviteDialog = ({ writer, onClose, onChanged }) => {
           <div className={styles.mutedNote}>
             Grant <strong>{writer.canonical_name}</strong> access to their writer portal.
           </div>
+
+          {contacts.length > 0 && (
+            <div className={styles.field}>
+              <span className={styles.fieldLabel}>Contacts on this account ({contacts.length})</span>
+              <ul className={styles.contactPick}>
+                {contacts.map((c) => {
+                  const st = contactState(c);
+                  const chosen = sameAddress(c.email, email);
+                  return (
+                    <li key={c.contact_id}>
+                      <button
+                        type="button"
+                        className={`${styles.contactPickRow} ${chosen ? styles.contactPickOn : ''}`}
+                        onClick={() => {
+                          setEmail(c.email);
+                          setRole(c.role || 'primary');
+                          setError(null);
+                        }}
+                      >
+                        <span className={styles.contactPickWho}>
+                          <strong>{c.display_name || c.email}</strong>
+                          {c.display_name && <span className={styles.contactPickMail}>{c.email}</span>}
+                        </span>
+                        <span className={styles.contactPickMeta}>
+                          <span className={styles.contactPickRole}>{c.role}</span>
+                          <span className={styles[`tone_${st.tone}`]}>{st.label}</span>
+                        </span>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+              <span className={styles.mutedNote}>Pick one to invite, or type any other address below.</span>
+            </div>
+          )}
 
           <label className={styles.field}>
             <span className={styles.fieldLabel}>Email</span>
