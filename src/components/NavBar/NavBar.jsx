@@ -2,6 +2,7 @@ import { useRef, useState, useContext } from 'react';
 // import { useGoogleLogin } from '@react-oauth/google'; // Temporarily disabled
 // import { FaGoogle, FaApple, FaFacebook } from 'react-icons/fa';
 // import CircularProgress from '@mui/material/CircularProgress';
+import { statementsLive } from '../../config/featureFlags';
 import styles from './navbar.css';
 import NavBarButton from '../NavBarButton/NavBarButton';
 import UserControl from '../UserControl/UserControl';
@@ -17,12 +18,13 @@ import VeraxLogo from '../VeraxLogo/VeraxLogo';
 // import GlassButton from '../Buttons/GlassButton/GlassButton';
 import ThemeButton from '../Buttons/ThemeButton/ThemeButton';
 
-// `marketingLinks` — Pricing / About / Services point at the public Verax
-// site. Signed-in product pages (Settings) have no business showing them,
-// so they can be switched off there while the marketing pages keep them.
-// `showDashboard` — the Dashboard button points at /catalog, a Verax product
-// page. Nothing in the publisher portal wants it.
-const NavBar = ({ marketingLinks = true, showDashboard = true }) => {
+// Verax product chrome, off in the publisher portal.
+//
+// `marketingLinks` — Pricing / About / Services. Pricing has NO ROUTE in this
+// app, and About/Services scroll to sections of a landing page the portal does
+// not serve, so in a portal build these are dead links. Defaulted off there.
+// `showDashboard` — the Dashboard button; see dashboardTarget below.
+const NavBar = ({ marketingLinks = !statementsLive, showDashboard = true }) => {
   // Google login temporarily disabled
   // const googleLogin = useGoogleLogin({
   //   onSuccess: async (tokenResponse) => {
@@ -128,7 +130,9 @@ const NavBar = ({ marketingLinks = true, showDashboard = true }) => {
           {/* Dashboard Button - Only when logged in */}
           {showDashboard && user && (
             <div className="cluster-element">
-              <NavBarButton text="Dashboard" to="/catalog" />
+              {/* /catalog is the Verax catalog product. A portal user's home is
+                  their earnings; sending them to /catalog is a dead end. */}
+              <NavBarButton text="Dashboard" to={statementsLive ? '/earnings' : '/catalog'} />
             </div>
           )}
 

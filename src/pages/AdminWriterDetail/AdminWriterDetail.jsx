@@ -5,7 +5,7 @@ import { FaArrowLeft, FaCheck, FaPaperPlane, FaClock, FaEnvelope, FaPen } from '
 import Sidebar from '../../components/Sidebar/Sidebar';
 import { useIsAdmin } from '../../utils/auth';
 import { statementsLive } from '../../config/featureFlags';
-import { getWriter } from '../../api/writersAdmin';
+import { getWriter, listWriters, moveAccount, distributeToWriter, deleteWriterStatement } from '../../api/writersAdmin';
 import WriterFormModal from '../AdminWriters/WriterFormModal';
 import InviteDialog from '../AdminWriters/InviteDialog';
 import {
@@ -51,6 +51,57 @@ const AdminWriterDetail = () => {
   const isAdmin = useIsAdmin();
   const { id } = useParams();
   const navigate = useNavigate();
+
+  // Find the client to move an account to. Searches the roster by name, payee
+  // or contact email — the same search the roster page uses — because two
+  // entries in a split are near-identical by name.
+  const handleSendToClient = async () => {
+    if (sending) return;
+    setSending(true);
+    setSendResult(null);
+    setSendBlockers(null);
+    try {
+      setSendResult(await distributeToWriter(Number(id)));
+      await loadLive();
+    } catch (err) {
+      // 409 carries the reasons this client cannot be sent to — they are a fix,
+      // not a wait, so show them rather than a generic failure.
+      const reasons = err?.detail?.detail?.reasons || err?.detail?.reasons;
+      setSendBlockers(reasons || [err?.message || 'Could not send to this client.']);
+    } finally {
+      setSending(false);
+    }
+  };
+
+  const searchClients = async (term) => {
+    setMoveSearch(term);
+    if (term.trim().length < 2) {
+      setMoveResults([]);
+      return;
+    }
+    try {
+      const res = await listWriters({ search: term.trim(), pageSize: 8, includeUnmatched: true });
+      setMoveResults((res.items || []).filter((c) => c.id !== Number(id)));
+    } catch {
+      setMoveResults([]);
+    }
+  };
+
+  // Moving an account to the client it actually belongs to. Held here rather
+  // than in the row so the confirmation can say what is about to change hands.
+  const [movingAccount, setMovingAccount] = useState(null);
+  const [moveSearch, setMoveSearch] = useState('');
+  const [moveResults, setMoveResults] = useState([]);
+  const [moveTarget, setMoveTarget] = useState(null);
+  const [moveBusy, setMoveBusy] = useState(false);
+  const [moveError, setMoveError] = useState(null);
+  // Sending this one client their statements, on request.
+  const [sending, setSending] = useState(false);
+  const [sendResult, setSendResult] = useState(null);
+  const [sendBlockers, setSendBlockers] = useState(null);
+  // Deleting a single statement that arrived wrong.
+  const [deletingStmt, setDeletingStmt] = useState(null);
+  const [deleteBusy, setDeleteBusy] = useState(false);
   const [, force] = useState(0);
   const [confirm, setConfirm] = useState(false);
 
@@ -253,7 +304,31 @@ const AdminWriterDetail = () => {
                     <span className={styles.panelSub}>
                       Documentation completeness &amp; distribution status by reporting period
                     </span>
+                    {/* Send just this client, without waiting on the rest of the
+                        batch. For the phone call that starts "where is mine?" */}
+                    <button
+                      className={styles.sendBtn}
+                      onClick={handleSendToClient}
+                      disabled={sending || stmts.length === 0}
+                      title="Publish this client's ready statements to their portal now"
+                    >
+                      <FaPaperPlane size={10} /> {sending ? 'Sending…' : 'Send statements'}
+                    </button>
                   </div>
+
+                  {sendResult && (
+                    <div className={styles.sendOk}>
+                      Sent {sendResult.published} statement{sendResult.published === 1 ? '' : 's'} to{' '}
+                      {sendResult.writer_name}&apos;s portal
+                      {sendResult.already_distributed > 0 && ` · ${sendResult.already_distributed} already there`}
+                      {sendResult.superseded > 0 && ` · ${sendResult.superseded} replaced`}
+                      {sendResult.skipped_cadence_dedup > 0 &&
+                        ` · ${sendResult.skipped_cadence_dedup} covered by a longer period`}
+                    </div>
+                  )}
+                  {sendBlockers && (
+                    <div className={styles.sendBlocked}>Cannot send to this client yet: {sendBlockers.join(' · ')}</div>
+                  )}
                   {stmts.length === 0 ? (
                     <div className={styles.empty}>No statements ingested for this client yet.</div>
                   ) : (
@@ -304,6 +379,21 @@ const AdminWriterDetail = () => {
                                           {CAT_LABEL[cat] || cat}
                                           {count > 1 ? ` · ${count} accounts` : ''}
                                         </span>
+                                        {s && (
+                                          <button
+                                            className={styles.stmtDelete}
+                                            onClick={() =>
+                                              setDeletingStmt({
+                                                ...s,
+                                                catLabel: CAT_LABEL[cat] || cat,
+                                                periodLabel: label,
+                                              })
+                                            }
+                                            title="Delete this statement and its line detail"
+                                          >
+                                            Delete
+                                          </button>
+                                        )}
                                         <span className={styles.checkLabel}>
                                           {!s ? (
                                             <span style={{ color: '#f59e0b' }}>not received</span>
@@ -338,7 +428,9 @@ const AdminWriterDetail = () => {
                 <section className={styles.panel}>
                   <div className={styles.panelHeader}>
                     <span className={styles.panelTitle}>Beneficiary accounts</span>
-                    <span className={styles.panelSub}>Read-only · re-point accounts in the client-import queue</span>
+                    <span className={styles.panelSub}>
+                      Move an account to the client it belongs to; its statements go with it
+                    </span>
                   </div>
                   {w.accounts.length === 0 ? (
                     <div className={styles.empty}>No accounts linked yet.</div>
@@ -349,6 +441,19 @@ const AdminWriterDetail = () => {
                           <code className={styles.liveCode}>{a.account_code}</code>
                           <span>{a.catalog || '—'}</span>
                           <span className={styles.liveSoft}>{a.status}</span>
+                          <button
+                            className={styles.moveBtn}
+                            onClick={() => {
+                              setMoveError(null);
+                              setMoveTarget(null);
+                              setMoveSearch('');
+                              setMoveResults([]);
+                              setMovingAccount(a);
+                            }}
+                            title="Move this account to the client it belongs to"
+                          >
+                            Move
+                          </button>
                         </div>
                       ))}
                     </div>
@@ -616,6 +721,117 @@ const AdminWriterDetail = () => {
               </button>
               <button className={styles.distributeCta} onClick={handleDistribute}>
                 <FaPaperPlane size={11} /> Distribute
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {deletingStmt && (
+        <div className={styles.confirmOverlay} onClick={() => !deleteBusy && setDeletingStmt(null)}>
+          <div className={styles.confirmModal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.confirmTitle}>
+              Delete the {deletingStmt.catLabel} statement for {deletingStmt.periodLabel}?
+            </div>
+            <div className={styles.confirmBody}>
+              Removes the statement and all of its line detail from{' '}
+              <strong>{liveWriter?.canonical_name || 'this client'}</strong>. The uploaded file is kept, so a re-upload
+              can restore it.
+              {deletingStmt.distributed && (
+                <div className={styles.deleteWarn}>
+                  This statement has already been published. Deleting it takes it out of their portal, and they will no
+                  longer be able to see or download it.
+                </div>
+              )}
+            </div>
+            <div className={styles.confirmActions}>
+              <button className={styles.cancelBtn} onClick={() => setDeletingStmt(null)} disabled={deleteBusy}>
+                Cancel
+              </button>
+              <button
+                className={styles.deleteCta}
+                disabled={deleteBusy}
+                onClick={async () => {
+                  setDeleteBusy(true);
+                  try {
+                    await deleteWriterStatement(Number(id), deletingStmt.statement_id);
+                    setDeletingStmt(null);
+                    await loadLive();
+                  } catch (err) {
+                    setDeletingStmt(null);
+                    setSendBlockers([err?.message || 'Could not delete that statement.']);
+                  } finally {
+                    setDeleteBusy(false);
+                  }
+                }}
+              >
+                {deleteBusy ? 'Deleting…' : 'Delete statement'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {movingAccount && (
+        <div className={styles.confirmOverlay} onClick={() => !moveBusy && setMovingAccount(null)}>
+          <div className={styles.confirmModal} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.confirmTitle}>Move {movingAccount.account_code} to another client</div>
+            <div className={styles.confirmBody}>
+              This account and <strong>every statement under it</strong> move to the client you pick. They see it in
+              their portal immediately, and {liveWriter?.canonical_name || 'this client'} stops seeing it. Statements
+              already distributed move too, which is usually the point.
+            </div>
+
+            <input
+              className={styles.moveSearch}
+              placeholder="Search clients by name, payee or email"
+              value={moveSearch}
+              onChange={(e) => searchClients(e.target.value)}
+              autoFocus
+            />
+
+            <div className={styles.moveResults}>
+              {moveResults.map((c) => (
+                <button
+                  key={c.id}
+                  className={`${styles.moveResult} ${moveTarget?.id === c.id ? styles.moveResultActive : ''}`}
+                  onClick={() => setMoveTarget(c)}
+                >
+                  <span>{c.canonical_name}</span>
+                  <span className={styles.liveSoft}>
+                    {c.is_unmatched ? 'unmatched' : c.kind || '—'}
+                    {c.account_count ? ` · ${c.account_count} accounts` : ''}
+                  </span>
+                </button>
+              ))}
+              {moveSearch.trim().length >= 2 && moveResults.length === 0 && (
+                <div className={styles.empty}>No clients match that.</div>
+              )}
+            </div>
+
+            {moveError && <div className={styles.moveError}>{moveError}</div>}
+
+            <div className={styles.confirmActions}>
+              <button className={styles.cancelBtn} onClick={() => setMovingAccount(null)} disabled={moveBusy}>
+                Cancel
+              </button>
+              <button
+                className={styles.distributeCta}
+                disabled={!moveTarget || moveBusy}
+                onClick={async () => {
+                  setMoveBusy(true);
+                  setMoveError(null);
+                  try {
+                    await moveAccount(Number(id), movingAccount.id, moveTarget.id);
+                    setMovingAccount(null);
+                    await loadLive();
+                  } catch (err) {
+                    setMoveError(err?.message || 'Could not move that account.');
+                  } finally {
+                    setMoveBusy(false);
+                  }
+                }}
+              >
+                {moveBusy ? 'Moving…' : `Move to ${moveTarget?.canonical_name || '…'}`}
               </button>
             </div>
           </div>

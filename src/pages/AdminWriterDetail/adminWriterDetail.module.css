@@ -592,3 +592,148 @@
   color: var(--soft-text, #9ca3af);
   text-transform: capitalize;
 }
+
+/* Moving an account to the client it belongs to. */
+.moveBtn {
+  margin-left: auto;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 3px 10px;
+  font-size: 11.5px;
+  color: var(--text);
+  cursor: pointer;
+  font-family: var(--font-body);
+}
+
+.moveBtn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.moveSearch {
+  width: 100%;
+  margin-top: 12px;
+  padding: 9px 12px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md, 8px);
+  background: var(--card-bg);
+  color: var(--text);
+  font-size: 13px;
+  font-family: var(--font-body);
+}
+
+.moveResults {
+  margin-top: 8px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.moveResult {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 9px 11px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  background: none;
+  color: var(--text);
+  font-size: 13px;
+  text-align: left;
+  cursor: pointer;
+  font-family: var(--font-body);
+}
+
+.moveResult:hover {
+  background: var(--hover-overlay, rgba(127, 127, 127, 0.08));
+}
+
+.moveResultActive {
+  border-color: var(--accent);
+  background: var(--accent-soft, rgba(99, 102, 241, 0.1));
+}
+
+.moveError {
+  margin-top: 10px;
+  color: #e5484d;
+  font-size: 12.5px;
+}
+
+/* Send this one client, and remove a statement that arrived wrong. */
+.sendBtn {
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 13px;
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-md, 8px);
+  background: var(--accent);
+  color: var(--accent-contrast, #0b0b0c);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-body);
+}
+
+.sendBtn:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.sendOk {
+  margin: 10px 0 0 0;
+  padding: 9px 12px;
+  border-radius: 8px;
+  background: rgba(34, 197, 94, 0.1);
+  color: #22c55e;
+  font-size: 12.5px;
+}
+
+.sendBlocked {
+  margin: 10px 0 0 0;
+  padding: 9px 12px;
+  border-radius: 8px;
+  background: rgba(229, 72, 77, 0.1);
+  color: #e5484d;
+  font-size: 12.5px;
+}
+
+.stmtDelete {
+  background: none;
+  border: none;
+  padding: 2px 6px;
+  font-size: 11px;
+  color: var(--soft-text);
+  cursor: pointer;
+  font-family: var(--font-body);
+}
+
+.stmtDelete:hover {
+  color: #e5484d;
+  text-decoration: underline;
+}
+
+/* Taking something back from a client who could already read it. */
+.deleteWarn {
+  margin-top: 10px;
+  padding: 9px 11px;
+  border-left: 2px solid #e5484d;
+  background: rgba(229, 72, 77, 0.07);
+  color: var(--soft-text);
+  font-size: 12.5px;
+}
+
+.deleteCta {
+  padding: 8px 16px;
+  border: 1px solid #e5484d;
+  border-radius: var(--radius-md, 8px);
+  background: #e5484d;
+  color: #fff;
+  font-size: 12.5px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-body);
+}

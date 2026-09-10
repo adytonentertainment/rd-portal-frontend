@@ -144,6 +144,10 @@ const translations = {
     'earnings.pageOf': 'Page {page} of {pages}',
     'table.amount': 'Amount',
 
+    'switcher.viewing': 'Viewing',
+    'role.client': 'Client',
+    'role.commissionPartner': 'Commission partner',
+
     'lang.label': 'Language',
     'lang.en': 'EN',
     'lang.es': 'ES',
@@ -276,6 +280,10 @@ const translations = {
     'earnings.showingRange': 'Mostrando {from}-{to} de {total} transacciones ({pages} páginas en total)',
     'earnings.pageOf': 'Página {page} de {pages}',
     'table.amount': 'Importe',
+
+    'switcher.viewing': 'Viendo',
+    'role.client': 'Cliente',
+    'role.commissionPartner': 'Socio de comisiones',
 
     'lang.label': 'Idioma',
     'lang.en': 'EN',

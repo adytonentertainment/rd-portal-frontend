@@ -535,6 +535,18 @@ const AdminWriters = () => {
                           <button className={styles.nameLink} onClick={() => navigate(`/admin/writers/${w.id}`)}>
                             {w.canonical_name}
                           </button>
+                          {/* Acquired: on the roster for accounting, invisible to
+                              the writer. Worth seeing without opening the row,
+                              because it decides whose money this is. */}
+                          {w.publisher_owned && (
+                            <span
+                              className={`${styles.pill} ${styles.pillOwned}`}
+                              style={{ marginLeft: 8 }}
+                              title="Catalog acquired from this writer — kept for accounting, hidden from their portal"
+                            >
+                              Publisher-owned
+                            </span>
+                          )}
                           {w.needs_info && (
                             <span
                               className={`${styles.pill} ${styles.pillInvited}`}
@@ -553,15 +565,27 @@ const AdminWriters = () => {
                               Unmatched account
                             </span>
                           )}
-                          {w.no_statements && !w.is_unmatched && (
-                            <span
-                              className={`${styles.pill} ${styles.pillBlocking}`}
-                              style={{ marginLeft: 8 }}
-                              title="On the roster but has no statements — upload one or remove them"
-                            >
-                              No statements
-                            </span>
-                          )}
+                          {w.no_statements &&
+                            !w.is_unmatched &&
+                            (w.awaiting_first_statement ? (
+                              // Signed after the last run: a normal state, not a
+                              // fault, so it must not read like one.
+                              <span
+                                className={`${styles.pill} ${styles.pillOwned}`}
+                                style={{ marginLeft: 8 }}
+                                title="Newly signed — no statements expected yet"
+                              >
+                                Newly signed
+                              </span>
+                            ) : (
+                              <span
+                                className={`${styles.pill} ${styles.pillBlocking}`}
+                                style={{ marginLeft: 8 }}
+                                title="On the roster but has no statements — upload one or remove them"
+                              >
+                                No statements
+                              </span>
+                            ))}
                           {/* The account's own name off the statement filename, plus
                               the closest client to it. A proposal, never applied —
                               a wrong merge sends one client's royalties to another. */}

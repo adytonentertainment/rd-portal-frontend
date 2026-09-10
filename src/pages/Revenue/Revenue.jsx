@@ -88,7 +88,8 @@ import EditMappingModal from '../../components/EditMappingModal/EditMappingModal
 import { statementsLive } from '../../config/featureFlags';
 import LanguageToggle from '../../components/LanguageToggle/LanguageToggle';
 import { useLanguage } from '../../i18n/LanguageContext';
-import { listMyTransactions, getMyEarnings } from '../../api/portal';
+import WriterSwitcher, { useActiveWriter } from '../../components/WriterSwitcher/WriterSwitcher';
+import { listMyTransactions, getMyEarnings, listMyWriters } from '../../api/portal';
 import './revenue.css';
 
 ChartJS.register(
@@ -263,6 +264,11 @@ const Revenue = () => {
     isLivePortal || (subscription && !['FREE', 'Free', 'ESSENTIAL', 'Essential'].includes(subscription.tier));
   // True when the signed-in account has no portal identity (admins). Kept
   // distinct from "no earnings yet", which is a different sentence entirely.
+  // Which client this login is reading. One login can hold a client entry and
+  // a commission-partner entry; their figures are different money and are never
+  // added together.
+  const [portalWriters, setPortalWriters] = useState([]);
+  const [activeId, setActiveId] = useActiveWriter(portalWriters);
   const [portalDenied, setPortalDenied] = useState(false);
   const [showUpgradeModal, setShowUpgradeModal] = useState(false);
   const [upgradeModalFeature, setUpgradeModalFeature] = useState('Revenue');
@@ -365,7 +371,11 @@ const Revenue = () => {
     (async () => {
       setIsLoading(true);
       try {
-        const [rows, earnings] = await Promise.all([listMyTransactions(), getMyEarnings()]);
+        const ws = await listMyWriters();
+        const list = Array.isArray(ws) ? ws : [];
+        if (!cancelled) setPortalWriters(list);
+        const scope = list.some((w) => w.id === activeId) ? activeId : list[0]?.id;
+        const [rows, earnings] = await Promise.all([listMyTransactions(scope), getMyEarnings(scope)]);
         if (!cancelled) {
           const all = Array.isArray(rows) ? rows : [];
           setUploadedTransactions(all.filter((r) => !r.is_song_row));
@@ -389,7 +399,7 @@ const Revenue = () => {
     return () => {
       cancelled = true;
     };
-  }, [isLivePortal]);
+  }, [isLivePortal, activeId]);
 
   // ── Demo: inject mock transactions/statements per selected/preview writer ─
   // Re-run when distributedPeriodsKey changes (admin distributed a new period).
@@ -3233,6 +3243,11 @@ const Revenue = () => {
           <div className="revenue-header">
             <div>
               <h1 className="revenue-title">{isLivePortal ? t('earnings.title') : 'Earnings'}</h1>
+              {isLivePortal && (
+                <div style={{ marginTop: 8 }}>
+                  <WriterSwitcher writers={portalWriters} activeId={activeId} onChange={setActiveId} />
+                </div>
+              )}
               <p className="revenue-subtitle">
                 {isLivePortal ? t('earnings.subtitleLive') : 'Track your income across all platforms and territories'}
               </p>
@@ -5201,11 +5216,17 @@ const Revenue = () => {
         />
 
         {/* Upgrade Modal for Free Tier Users */}
-        <UpgradeModal
-          isOpen={showUpgradeModal}
-          onClose={() => setShowUpgradeModal(false)}
-          feature={upgradeModalFeature}
-        />
+        {/* Never in a publisher portal: a writer's own royalties are not a
+            paid feature, and /pricing (where it sends people) is not even
+            routed in this app. isFreeTier is already forced false here, so
+            this is belt and braces — the modal simply does not exist. */}
+        {!statementsLive && (
+          <UpgradeModal
+            isOpen={showUpgradeModal}
+            onClose={() => setShowUpgradeModal(false)}
+            feature={upgradeModalFeature}
+          />
+        )}
       </div>
     </>
   );

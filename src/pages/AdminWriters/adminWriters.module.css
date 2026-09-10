@@ -749,3 +749,27 @@
   color: var(--soft-text);
   font-size: 12.5px;
 }
+
+/* An acquired catalog: on the roster, never in the writer's portal. */
+.ownedRow {
+  display: flex;
+  align-items: flex-start;
+  gap: 9px;
+  padding: 10px 0;
+  font-size: 13px;
+  color: var(--text);
+  cursor: pointer;
+}
+
+.ownedHint {
+  display: block;
+  margin-top: 2px;
+  font-size: 12px;
+  color: var(--soft-text);
+}
+
+/* Neutral, not a warning: an acquired catalog is a correct, settled state. */
+.pillOwned {
+  background: rgba(99, 102, 241, 0.14);
+  color: #6366f1;
+}

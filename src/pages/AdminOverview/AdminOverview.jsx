@@ -72,7 +72,13 @@ const liveCompleteness = (w) => {
   }
   // Red, not grey: nothing arrived for this payee, so they are getting nothing
   // this period and the send is gated on it. Grey read as "nothing to do here".
-  if (!w.statementCount) return { kind: 'blocking', label: 'No statements' };
+  if (!w.statementCount) {
+    // Signed after the last run: nothing is missing for them, so this is a
+    // statement of fact rather than something to chase.
+    return w.awaitingFirstStatement
+      ? { kind: 'idle', label: 'Newly signed', title: 'Signed recently — no statements expected yet' }
+      : { kind: 'blocking', label: 'No statements' };
+  }
 
   const expected = w.expectedCatalogs || [];
   const covered = new Set(w.coveredCatalogs || []);
@@ -303,6 +309,7 @@ const AdminOverview = () => {
         needsInfo: w.needs_info,
         missingInfo: w.missing_info || [],
         isUnmatched: w.is_unmatched,
+        awaitingFirstStatement: w.awaiting_first_statement,
         accountName: w.account_name,
         suggestedClient: w.suggested_client,
         statementCount: w.statement_count || 0,

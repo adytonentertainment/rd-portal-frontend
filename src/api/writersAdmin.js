@@ -83,6 +83,26 @@ export const assignUnmatchedToClient = (writerId, targetWriterId) =>
     data: { target_writer_id: targetWriterId },
   });
 
+// Move one beneficiary account, and every statement under it, to another
+// client. Portal reads resolve ownership through the account's current writer,
+// so this takes effect immediately for both sides.
+export const moveAccount = (writerId, accountId, targetWriterId) =>
+  request({
+    url: `/admin/writers/${writerId}/accounts/${accountId}/move`,
+    method: 'POST',
+    data: { target_writer_id: targetWriterId },
+  });
+
+// Send ONE client their statements now, without waiting for the whole batch to
+// be clean. Refuses (409, with reasons) when this client is the unresolved one.
+export const distributeToWriter = (writerId) =>
+  request({ url: `/admin/writers/${writerId}/distribute`, method: 'POST' });
+
+// Remove a single statement and its line detail. If it was published, the
+// client stops seeing it — the response says how many copies were withdrawn.
+export const deleteWriterStatement = (writerId, statementId) =>
+  request({ url: `/admin/writers/${writerId}/statements/${statementId}`, method: 'DELETE' });
+
 export const resetAllData = () => request({ url: '/admin/writers/reset-all', method: 'POST' });
 
 // GET /admin/writers/summary → roster-wide rollup for the dashboard header

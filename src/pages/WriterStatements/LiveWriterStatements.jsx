@@ -5,6 +5,7 @@ import Sidebar from '../../components/Sidebar/Sidebar';
 import { listMyWriters, listMyStatements, downloadMyStatementPdf } from '../../api/portal';
 import { useLanguage } from '../../i18n/LanguageContext';
 import AccessPanel from './AccessPanel';
+import WriterSwitcher, { useActiveWriter } from '../../components/WriterSwitcher/WriterSwitcher';
 import '../Revenue/revenue.css';
 import styles from './writerStatements.module.css';
 
@@ -46,6 +47,7 @@ const LiveWriterStatements = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [downloadingId, setDownloadingId] = useState(null);
+  const [activeId, setActiveId] = useActiveWriter(writers);
 
   useEffect(() => {
     let cancelled = false;
@@ -53,9 +55,15 @@ const LiveWriterStatements = () => {
       setLoading(true);
       setError(null);
       try {
-        const [ws, sts] = await Promise.all([listMyWriters(), listMyStatements()]);
+        // Writers first: which clients this login holds decides what the
+        // switcher offers and which one the statements are read for.
+        const ws = await listMyWriters();
         if (cancelled) return;
-        setWriters(Array.isArray(ws) ? ws : []);
+        const list = Array.isArray(ws) ? ws : [];
+        setWriters(list);
+        const scope = list.some((w) => w.id === activeId) ? activeId : list[0]?.id;
+        const sts = await listMyStatements(scope);
+        if (cancelled) return;
         setStatements(Array.isArray(sts) ? sts : []);
       } catch (err) {
         if (!cancelled) setError(err?.message || t('statements.loadError'));
@@ -66,13 +74,12 @@ const LiveWriterStatements = () => {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [activeId]);
 
-  const writerName = useMemo(() => {
-    if (writers.length === 1) return writers[0].name;
-    if (writers.length > 1) return writers.map((w) => w.name).join(', ');
-    return null;
-  }, [writers]);
+  // The client currently being read. Previously this joined every client's
+  // name into one line, which described a combined view the portal no longer
+  // shows.
+  const activeName = useMemo(() => writers.find((w) => w.id === activeId)?.name || null, [writers, activeId]);
 
   const total = useMemo(() => statements.reduce((s, r) => s + (Number(r.payable) || 0), 0), [statements]);
 
@@ -123,9 +130,10 @@ const LiveWriterStatements = () => {
             <div>
               <h1 className="revenue-title">{t('statements.title')}</h1>
               <p className="revenue-subtitle">
-                {writerName ? t('statements.subtitleNamed', { name: writerName }) : t('statements.subtitle')}
+                {activeName ? t('statements.subtitleNamed', { name: activeName }) : t('statements.subtitle')}
               </p>
             </div>
+            <WriterSwitcher writers={writers} activeId={activeId} onChange={setActiveId} />
             {statements.length > 0 && (
               <div className={styles.totalPill}>
                 <span className={styles.totalLabel}>{t('statements.totalDistributed')}</span>

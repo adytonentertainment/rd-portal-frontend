@@ -28,6 +28,7 @@ import ResetPassword from './pages/ResetPassword/ResetPassword';
 import ForgotPassword from './pages/ForgotPassword/ForgotPassword';
 import Revenue from './pages/Revenue/Revenue';
 import TokenWatcher from './components/TokenWatcher/TokenWatcher';
+import { statementsLive } from './config/featureFlags';
 import CrispChat from './components/CrispChat/CrispChat';
 import AutoRegister from './pages/AutoRegister/AutoRegister';
 import WriterStatements from './pages/WriterStatements/WriterStatements';
@@ -85,7 +86,11 @@ const App = () => {
                     <GoogleOAuthProvider clientId="456632936333-6nob9vo959nuhchsb5c6usm3eeb08gbj.apps.googleusercontent.com">
                       <BrowserRouter>
                         <TokenWatcher />
-                        <CrispChat />
+                        {/* Verax's own support chat. A publisher's writers are
+                            not Verax customers and must not be routed to Verax
+                            support — nor have a third-party script load on a
+                            page showing their royalties. */}
+                        {!statementsLive && <CrispChat />}
                         <Routes>
                           <Route element={<RootRoute />} path="/" />
                           {/* One way in: /signup is the historical URL, /register is the page.

@@ -34,6 +34,8 @@ const WriterFormModal = ({ writer, onClose, onSaved }) => {
     canonical_name: writer?.canonical_name || '',
     payee_name: writer?.payee_name || '',
     kind: writer?.kind || '',
+    publisher_owned: writer?.publisher_owned || false,
+    awaiting_first_statement: writer?.awaiting_first_statement || false,
     expected_catalogs: writer?.expected_catalogs || [],
     preferred_language: writer?.preferred_language || '',
     cadence: writer?.cadence || '',
@@ -71,6 +73,8 @@ const WriterFormModal = ({ writer, onClose, onSaved }) => {
       canonical_name: form.canonical_name.trim(),
       payee_name: form.payee_name.trim() || null,
       kind: form.kind || null,
+      publisher_owned: form.publisher_owned,
+      awaiting_first_statement: form.awaiting_first_statement,
       expected_catalogs: form.expected_catalogs,
       preferred_language: form.preferred_language || null,
       cadence: form.cadence || null,
@@ -162,6 +166,41 @@ const WriterFormModal = ({ writer, onClose, onSaved }) => {
               onChange={(e) => set('payee_name', e.target.value)}
               placeholder="Name royalties are paid under"
             />
+          </label>
+
+          {/* An acquired catalog. The writer sold it: the entry stays on the
+              roster under their name so the publisher can account for it, but
+              the money is the publisher's and the writer must never see it. */}
+          {/* Signed after the last statement run. Nothing is missing for them,
+              so they should not sit in "needs attention" alongside clients whose
+              statements genuinely failed to arrive. */}
+          <label className={styles.ownedRow}>
+            <input
+              type="checkbox"
+              checked={form.awaiting_first_statement}
+              onChange={(e) => set('awaiting_first_statement', e.target.checked)}
+            />
+            <span>
+              <strong>Newly signed — no statements expected yet</strong>
+              <span className={styles.ownedHint}>
+                Stops them being reported as a client whose statements are missing. Clear it once their first statement
+                has been through.
+              </span>
+            </span>
+          </label>
+
+          <label className={styles.ownedRow}>
+            <input
+              type="checkbox"
+              checked={form.publisher_owned}
+              onChange={(e) => set('publisher_owned', e.target.checked)}
+            />
+            <span>
+              <strong>Publisher-owned catalog</strong>
+              <span className={styles.ownedHint}>
+                Acquired from this writer. Kept for accounting, hidden from their portal, and it cannot be invited to.
+              </span>
+            </span>
           </label>
 
           <div className={styles.fieldRow}>

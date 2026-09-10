@@ -85,8 +85,8 @@ const InviteAccept = () => {
       );
       return;
     }
-    if (!username.trim()) {
-      setError('Choose a username — this is what you will sign in with.');
+    if (!preview?.has_login && !username.trim()) {
+      setError('Choose a username. This is what you will sign in with.');
       return;
     }
     setSubmitting(true);
@@ -138,22 +138,23 @@ const InviteAccept = () => {
                 <strong>{preview.email}</strong>. See statements, earnings, and distribution history.
               </p>
 
-              {preview.needs_password && !preview.requires_sign_in && (
+              {/* Only when setting up a login. If this address already has
+                  one, this invite adds a client to it and the account keeps the
+                  username it already has. */}
+              {preview.needs_password && !preview.requires_sign_in && !preview.has_login && (
                 <Input
                   label="Username"
                   value={username}
                   onValueChange={setUsername}
                   isRequired
                   autoComplete="username"
-                  description={`You'll sign in with this. It is set to ${
-                    preview.writer_name || 'this client'
-                  } so you can tell this portal apart if you hold more than one.`}
+                  description="You'll sign in with this."
                 />
               )}
 
               {preview.needs_password && !preview.requires_sign_in && (
                 <Input
-                  label="Set a password"
+                  label={preview.has_login ? 'Your password' : 'Set a password'}
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onValueChange={setPassword}
@@ -161,7 +162,7 @@ const InviteAccept = () => {
                   autoComplete={preview.has_login ? 'current-password' : 'new-password'}
                   description={
                     preview.has_login
-                      ? 'This email already has an account — confirm your password to accept'
+                      ? 'This email already has an account. Enter its password and this client is added to it.'
                       : 'This secures your portal login'
                   }
                   endContent={
