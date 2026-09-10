@@ -17,6 +17,13 @@ const SOURCE_OPTIONS = ['Auto-detect', ...SOURCES];
 // can still be resumed rather than stranding the files already sent.
 const PENDING_KEY = 'rdPendingUploadId';
 
+// How many times a transfer picks itself back up after the connection drops,
+// and how long it waits before each attempt. Generous on purpose: a Wi-Fi roam
+// resolves in seconds, a VPN reconnect can take a minute, and the cost of
+// waiting is nothing next to re-sending 2 GB.
+const RECOVERY_ATTEMPTS = 6;
+const RECOVERY_WAIT_MS = [3000, 8000, 15000, 30000, 60000, 60000];
+
 // ---------------------------------------------------------------------------
 // Mock upload (flag off) — pre-existing demo behavior, unchanged.
 // ---------------------------------------------------------------------------
@@ -191,6 +198,8 @@ const LiveStatementUpload = () => {
   const [pollPaused, setPollPaused] = useState(false);
   // An id recovered from a previous tab that died mid-transfer (see PENDING_KEY).
   const [strandedId, setStrandedId] = useState(null);
+  // Set while a dropped transfer is picking itself back up.
+  const [recovering, setRecovering] = useState(null);
 
   const uploadId = upload?.upload_id ?? null;
 
@@ -316,15 +325,50 @@ const LiveStatementUpload = () => {
       }
     };
 
+    // Keep picking the transfer back up rather than handing it back as an
+    // error. Server logs show every lane dying in the same second with the
+    // page still alive and no unload — the whole socket pool to the host went
+    // at once, which is what a Wi-Fi roam, a VPN reconnect or a firewall looks
+    // like from in here. The batches already sent are on the server, so the
+    // right answer is to wait for the network and ask what is still missing,
+    // not to make somebody re-drop two gigabytes because the link blinked.
+    //
+    // Each pass re-reads /missing, so a pass that transfers nothing costs one
+    // request. Genuine failures — a 409 from a cancelled upload, files that no
+    // longer match the manifest — are not connection faults and stop at once.
+    let attempt = 0;
+    let current = resumeId;
+
+    for (;;) {
+      try {
+        const created = current
+          ? await resumeUpload(current, queued, onProgress)
+          : await createUpload(queued, onProgress);
+        setUpload(created);
+        setResumeId(null);
+        setRecovering(null);
+        clearPending();
+        setPollPaused(false);
+        setPhase('processing');
+        return;
+      } catch (err) {
+        const lostConnection = err?.status === 0;
+        current = err?.upload_id || current;
+        attempt += 1;
+        if (!lostConnection || !current || attempt > RECOVERY_ATTEMPTS) {
+          setRecovering(null);
+          throw err;
+        }
+        const waitMs = RECOVERY_WAIT_MS[Math.min(attempt - 1, RECOVERY_WAIT_MS.length - 1)];
+        setRecovering({ attempt, of: RECOVERY_ATTEMPTS, waitMs });
+        await new Promise((r) => setTimeout(r, waitMs));
+      }
+    }
+  };
+
+  const runUploadGuarded = async (resumeId) => {
     try {
-      const created = resumeId
-        ? await resumeUpload(resumeId, queued, onProgress)
-        : await createUpload(queued, onProgress);
-      setUpload(created);
-      setResumeId(null);
-      clearPending();
-      setPollPaused(false);
-      setPhase('processing');
+      await runUpload(resumeId);
     } catch (err) {
       // Keep the upload id. Losing it was what made every interruption
       // unrecoverable: the files were safe on the server, but nothing could
@@ -335,7 +379,7 @@ const LiveStatementUpload = () => {
     }
   };
 
-  const handleSubmit = () => runUpload(null);
+  const handleSubmit = () => runUploadGuarded(null);
 
   const reset = () => {
     setQueued([]);
@@ -346,6 +390,7 @@ const LiveStatementUpload = () => {
     setUploadPct(0);
     setResumeId(null);
     setStrandedId(null);
+    setRecovering(null);
     clearPending();
     setPollPaused(false);
   };
@@ -384,12 +429,28 @@ const LiveStatementUpload = () => {
               } else {
                 // Resume rather than restart: re-sending would abandon the
                 // files already uploaded and mint a second upload.
-                runUpload(resumeId);
+                runUploadGuarded(resumeId);
               }
             }}
           >
             {resumeId ? 'Resume upload' : 'Retry'}
           </button>
+        </div>
+      )}
+
+      {recovering && (
+        <div className={styles.errorBanner}>
+          <FaExclamationTriangle />
+          <div className={styles.errorBannerText}>
+            <strong>Connection lost — picking the transfer back up</strong>
+            <span>
+              Attempt {recovering.attempt} of {recovering.of}, retrying in {Math.round(recovering.waitMs / 1000)}s.
+            </span>
+            <span className={styles.mutedNote}>
+              Everything already sent is safe on the server. Only the missing files get re-sent, so leave this page
+              open.
+            </span>
+          </div>
         </div>
       )}
 
@@ -412,7 +473,7 @@ const LiveStatementUpload = () => {
             disabled={!queued.length}
             onClick={() => {
               setStrandedId(null);
-              runUpload(strandedId);
+              runUploadGuarded(strandedId);
             }}
           >
             Resume upload
