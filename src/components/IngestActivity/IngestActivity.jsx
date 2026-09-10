@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FaCheck, FaExclamationTriangle, FaSpinner, FaTimes } from 'react-icons/fa';
 import { listUploads, cancelUpload } from '../../api/statementsAdmin';
+import { parseServerTime } from '../../utils/serverTime';
 import styles from './ingestActivity.module.css';
 
 // Live view of every statement upload on the server — transferring, sorting,
@@ -26,8 +27,8 @@ const signatureOf = (rows) => rows.map((u) => `${u.upload_id}:${u.status}`).join
 
 const fmtTime = (iso) => {
   if (!iso) return '—';
-  const d = new Date(iso);
-  return Number.isNaN(d.getTime()) ? '—' : d.toLocaleTimeString();
+  const d = parseServerTime(iso);
+  return d ? d.toLocaleTimeString() : '—';
 };
 
 // One upload -> what the admin needs to know about it right now.
@@ -42,8 +43,8 @@ const describe = (u) => {
     // open time, or an upload whose browser died before its very first batch
     // would sit on 'Transferring' forever — the one case with nothing at all
     // to show for it, and so the most confusing.
-    const clock = u.last_batch_at || u.uploaded_at;
-    const last = clock ? new Date(clock).getTime() : null;
+    const clock = parseServerTime(u.last_batch_at || u.uploaded_at);
+    const last = clock ? clock.getTime() : null;
     const idleMs = last ? Date.now() - last : null;
     if (idleMs !== null && idleMs > STALLED_AFTER_MS) {
       const mins = Math.floor(idleMs / 60000);
