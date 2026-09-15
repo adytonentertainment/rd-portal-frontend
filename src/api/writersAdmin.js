@@ -65,6 +65,16 @@ export const addContact = (id, { email, displayName, role = 'primary' }) =>
   });
 
 // DELETE /admin/writers/{id}/contacts/{contactId} → remove a contact's access link
+// The name shown for a contact. Stored on the Contact, which is shared, so one
+// correction lands on every client that address reaches — aramtve@gmail.com
+// reaches 79 of them, and fixing it per client would mean 79 edits that drift.
+export const renameContact = (id, contactId, displayName) =>
+  request({
+    url: `/admin/writers/${id}/contacts/${contactId}`,
+    method: 'PATCH',
+    data: { display_name: displayName },
+  });
+
 export const unlinkContact = (id, contactId) =>
   request({ url: `/admin/writers/${id}/contacts/${contactId}`, method: 'DELETE' });
 

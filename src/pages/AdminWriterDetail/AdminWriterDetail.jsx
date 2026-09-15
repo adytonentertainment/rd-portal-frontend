@@ -5,7 +5,14 @@ import { FaArrowLeft, FaCheck, FaPaperPlane, FaClock, FaEnvelope, FaPen } from '
 import Sidebar from '../../components/Sidebar/Sidebar';
 import { useIsAdmin } from '../../utils/auth';
 import { statementsLive } from '../../config/featureFlags';
-import { getWriter, listWriters, moveAccount, distributeToWriter, deleteWriterStatement } from '../../api/writersAdmin';
+import {
+  getWriter,
+  listWriters,
+  moveAccount,
+  distributeToWriter,
+  deleteWriterStatement,
+  renameContact,
+} from '../../api/writersAdmin';
 import WriterFormModal from '../AdminWriters/WriterFormModal';
 import InviteDialog from '../AdminWriters/InviteDialog';
 import {
@@ -110,6 +117,11 @@ const AdminWriterDetail = () => {
   const [liveLoading, setLiveLoading] = useState(statementsLive);
   const [liveError, setLiveError] = useState(null);
   const [showEdit, setShowEdit] = useState(false);
+  // Renaming a contact edits the shared Contact, so it corrects every client
+  // that address reaches rather than just this one.
+  const [renamingId, setRenamingId] = useState(null);
+  const [renameValue, setRenameValue] = useState('');
+  const [savingName, setSavingName] = useState(false);
   const [showInvite, setShowInvite] = useState(false);
 
   const loadLive = useCallback(async () => {
@@ -124,6 +136,20 @@ const AdminWriterDetail = () => {
       setLiveLoading(false);
     }
   }, [live, id]);
+
+  const saveRename = async (contactId) => {
+    if (savingName) return;
+    setSavingName(true);
+    try {
+      await renameContact(id, contactId, renameValue.trim());
+      setRenamingId(null);
+      await loadLive();
+    } catch {
+      // The row keeps its old name and the editor stays open to try again.
+    } finally {
+      setSavingName(false);
+    }
+  };
 
   useEffect(() => {
     loadLive();
@@ -472,12 +498,50 @@ const AdminWriterDetail = () => {
                     <div className={styles.liveRows}>
                       {w.contacts.map((c) => (
                         <div key={`c${c.contact_id}`} className={styles.liveRow}>
-                          <span>
-                            {c.display_name ? `${c.display_name} · ` : ''}
-                            {c.email}
-                          </span>
-                          <span className={styles.liveSoft}>{c.role}</span>
-                          <span className={styles.liveSoft}>{c.has_login ? 'portal login' : 'no login'}</span>
+                          {renamingId === c.contact_id ? (
+                            <>
+                              <input
+                                className={styles.renameInput}
+                                autoFocus
+                                value={renameValue}
+                                placeholder={c.email}
+                                onChange={(e) => setRenameValue(e.target.value)}
+                                onKeyDown={(e) => {
+                                  if (e.key === 'Enter') saveRename(c.contact_id);
+                                  if (e.key === 'Escape') setRenamingId(null);
+                                }}
+                              />
+                              <button
+                                className={styles.renameSave}
+                                disabled={savingName}
+                                onClick={() => saveRename(c.contact_id)}
+                              >
+                                {savingName ? 'Saving…' : 'Save'}
+                              </button>
+                              <button className={styles.renameCancel} onClick={() => setRenamingId(null)}>
+                                Cancel
+                              </button>
+                            </>
+                          ) : (
+                            <>
+                              <span>
+                                {c.display_name ? `${c.display_name} · ` : ''}
+                                {c.email}
+                              </span>
+                              <span className={styles.liveSoft}>{c.role}</span>
+                              <span className={styles.liveSoft}>{c.has_login ? 'portal login' : 'no login'}</span>
+                              <button
+                                className={styles.renameLink}
+                                title="This name is shared by every client this address reaches"
+                                onClick={() => {
+                                  setRenamingId(c.contact_id);
+                                  setRenameValue(c.display_name || '');
+                                }}
+                              >
+                                {c.display_name ? 'Rename' : 'Add name'}
+                              </button>
+                            </>
+                          )}
                         </div>
                       ))}
                       {w.invites
