@@ -25,6 +25,7 @@ const AccessPanel = ({ writer }) => {
   const [copied, setCopied] = useState(false);
 
   const canManage = writer?.can_manage_access;
+  const writerName = writer?.canonical_name || writer?.name || null;
 
   const load = async () => {
     try {
@@ -81,8 +82,20 @@ const AccessPanel = ({ writer }) => {
   return (
     <div className={styles.accessCard}>
       <div className={styles.accessHeader}>
-        <h2 className={styles.accessTitle}>{t('access.title')}</h2>
-        <p className={styles.accessSubtitle}>{canManage ? t('access.subtitle') : t('access.guestNote')}</p>
+        {/* One panel is rendered per artist. Somebody holding several saw a
+            stack of identical panels with no way to tell which artist each
+            invite applied to — so the name goes in the heading, not just the
+            page around it. */}
+        <h2 className={styles.accessTitle}>
+          {writerName ? t('access.forWriter', { name: writerName }) : t('access.title')}
+        </h2>
+        <p className={styles.accessSubtitle}>
+          {canManage
+            ? writerName
+              ? t('access.subtitleFor', { name: writerName })
+              : t('access.subtitle')
+            : t('access.guestNote')}
+        </p>
       </div>
 
       {members.length === 0 && pending.length === 0 ? (

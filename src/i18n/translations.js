@@ -69,6 +69,10 @@ const translations = {
 
     'access.title': 'Who has access',
     'access.subtitle': 'Invite your manager or attorney to view these statements.',
+    // One panel is rendered per artist. Somebody holding several saw several
+    // identical panels and could not tell which invite went to which artist.
+    'access.forWriter': 'Access to {name}',
+    'access.subtitleFor': "Invite your manager or attorney to view {name}'s statements.",
     'access.guestNote': 'Only the primary contact for this client can change who has access.',
     'access.emailPlaceholder': 'name@example.com',
     'access.role': 'Role',
@@ -206,6 +210,8 @@ const translations = {
 
     'access.title': 'Quién tiene acceso',
     'access.subtitle': 'Invita a tu representante o abogado a ver estos estados de cuenta.',
+    'access.forWriter': 'Acceso a {name}',
+    'access.subtitleFor': 'Invita a tu representante o abogado a ver los estados de cuenta de {name}.',
     'access.guestNote': 'Solo el contacto principal de este cliente puede cambiar quién tiene acceso.',
     'access.emailPlaceholder': 'nombre@ejemplo.com',
     'access.role': 'Rol',

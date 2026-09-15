@@ -1390,7 +1390,16 @@ const Revenue = () => {
 
       songRevenueMap[songKey].totalRevenue += t.amount;
       songRevenueMap[songKey].transactionCount += 1;
-      if (t.territory) songRevenueMap[songKey].territories.add(t.territory);
+      // Song rows from the portal carry their own territory codes: country is
+      // deliberately not part of the song key server-side (it is what made the
+      // payload 475k rows), so without these every song counted 0 territories.
+      // They are unioned, not summed — the same song earning in the same
+      // country across two periods is still one territory.
+      if (Array.isArray(t.territories)) {
+        t.territories.forEach((code) => code && songRevenueMap[songKey].territories.add(code));
+      } else if (t.territory) {
+        songRevenueMap[songKey].territories.add(t.territory);
+      }
       if (t.source) songRevenueMap[songKey].sources.add(t.source);
 
       // Store ISRC if we don't have one yet
