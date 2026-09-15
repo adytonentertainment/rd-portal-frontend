@@ -30,6 +30,8 @@ describe('portal translations', () => {
       'income.streaming',
       'lang.switchToEnglish',
       'lang.switchToSpanish',
+      // Microsoft's product name; Spanish says "Excel" too.
+      'statements.downloadXlsx',
     ]);
   });
 

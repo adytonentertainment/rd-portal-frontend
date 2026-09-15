@@ -56,6 +56,17 @@ export const downloadMyStatementPdf = (distributionId) =>
     headers: { accept: 'application/pdf' },
   });
 
+// The spreadsheet the statement arrived as. Clients read the PDF and work in
+// the XLSX, so both are offered per statement.
+export const downloadMyStatementXlsx = (distributionId) =>
+  request({
+    url: `/me/statements/${distributionId}/xlsx`,
+    responseType: 'blob',
+    headers: {
+      accept: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    },
+  });
+
 // --- admin bootstrap: /admin/writers/{id}/invites ----------------------------
 
 export const adminInviteToWriter = (writerId, email, role = 'primary') =>

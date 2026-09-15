@@ -317,3 +317,32 @@
   display: flex;
   gap: 8px;
 }
+
+/* Two formats per statement: the PDF is the statement of record, the XLSX is
+   the same figures in something a client can sum. */
+.downloadGroup {
+  display: inline-flex;
+  gap: 6px;
+  justify-content: flex-end;
+}
+.downloadBtnAlt {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 6px 11px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #067647;
+  background: #f6fef9;
+  border: 1px solid #abefc6;
+  border-radius: 7px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+.downloadBtnAlt:hover:not(:disabled) {
+  background: #ecfdf3;
+}
+.downloadBtnAlt:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
