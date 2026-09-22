@@ -91,7 +91,10 @@ const Settings = () => {
         sessionStorage.clear();
 
         // Use replace to prevent back navigation
-        window.location.replace(urlJoin(process.env.REACT_APP_FRONTEND_URL, '/login'));
+        // Relative: this is our own login route. Building it from
+        // REACT_APP_FRONTEND_URL redirected onto whatever host that variable
+        // happened to hold — staging.verax.app in a production build.
+        window.location.replace('/login');
       }
     } catch (error) {
       console.error('Error deleting account:', error);
