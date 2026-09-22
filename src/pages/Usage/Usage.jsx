@@ -65,7 +65,7 @@ const detections = [
   { source: 'tv', title: 'Hours Like These', sub: 'France 2 — "C à vous" · Paris', time: '3d ago' },
 ];
 
-const fmtNum = (n) => n.toLocaleString();
+const fmtNum = (n) => n.toLocaleString('en-US');
 
 const ChartTooltip = ({ active, payload, label }) => {
   if (!active || !payload || !payload.length) return null;

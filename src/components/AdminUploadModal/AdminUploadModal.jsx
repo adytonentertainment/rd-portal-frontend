@@ -125,7 +125,7 @@ const fmtMoney = (n) =>
 
 // Human-readable one-liner for a parsed row's second line of text.
 const subtitleFor = (f) => {
-  const base = `${f.parsed.lines.toLocaleString()} lines · ${f.parsed.matched.toLocaleString()} auto-matched · ${fmtMoney(f.parsed.total)}`;
+  const base = `${f.parsed.lines.toLocaleString('en-US')} lines · ${f.parsed.matched.toLocaleString('en-US')} auto-matched · ${fmtMoney(f.parsed.total)}`;
   if (!f.live) return base + (statementsLive ? ' · est.' : '');
   const pairTag = f.paired ? 'PDF+XLSX' : f.pdfPresent ? 'PDF only' : 'XLSX only';
   const reconTag = f.reconciled === true ? ' · reconciled' : f.reconciled === false ? ' · ⚠ mismatch' : '';
@@ -614,7 +614,7 @@ const AdminUploadModal = ({ open, onClose, onComplete }) => {
         {statementsLive && liveUpload && (
           <div className={styles.liveSummary}>
             <div className={styles.liveHead}>
-              <strong>{liveUpload.fileCount.toLocaleString()}</strong> files uploaded
+              <strong>{liveUpload.fileCount.toLocaleString('en-US')}</strong> files uploaded
               {liveUpload.status === 'done' ? (
                 <span className={styles.liveDone}>
                   {' · '}
@@ -631,11 +631,11 @@ const AdminUploadModal = ({ open, onClose, onComplete }) => {
             </div>
             <div className={styles.liveStats}>
               <div className={styles.liveStat}>
-                <span className={styles.liveNum}>{liveUpload.writers.toLocaleString()}</span>
+                <span className={styles.liveNum}>{liveUpload.writers.toLocaleString('en-US')}</span>
                 <span className={styles.liveLabel}>clients</span>
               </div>
               <div className={styles.liveStat}>
-                <span className={styles.liveNum}>{liveUpload.statements.toLocaleString()}</span>
+                <span className={styles.liveNum}>{liveUpload.statements.toLocaleString('en-US')}</span>
                 <span className={styles.liveLabel}>statements</span>
               </div>
               <div className={styles.liveStat}>
@@ -652,7 +652,7 @@ const AdminUploadModal = ({ open, onClose, onComplete }) => {
                   return 'Sorting files… clients will appear here in a moment.';
                 }
                 if (liveUpload.statements === 0 && dups > 0) {
-                  return `These ${dups.toLocaleString()} files were already ingested (duplicates) — nothing new to create.`;
+                  return `These ${dups.toLocaleString('en-US')} files were already ingested (duplicates) — nothing new to create.`;
                 }
                 if (liveUpload.statements === 0 && done) {
                   return 'No new statements were created from these files.';
@@ -860,7 +860,7 @@ const AdminUploadModal = ({ open, onClose, onComplete }) => {
           <div className={styles.footerTotals}>
             {!statementsLive &&
               files.length > 0 &&
-              `${totals.lines.toLocaleString()} lines · ${fmtMoney(totals.total)}`}
+              `${totals.lines.toLocaleString('en-US')} lines · ${fmtMoney(totals.total)}`}
           </div>
           <div className={styles.footerActions}>
             <button className={styles.cancelBtn} onClick={onClose}>

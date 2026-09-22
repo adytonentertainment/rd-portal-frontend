@@ -71,7 +71,7 @@ const StatementsModal = ({ statements, isOpen, onClose, onDeleteStatement, onEdi
                     <div className="col-date">{formatDate(statement.uploadDate)}</div>
                     <div className="col-transactions">
                       <FaListUl className="meta-icon" />
-                      {(statement.transactionCount || 0).toLocaleString()}
+                      {(statement.transactionCount || 0).toLocaleString('en-US')}
                     </div>
                     <div className="col-amount">
                       <FaDollarSign className="meta-icon" />

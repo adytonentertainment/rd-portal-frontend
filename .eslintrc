@@ -23,7 +23,14 @@
     "@typescript-eslint/no-require-imports": "off",
     "@typescript-eslint/no-unused-expressions": "warn",
     "@typescript-eslint/ban-ts-comment": "off",
-    "prefer-const": "warn"
+    "prefer-const": "warn",
+    "no-restricted-syntax": [
+      "error",
+      {
+        "selector": ":matches(CallExpression, OptionalCallExpression)[callee.property.name='toLocaleString'][arguments.length=0]",
+        "message": "Pass an explicit locale: .toLocaleString('en-US'). With no argument this follows the VIEWER's locale, so the same statement renders as 341,871 / 341 871 / 341.871 depending on who opens it — and a reader whose convention says comma-is-decimal misreads a thousands separator by 1000x. Statements are USD; every viewer must see identical digits. For money prefer formatCurrency() from utils/currencyFormatter."
+      }
+    ]
   },
   "overrides": [
     {

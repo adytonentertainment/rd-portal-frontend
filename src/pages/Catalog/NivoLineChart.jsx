@@ -73,9 +73,7 @@ const NivoLineChart = ({
       } else {
         // Skip some weeks to maintain readability
         const skipFactor = Math.ceil(dataCount / targetTicks);
-        ticks = dataPoints
-          .filter((_, i) => i % skipFactor === 0)
-          .map((d) => d.date_added.substring(0, 10));
+        ticks = dataPoints.filter((_, i) => i % skipFactor === 0).map((d) => d.date_added.substring(0, 10));
       }
     } else {
       // For daily: compute ticks based on total day span
@@ -227,7 +225,7 @@ const NivoLineChart = ({
           } else if (value >= 1000) {
             return `${(value / 1000).toFixed(0)}K`;
           }
-          return value.toLocaleString();
+          return value.toLocaleString('en-US');
         },
       };
     } else {
@@ -261,7 +259,7 @@ const NivoLineChart = ({
           } else if (value >= 1000) {
             return `${(value / 1000).toFixed(0)}K`;
           }
-          return value.toLocaleString();
+          return value.toLocaleString('en-US');
         },
       };
     }
@@ -362,7 +360,7 @@ const NivoLineChart = ({
           if (chartViewMode === 'revenue') {
             return `$${value.toFixed(2)}`;
           }
-          return value.toLocaleString();
+          return value.toLocaleString('en-US');
         }}
         axisTop={null}
         axisRight={getAxisRight()}
@@ -425,7 +423,9 @@ const NivoLineChart = ({
               />
               <span>{point.serieId}:</span>
               <strong>
-                {chartViewMode === 'revenue' ? `$${point.data.yFormatted}` : point.data.yFormatted.toLocaleString()}
+                {chartViewMode === 'revenue'
+                  ? `$${point.data.yFormatted}`
+                  : point.data.yFormatted.toLocaleString('en-US')}
               </strong>
             </div>
           </div>

@@ -341,11 +341,11 @@ const AdminWriters = () => {
               <h1 className={styles.title}>Clients</h1>
               <p className={styles.subtitle}>
                 {roster
-                  ? `${(roster.client_count ?? 0).toLocaleString()} clients · ${(
+                  ? `${(roster.client_count ?? 0).toLocaleString('en-US')} clients · ${(
                       roster.commission_partner_count ?? 0
-                    ).toLocaleString()} commission partners`
+                    ).toLocaleString('en-US')} commission partners`
                   : total > 0
-                    ? `${total.toLocaleString()} on the roster`
+                    ? `${total.toLocaleString('en-US')} on the roster`
                     : 'Manage your roster'}{' '}
                 · search, edit, and invite to portal
               </p>
@@ -700,7 +700,7 @@ const AdminWriters = () => {
                 Previous
               </button>
               <span className={styles.pageInfo}>
-                Page {page} of {totalPages} · {total.toLocaleString()} clients
+                Page {page} of {totalPages} · {total.toLocaleString('en-US')} clients
               </span>
               <button
                 className={styles.pageButton}

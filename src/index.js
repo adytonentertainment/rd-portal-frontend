@@ -38,6 +38,7 @@ import AdminStatementUpload from './pages/AdminStatementUpload/AdminStatementUpl
 import AdminStatementDetail from './pages/AdminStatementDetail/AdminStatementDetail';
 import AdminWriters from './pages/AdminWriters/AdminWriters';
 import AdminWriterDetail from './pages/AdminWriterDetail/AdminWriterDetail';
+import AdminWriterPreview from './pages/AdminWriterPreview/AdminWriterPreview';
 import AdminClientImport from './pages/AdminClientImport/AdminClientImport';
 import InviteAccept from './pages/InviteAccept/InviteAccept';
 import { UserContextProvider } from './components/UserContext/UserContext';
@@ -121,6 +122,7 @@ const App = () => {
                             <Route element={<AdminStatementDetail />} path="/admin/statements/:id" />
                             <Route element={<AdminWriters />} path="/admin/writers" />
                             <Route element={<AdminWriterDetail />} path="/admin/writers/:id" />
+                            <Route element={<AdminWriterPreview />} path="/admin/writers/:id/preview" />
                             <Route element={<AdminClientImport />} path="/admin/client-imports/:id" />
                             <Route element={<AdminDistributions />} path="/admin/distributions" />
                             <Route element={<AdminDistributionDetail />} path="/admin/distributions/:periodId" />

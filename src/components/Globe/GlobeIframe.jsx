@@ -15,7 +15,7 @@ export default function GlobeIframe({ territories = [], territoryCoordinates = {
         lon: coords.lon,
         lat: coords.lat,
         name: coords.name || t.territory,
-        address: `Revenue: $${t.amount.toLocaleString()}`,
+        address: `Revenue: $${t.amount.toLocaleString('en-US')}`,
         phone: `Territory: ${t.territory}`,
       };
     })

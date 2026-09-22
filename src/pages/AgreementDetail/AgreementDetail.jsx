@@ -2523,7 +2523,7 @@ const AgreementDetail = () => {
                         >
                           <span style={{ color: '#3b82f6', fontWeight: 600 }}>
                             {typeof parsed.financial_projection.estimated_advance === 'number'
-                              ? `£${parsed.financial_projection.estimated_advance.toLocaleString()}`
+                              ? `£${parsed.financial_projection.estimated_advance.toLocaleString('en-US')}`
                               : parsed.financial_projection.estimated_advance}
                           </span>
                         </div>
@@ -2538,7 +2538,7 @@ const AgreementDetail = () => {
                         >
                           <span style={{ color: '#16a34a', fontWeight: 600 }}>
                             {typeof parsed.financial_projection.recording_royalties === 'number'
-                              ? `£${parsed.financial_projection.recording_royalties.toLocaleString()}`
+                              ? `£${parsed.financial_projection.recording_royalties.toLocaleString('en-US')}`
                               : parsed.financial_projection.recording_royalties}
                           </span>
                         </div>
@@ -2553,7 +2553,7 @@ const AgreementDetail = () => {
                         >
                           <span style={{ color: '#8b5cf6', fontWeight: 600 }}>
                             {typeof parsed.financial_projection.sync_income === 'number'
-                              ? `£${parsed.financial_projection.sync_income.toLocaleString()}`
+                              ? `£${parsed.financial_projection.sync_income.toLocaleString('en-US')}`
                               : parsed.financial_projection.sync_income}
                           </span>
                         </div>
@@ -2568,7 +2568,7 @@ const AgreementDetail = () => {
                         >
                           <span style={{ color: '#ec4899', fontWeight: 600 }}>
                             {typeof parsed.financial_projection.soundexchange === 'number'
-                              ? `£${parsed.financial_projection.soundexchange.toLocaleString()}`
+                              ? `£${parsed.financial_projection.soundexchange.toLocaleString('en-US')}`
                               : parsed.financial_projection.soundexchange}
                           </span>
                         </div>
@@ -2583,7 +2583,7 @@ const AgreementDetail = () => {
                         >
                           <span style={{ color: '#f59e0b', fontWeight: 600 }}>
                             {typeof parsed.financial_projection.publishing === 'number'
-                              ? `£${parsed.financial_projection.publishing.toLocaleString()}`
+                              ? `£${parsed.financial_projection.publishing.toLocaleString('en-US')}`
                               : parsed.financial_projection.publishing}
                           </span>
                         </div>

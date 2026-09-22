@@ -171,7 +171,7 @@ const AutoDetectConfirmModal = ({ isOpen, onClose, onImport, onAdjustMapping, cs
               <div className="stats-summary">
                 <div className="stat-card">
                   <div className="stat-label">Transactions</div>
-                  <div className="stat-value">{transactionCount.toLocaleString()}</div>
+                  <div className="stat-value">{transactionCount.toLocaleString('en-US')}</div>
                 </div>
                 <div className="stat-card">
                   <div className="stat-label">Total Amount</div>
@@ -215,7 +215,7 @@ const AutoDetectConfirmModal = ({ isOpen, onClose, onImport, onAdjustMapping, cs
                   </table>
                 </div>
                 {transactionCount > 5 && (
-                  <p className="sample-note">Showing 5 of {transactionCount.toLocaleString()} transactions</p>
+                  <p className="sample-note">Showing 5 of {transactionCount.toLocaleString('en-US')} transactions</p>
                 )}
               </div>
             </>
@@ -227,7 +227,8 @@ const AutoDetectConfirmModal = ({ isOpen, onClose, onImport, onAdjustMapping, cs
             <FaEdit /> Adjust Mapping
           </button>
           <button className="btn-primary" onClick={handleImport} disabled={loading || error || !parseResult}>
-            <FaCheckCircle /> Import {transactionCount > 0 ? `${transactionCount.toLocaleString()} ` : ''}Transactions
+            <FaCheckCircle /> Import {transactionCount > 0 ? `${transactionCount.toLocaleString('en-US')} ` : ''}
+            Transactions
           </button>
         </div>
       </div>

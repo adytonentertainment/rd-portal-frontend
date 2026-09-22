@@ -112,7 +112,7 @@ const AdminDistributions = () => {
                     return (
                       <tr key={p.period_code}>
                         <td className={styles.periodLabel}>{p.label}</td>
-                        <td className={styles.amount}>{p.statements.toLocaleString()}</td>
+                        <td className={styles.amount}>{p.statements.toLocaleString('en-US')}</td>
                         <td className={styles.amount}>{fmtMoney(p.net_total)}</td>
                         <td>
                           <span className={styles.statusPill} style={{ backgroundColor: s.bg, color: s.color }}>
@@ -120,7 +120,7 @@ const AdminDistributions = () => {
                           </span>
                         </td>
                         <td className={styles.amount}>
-                          {p.distributed.toLocaleString()} / {p.statements.toLocaleString()}
+                          {p.distributed.toLocaleString('en-US')} / {p.statements.toLocaleString('en-US')}
                         </td>
                         <td className={styles.date}>{fmtDate(p.distributed_at)}</td>
                       </tr>

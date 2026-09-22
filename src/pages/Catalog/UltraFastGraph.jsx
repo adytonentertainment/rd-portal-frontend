@@ -430,7 +430,7 @@ const UltraFastGraph = ({
             const val = value / 1000;
             label = val >= 10 ? Math.round(val) + 'K' : val.toFixed(1) + 'K';
           } else {
-            label = Math.round(value).toLocaleString();
+            label = Math.round(value).toLocaleString('en-US');
           }
           ctx.fillText(label, paddingLeft - 10, y + 4);
         }
@@ -462,7 +462,7 @@ const UltraFastGraph = ({
             const val = value / 1000;
             label = val >= 10 ? Math.round(val) + 'K' : val.toFixed(1) + 'K';
           } else {
-            label = Math.round(value).toLocaleString();
+            label = Math.round(value).toLocaleString('en-US');
           }
           ctx.fillText(label, paddingLeft - 10, y + 4);
         }
@@ -521,7 +521,7 @@ const UltraFastGraph = ({
             const val = value / 1000;
             label = '$' + (val >= 10 ? Math.round(val).toString() : val.toFixed(1)) + 'K';
           } else if (value >= 100) {
-            label = '$' + Math.round(value).toLocaleString();
+            label = '$' + Math.round(value).toLocaleString('en-US');
           } else {
             label = '$' + value.toFixed(2);
           }
@@ -544,7 +544,7 @@ const UltraFastGraph = ({
             const val = value / 1000;
             label = '$' + (val >= 10 ? Math.round(val).toString() : val.toFixed(1)) + 'K';
           } else if (value >= 100) {
-            label = '$' + Math.round(value).toLocaleString();
+            label = '$' + Math.round(value).toLocaleString('en-US');
           } else {
             label = '$' + value.toFixed(2);
           }
@@ -887,7 +887,9 @@ const UltraFastGraph = ({
           </div>
           <div style={{ color: '#ccc' }}>{hoveredPoint.label}</div>
           <div style={{ fontWeight: '700', fontSize: '14px', marginTop: '4px' }}>
-            {hoveredPoint.isRevenue ? `$${hoveredPoint.value.toLocaleString()}` : hoveredPoint.value.toLocaleString()}
+            {hoveredPoint.isRevenue
+              ? `$${hoveredPoint.value.toLocaleString('en-US')}`
+              : hoveredPoint.value.toLocaleString('en-US')}
           </div>
         </div>
       )}

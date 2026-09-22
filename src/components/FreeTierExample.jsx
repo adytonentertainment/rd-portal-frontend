@@ -20,7 +20,7 @@ import '../styles/unlock-animations.css';
  *    {isFreeTier ? (
  *      <LockedMetric
  *        label="Total Streams"
- *        value={playcount.toLocaleString()}
+ *        value={playcount.toLocaleString('en-US')}
  *        upgradeUrl="/upgrade"
  *        showClaimButton={false}
  *      />
@@ -149,7 +149,7 @@ export const FreeTierExample = () => {
         {isFreeTier ? (
           <LockedMetric
             label="Total Streams"
-            value={metrics.totalStreams.toLocaleString()}
+            value={metrics.totalStreams.toLocaleString('en-US')}
             upgradeUrl="/upgrade"
             showClaimButton={false}
           />
@@ -179,7 +179,7 @@ export const FreeTierExample = () => {
                 color: '#333',
               }}
             >
-              {metrics.totalStreams.toLocaleString()}
+              {metrics.totalStreams.toLocaleString('en-US')}
             </div>
             <div
               style={{
@@ -197,7 +197,7 @@ export const FreeTierExample = () => {
         {isFreeTier ? (
           <LockedMetric
             label="Spotify Streams"
-            value={metrics.spotifyStreams.toLocaleString()}
+            value={metrics.spotifyStreams.toLocaleString('en-US')}
             upgradeUrl="/upgrade"
             showClaimButton={false}
           />
@@ -227,7 +227,7 @@ export const FreeTierExample = () => {
                 color: '#1DB954',
               }}
             >
-              {metrics.spotifyStreams.toLocaleString()}
+              {metrics.spotifyStreams.toLocaleString('en-US')}
             </div>
             <div
               style={{
@@ -245,7 +245,7 @@ export const FreeTierExample = () => {
         {isFreeTier ? (
           <LockedMetric
             label="YouTube Streams"
-            value={metrics.youtubeStreams.toLocaleString()}
+            value={metrics.youtubeStreams.toLocaleString('en-US')}
             upgradeUrl="/upgrade"
             showClaimButton={true}
           />
@@ -275,7 +275,7 @@ export const FreeTierExample = () => {
                 color: '#FF0000',
               }}
             >
-              {metrics.youtubeStreams.toLocaleString()}
+              {metrics.youtubeStreams.toLocaleString('en-US')}
             </div>
             <div
               style={{

@@ -306,7 +306,7 @@ const AdminOverview = () => {
     { value: 'commission_partner', label: 'Commission partners' },
   ];
   const rosterLabel = (() => {
-    const n = liveTotal.toLocaleString();
+    const n = liveTotal.toLocaleString('en-US');
     if (membership === 'client') return `${n} client${liveTotal === 1 ? '' : 's'}`;
     if (membership === 'commission_partner') {
       return `${n} commission partner${liveTotal === 1 ? '' : 's'}`;
@@ -314,7 +314,7 @@ const AdminOverview = () => {
     const clients = summary?.client_count;
     const partners = summary?.commission_partner_count;
     return clients != null
-      ? `${n} active payees · ${clients.toLocaleString()} clients · ${partners} commission partners`
+      ? `${n} active payees · ${clients.toLocaleString('en-US')} clients · ${partners} commission partners`
       : `${n} active payees`;
   })();
 
@@ -558,7 +558,7 @@ const AdminOverview = () => {
                   <span className={styles.summaryLabel}>Ready to send</span>
                   <span className={styles.summaryValue}>{fmtMoney(summary.pending_amount)}</span>
                   <span className={styles.summaryHint}>
-                    {summary.pending_statements.toLocaleString()} statements not yet shared
+                    {summary.pending_statements.toLocaleString('en-US')} statements not yet shared
                     {summary.total_amount != null &&
                       ` · of ${fmtMoney(summary.total_amount)} total (${fmtMoney(
                         summary.held_amount || 0
@@ -568,7 +568,7 @@ const AdminOverview = () => {
                 <div className={styles.summaryCard}>
                   <span className={styles.summaryLabel}>Active clients</span>
                   <span className={styles.summaryValue}>
-                    {(summary.client_count ?? summary.active_clients).toLocaleString()}
+                    {(summary.client_count ?? summary.active_clients).toLocaleString('en-US')}
                   </span>
                   <span className={styles.summaryHint}>
                     {summary.commission_partner_count != null &&
@@ -619,7 +619,7 @@ const AdminOverview = () => {
                   <span
                     className={styles.summaryHint}
                     style={{ color: 'var(--success, #22c55e)' }}
-                    title={`Verified ${audit.checked?.statements?.toLocaleString?.() ?? ''} statements against the source files`}
+                    title={`Verified ${audit.checked?.statements?.toLocaleString?.('en-US') ?? ''} statements against the source files`}
                   >
                     <FaCheckCircle size={11} /> Ingestion audit passed
                   </span>
@@ -961,9 +961,9 @@ const AdminOverview = () => {
                     <li key={u.id} className={styles.recentItem}>
                       <span className={styles.recentSource}>{u.source}</span>
                       <span className={styles.recentPeriod}>{u.period}</span>
-                      <span className={styles.recentLines}>{u.lines.toLocaleString()} lines</span>
+                      <span className={styles.recentLines}>{u.lines.toLocaleString('en-US')} lines</span>
                       <span className={styles.recentMatch}>
-                        {u.matched.toLocaleString()} auto-matched ({matchPct}%)
+                        {u.matched.toLocaleString('en-US')} auto-matched ({matchPct}%)
                       </span>
                       <span className={styles.recentTime}>{timeAgo(u.uploadedAt)}</span>
                     </li>
@@ -1009,7 +1009,7 @@ const AdminOverview = () => {
               This shares every ready statement to client portals immediately — clients will be able to view and
               download them. It does not move any money.
               {summary.pending_statements > 0 &&
-                ` ${summary.pending_statements.toLocaleString()} statement${
+                ` ${summary.pending_statements.toLocaleString('en-US')} statement${
                   summary.pending_statements === 1 ? '' : 's'
                 } covering ${fmtMoney(summary.pending_amount)} in royalties.`}
             </div>
@@ -1018,7 +1018,7 @@ const AdminOverview = () => {
                 <FaExclamationTriangle size={14} />
                 <div>
                   <strong>
-                    {summary.unmatched_accounts.toLocaleString()} statement account
+                    {summary.unmatched_accounts.toLocaleString('en-US')} statement account
                     {summary.unmatched_accounts === 1 ? '' : 's'} match no client on your list
                   </strong>{' '}
                   — their money is held back, not sent, until you assign them.
@@ -1030,7 +1030,7 @@ const AdminOverview = () => {
                 <FaExclamationTriangle size={14} />
                 <div>
                   <strong>
-                    {summary.clients_without_statements.toLocaleString()} client
+                    {summary.clients_without_statements.toLocaleString('en-US')} client
                     {summary.clients_without_statements === 1 ? '' : 's'} have no statement this period
                   </strong>{' '}
                   and won&apos;t receive anything:
@@ -1040,7 +1040,7 @@ const AdminOverview = () => {
                       .map((c) => c.name)
                       .join(', ')}
                     {summary.clients_without_statements > 8 &&
-                      ` +${(summary.clients_without_statements - 8).toLocaleString()} more`}
+                      ` +${(summary.clients_without_statements - 8).toLocaleString('en-US')} more`}
                   </div>
                 </div>
               </div>

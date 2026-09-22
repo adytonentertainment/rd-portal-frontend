@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Navigate, useNavigate, useParams } from 'react-router-dom';
-import { FaArrowLeft, FaCheck, FaPaperPlane, FaClock, FaEnvelope, FaPen } from 'react-icons/fa';
+import { FaArrowLeft, FaCheck, FaPaperPlane, FaClock, FaEnvelope, FaPen, FaEye } from 'react-icons/fa';
 import Sidebar from '../../components/Sidebar/Sidebar';
 import { useIsAdmin } from '../../utils/auth';
 import { statementsLive } from '../../config/featureFlags';
@@ -232,6 +232,18 @@ const AdminWriterDetail = () => {
                     </div>
                   </div>
                   <div style={{ display: 'inline-flex', gap: 10 }}>
+                    {/* Read-only view of this client's own portal. Opens in a
+                        NEW TAB so the admin keeps their place in the roster —
+                        the point of it is comparing what the client sees
+                        against what the admin panel says, which is awkward if
+                        one replaces the other. */}
+                    <button
+                      className={styles.backBtn}
+                      onClick={() => window.open(`/admin/writers/${w.id}/preview`, '_blank', 'noopener')}
+                      title="See what this client sees in their portal (read-only)"
+                    >
+                      <FaEye size={11} /> Preview portal
+                    </button>
                     <button className={styles.backBtn} onClick={() => setShowEdit(true)}>
                       <FaPen size={11} /> Edit
                     </button>
@@ -657,7 +669,9 @@ const AdminWriterDetail = () => {
             <div className={styles.kpiCard}>
               <span className={styles.kpiLabel}>Pending royalties</span>
               <span className={styles.kpiValue}>{fmtMoney(writer.pending)}</span>
-              <span className={styles.kpiHint}>{writer.pendingLines.toLocaleString()} lines awaiting distribution</span>
+              <span className={styles.kpiHint}>
+                {writer.pendingLines.toLocaleString('en-US')} lines awaiting distribution
+              </span>
             </div>
             <div className={styles.kpiCard}>
               <span className={styles.kpiLabel}>Distributed lifetime</span>
@@ -669,7 +683,7 @@ const AdminWriterDetail = () => {
             <div className={styles.kpiCard}>
               <span className={styles.kpiLabel}>Works in catalog</span>
               <span className={styles.kpiValue}>{writer.worksCount}</span>
-              <span className={styles.kpiHint}>{writer.totalUsages.toLocaleString()} usages tracked</span>
+              <span className={styles.kpiHint}>{writer.totalUsages.toLocaleString('en-US')} usages tracked</span>
             </div>
           </div>
 
@@ -776,8 +790,8 @@ const AdminWriterDetail = () => {
               Distribute {fmtMoney(writer.pending)} to {writer.name}?
             </div>
             <div className={styles.confirmBody}>
-              {writer.pendingLines.toLocaleString()} statement lines will be released to {writer.name}'s portal. They
-              will see the breakdown immediately and the statement PDF will be generated.
+              {writer.pendingLines.toLocaleString('en-US')} statement lines will be released to {writer.name}'s portal.
+              They will see the breakdown immediately and the statement PDF will be generated.
             </div>
             <div className={styles.confirmActions}>
               <button className={styles.cancelBtn} onClick={() => setConfirm(false)}>

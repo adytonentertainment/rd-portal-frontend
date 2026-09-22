@@ -200,11 +200,62 @@ export const latLngToPhiTheta = (lat, lng) => {
   return { phi, theta };
 };
 
+// AGGREGATE TERRITORIES — codes that are not places.
+//
+// Statement sources don't always break revenue out by country. YouTube reports
+// publishing income for eight territories individually and lumps the entire
+// rest of the planet into one 'ROW' line, so a ROW row sits in the same list
+// as US and CA while meaning something categorically different: it is not a
+// country, it has no location, and it cannot be drawn on a globe.
+//
+// Before this, ROW was simply a code with no coordinates. That made it
+// indistinguishable from a genuine gap in our data — it fell through to the
+// raw code "ROW" in the country list while the rest of the app said "Rest of
+// World", it vanished from the globe with no explanation, and it logged a
+// "No coordinates found" warning on every render as though something were
+// broken. Naming the category fixes all three.
+export const AGGREGATE_TERRITORIES = {
+  ROW: {
+    name: 'Rest of World',
+    // The territories the source DOES itemise; ROW is everywhere else.
+    itemised: ['US', 'CA', 'BR', 'PR', 'VI', 'GU', 'AS', 'MP'],
+    explain:
+      'Rest of World — reported by the source as a single aggregate for ' +
+      'YouTube publishing income, covering every territory except US, CA, ' +
+      'BR, PR, VI, GU, AS and MP. It has no single location, so it is not ' +
+      'shown on the globe.',
+  },
+};
+
+export const isAggregateTerritory = (code) => Boolean(code && AGGREGATE_TERRITORIES[code.toUpperCase()]);
+
+// The name to show for a territory code, wherever it appears. Aggregates
+// resolve through AGGREGATE_TERRITORIES so "ROW" never reaches the screen as
+// a bare code in one panel while reading "Rest of World" in another.
+export const territoryDisplayName = (code, fallback) => {
+  if (!code) return fallback || code;
+  const upper = code.toUpperCase();
+  return AGGREGATE_TERRITORIES[upper]?.name || COUNTRY_COORDINATES[upper]?.name || fallback || code;
+};
+
+// Codes already warned about. getCountryCoordinates runs for every territory
+// on every render, so an un-deduped warning turned one unmappable code into a
+// console full of identical lines and buried anything real.
+const _warnedMissingCoords = new Set();
+
 // Get coordinates for a country code
 export const getCountryCoordinates = (countryCode) => {
-  const country = COUNTRY_COORDINATES[countryCode.toUpperCase()];
+  if (!countryCode) return null;
+  const upper = countryCode.toUpperCase();
+  const country = COUNTRY_COORDINATES[upper];
   if (!country) {
-    console.warn(`No coordinates found for country code: ${countryCode}`);
+    // An aggregate having no coordinates is correct, not a defect — warning
+    // about it trains people to ignore the warning that matters: a real
+    // country we're silently dropping off the globe.
+    if (!isAggregateTerritory(upper) && !_warnedMissingCoords.has(upper)) {
+      _warnedMissingCoords.add(upper);
+      console.warn(`No coordinates found for country code: ${countryCode}`);
+    }
     return null;
   }
   return country;

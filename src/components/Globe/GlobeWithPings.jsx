@@ -22,7 +22,7 @@ const GlobeWithPings = ({ className = '', territories = [], territoryCoordinates
           lng: coords.lon,
           size: Math.log(t.amount + 1) * 0.1,
           color: theme === 'dark' ? '#7AE1FF' : '#0C7A9E',
-          label: `${coords.name || t.territory}: $${t.amount.toLocaleString()}`,
+          label: `${coords.name || t.territory}: $${t.amount.toLocaleString('en-US')}`,
           amount: t.amount,
           territory: coords.name || t.territory,
         };
@@ -66,7 +66,7 @@ const GlobeWithPings = ({ className = '', territories = [], territoryCoordinates
             box-shadow: 0 2px 8px rgba(0,0,0,0.3);
           ">
             <strong>${d.territory}</strong><br/>
-            Revenue: $${d.amount.toLocaleString()}
+            Revenue: $${d.amount.toLocaleString('en-US')}
           </div>
         `}
         // Atmosphere

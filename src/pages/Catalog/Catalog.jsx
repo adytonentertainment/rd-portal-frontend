@@ -354,11 +354,13 @@ const Track = ({
           <MUITooltip title="Soundcharts Data" placement="top">
             <div className="flex flex-col gap-1">
               {data.soundcharts.spotify_monthly_listeners && (
-                <div>🎵 {data.soundcharts.spotify_monthly_listeners.toLocaleString()} listeners</div>
+                <div>🎵 {data.soundcharts.spotify_monthly_listeners.toLocaleString('en-US')} listeners</div>
               )}
-              {data.soundcharts.youtube_views && <div>▶️ {data.soundcharts.youtube_views.toLocaleString()} views</div>}
+              {data.soundcharts.youtube_views && (
+                <div>▶️ {data.soundcharts.youtube_views.toLocaleString('en-US')} views</div>
+              )}
               {data.soundcharts.tiktok_posts && (
-                <div>🎵 {data.soundcharts.tiktok_posts.toLocaleString()} TikTok posts</div>
+                <div>🎵 {data.soundcharts.tiktok_posts.toLocaleString('en-US')} TikTok posts</div>
               )}
             </div>
           </MUITooltip>
@@ -1076,7 +1078,7 @@ const Catalog = () => {
     // Reprocess the cached data with new selections
     // Must match processRawData logic: apply adaptive granularity, then compute growth (last - first)
     const data = playcountHistory;
-    let filteredData = data.total;
+    const filteredData = data.total;
 
     if (filteredData.length === 0) {
       return;
@@ -2092,7 +2094,7 @@ const Catalog = () => {
     const token = localStorage.getItem('token');
 
     // sorting parameters
-    let sort = [];
+    const sort = [];
     let dateSortString = '';
     if (dateSortOrder === 'ascending') dateSortString = '+';
     else if (dateSortOrder === 'descending') dateSortString = '-';
@@ -2234,7 +2236,7 @@ const Catalog = () => {
       if (response.ok) {
         // returns updated element
         const data = await response.json();
-        let newCatalog = [...catalog];
+        const newCatalog = [...catalog];
         newCatalog[selectedTrackIndex] = data.items[0];
         setCatalog(newCatalog);
         toast('Changes have been applied.');
@@ -2513,7 +2515,7 @@ const Catalog = () => {
       if (response.ok) {
         // returns updated element
         const data = await response.json();
-        let newCatalog = [...catalog];
+        const newCatalog = [...catalog];
         newCatalog[index] = data.items[0];
         setCatalog(newCatalog);
 

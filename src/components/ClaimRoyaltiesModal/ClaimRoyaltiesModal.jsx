@@ -203,7 +203,7 @@ const ClaimRoyaltiesModal = ({ isOpen, onClose, trackData, onCaseFiled }) => {
     }
 
     const formatAmount = (amount) => {
-      return `$${Math.round(amount).toLocaleString()}`;
+      return `$${Math.round(amount).toLocaleString('en-US')}`;
     };
 
     return {

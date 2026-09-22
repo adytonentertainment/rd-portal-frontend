@@ -121,7 +121,7 @@ const AttentionItem = ({ notification, onDismiss, onResolve, onClick }) => {
           <span className={styles.itemTime}>{formatTimeAgo(notification.created_at)}</span>
           <div className={styles.itemActions}>
             {notification.extra_data?.amount > 0 && (
-              <span className={styles.itemAmount}>${notification.extra_data.amount.toLocaleString()}</span>
+              <span className={styles.itemAmount}>${notification.extra_data.amount.toLocaleString('en-US')}</span>
             )}
             <span
               className={styles.itemCta}

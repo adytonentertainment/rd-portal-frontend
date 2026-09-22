@@ -129,9 +129,9 @@ const CatalogAnalysisModal = ({ isOpen, onClose, userCatalogData, userInfo }) =>
       formatted += `   • Master: ${masterOwnership}%\n`;
       formatted += `   \n`;
       formatted += `   STREAMS:\n`;
-      formatted += `   • Total: ${streams.toLocaleString()}\n`;
-      formatted += `   • Spotify: ${spotifyStreams.toLocaleString()}\n`;
-      formatted += `   • YouTube: ${youtubeStreams.toLocaleString()}\n`;
+      formatted += `   • Total: ${streams.toLocaleString('en-US')}\n`;
+      formatted += `   • Spotify: ${spotifyStreams.toLocaleString('en-US')}\n`;
+      formatted += `   • YouTube: ${youtubeStreams.toLocaleString('en-US')}\n`;
       formatted += `   \n`;
       formatted += `   ESTIMATED REVENUE:\n`;
       formatted += `   • Publishing: $${publishingRevenue.toFixed(2)}\n`;
@@ -143,7 +143,7 @@ const CatalogAnalysisModal = ({ isOpen, onClose, userCatalogData, userInfo }) =>
     formatted += `TOTAL CATALOG SUMMARY:\n`;
     formatted += `━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n`;
     formatted += `Total Tracks: ${catalog.length}\n`;
-    formatted += `Total Streams: ${totalStreams.toLocaleString()}\n`;
+    formatted += `Total Streams: ${totalStreams.toLocaleString('en-US')}\n`;
     formatted += `\n`;
     formatted += `ESTIMATED TOTAL REVENUE:\n`;
     formatted += `• Publishing Revenue: $${totalPublishingRevenue.toFixed(2)}\n`;

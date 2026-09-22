@@ -679,10 +679,10 @@ const incompleteDetail = (err) => {
   const d = err?.detail;
   if (!d || d.error !== 'incomplete_upload') return null;
   const bits = [];
-  if (d.missing_count) bits.push(`${d.missing_count.toLocaleString()} file(s) never arrived`);
-  if (d.short_count) bits.push(`${d.short_count.toLocaleString()} arrived incomplete`);
-  return `${d.on_disk?.toLocaleString?.() ?? d.on_disk} of ${
-    d.expected?.toLocaleString?.() ?? d.expected
+  if (d.missing_count) bits.push(`${d.missing_count.toLocaleString('en-US')} file(s) never arrived`);
+  if (d.short_count) bits.push(`${d.short_count.toLocaleString('en-US')} arrived incomplete`);
+  return `${d.on_disk?.toLocaleString?.('en-US') ?? d.on_disk} of ${
+    d.expected?.toLocaleString?.('en-US') ?? d.expected
   } files received — ${bits.join(', ')}. Resume to send the rest.`;
 };
 

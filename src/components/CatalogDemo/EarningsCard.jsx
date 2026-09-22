@@ -219,7 +219,7 @@ export function EarningsCard({ theme = 'dark' }) {
                         {platform.name}
                       </div>
                       <div style={{ fontSize: '13px', fontWeight: 600, color: textPrimary }}>
-                        ${platform.value.toLocaleString()}
+                        ${platform.value.toLocaleString('en-US')}
                       </div>
                     </div>
                   </motion.div>

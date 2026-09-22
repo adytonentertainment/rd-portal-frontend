@@ -68,14 +68,14 @@ function CatalogWithFreeTier() {
         {isFreeTier ? (
           <LockedMetric
             label="Total Streams"
-            value={playcount.toLocaleString()}
+            value={playcount.toLocaleString('en-US')}
             upgradeUrl="/upgrade"
             showClaimButton={false}
           />
         ) : (
           <div className="metric-card">
             <div className="label">Total Streams</div>
-            <div className="value">{playcount.toLocaleString()}</div>
+            <div className="value">{playcount.toLocaleString('en-US')}</div>
             <div className="sublabel">Last 30 days</div>
           </div>
         )}
@@ -84,7 +84,7 @@ function CatalogWithFreeTier() {
         {isFreeTier ? (
           <LockedMetric
             label="Spotify Streams"
-            value={spotifyPlaycount.toLocaleString()}
+            value={spotifyPlaycount.toLocaleString('en-US')}
             upgradeUrl="/upgrade"
             showClaimButton={false}
           />
@@ -92,7 +92,7 @@ function CatalogWithFreeTier() {
           <div className="metric-card">
             <div className="label">Spotify Streams</div>
             <div className="value" style={{ color: '#1DB954' }}>
-              {spotifyPlaycount.toLocaleString()}
+              {spotifyPlaycount.toLocaleString('en-US')}
             </div>
             <div className="sublabel">Last 30 days</div>
           </div>
@@ -102,7 +102,7 @@ function CatalogWithFreeTier() {
         {isFreeTier ? (
           <LockedMetric
             label="YouTube Streams"
-            value={youtubePlaycount.toLocaleString()}
+            value={youtubePlaycount.toLocaleString('en-US')}
             upgradeUrl="/upgrade"
             showClaimButton={true}
           />
@@ -110,7 +110,7 @@ function CatalogWithFreeTier() {
           <div className="metric-card">
             <div className="label">YouTube Streams</div>
             <div className="value" style={{ color: '#FF0000' }}>
-              {youtubePlaycount.toLocaleString()}
+              {youtubePlaycount.toLocaleString('en-US')}
             </div>
             <div className="sublabel">Last 30 days</div>
           </div>

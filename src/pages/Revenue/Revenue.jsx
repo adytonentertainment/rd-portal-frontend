@@ -53,7 +53,9 @@ import {
   generateRevenueMarkers,
   getCountryCoordinates,
   normalizeTerritory,
-  COUNTRY_COORDINATES,
+  territoryDisplayName,
+  isAggregateTerritory,
+  AGGREGATE_TERRITORIES,
 } from '../../utils/countryCoordinates';
 import SmartCsvParser from '../../utils/smartCsvParser';
 import { normalizeSourceName } from '../../utils/sourceNormalization';
@@ -90,6 +92,7 @@ import LanguageToggle from '../../components/LanguageToggle/LanguageToggle';
 import { useLanguage } from '../../i18n/LanguageContext';
 import WriterSwitcher, { useActiveWriter } from '../../components/WriterSwitcher/WriterSwitcher';
 import { listMyTransactions, getMyEarnings, listMyWriters } from '../../api/portal';
+import { getWriterPortalView } from '../../api/writersAdmin';
 import './revenue.css';
 
 ChartJS.register(
@@ -229,11 +232,21 @@ const comparePeriods = (a, b) => {
   return halfB - halfA; // newer half first (H2 > H1)
 };
 
-const Revenue = () => {
+// `portalPreviewWriterId` turns this into the ADMIN'S read-only preview of
+// client's portal. It is the same page the writer sees — same components, same
+// aggregation, same visuals — with its data fetched through the admin endpoint
+// instead of /me/*, because an admin has no portal contact record and /me/*
+// would (correctly) 403. Rebuilding a lookalike page was the alternative, and
+// a lookalike drifts: the moment the portal changes, the preview is showing
+// the client something the client is not seeing.
+const Revenue = ({ portalPreviewWriterId = null }) => {
   const user = useContext(UserContextProvider);
   const { currentTheme } = useContext(ThemeContext);
   const { selectedClientId, selectedClient, clients } = useClientContext();
   // Local preview filter — lets a publisher view a single writer's earnings without leaving the publisher context.
+  // NOTE: unrelated to the `portalPreviewWriterId` prop above, which is the
+  // admin's read-only preview of a client's LIVE portal. This one is the
+  // demo-dataset writer filter.
   const [previewWriterId, setPreviewWriterId] = useState(null);
   const effectiveClientId = selectedClientId ?? previewWriterId;
   // Derived stats (usages, works) come from static archetype profiles. For a
@@ -253,11 +266,14 @@ const Revenue = () => {
   // was previously dropped into the demo dataset here and shown invented numbers
   // formatted exactly like real ones. Nothing about a page that reports money
   // should be fabricated; if there is no data to show, say so.
-  const isLivePortal = statementsLive;
+  // A preview is always the live portal: it exists to show one client's REAL
+  // distributed royalties, so it must never fall through to the demo dataset
+  // if the flag happens to be off in this deployment.
+  const isLivePortal = statementsLive || !!portalPreviewWriterId;
   // No paywall in a publisher deployment, ever. The blur and "Upgrade to view"
   // belong to the Verax SaaS product; a writer must never have their own
   // royalties censored, and an admin must not see a fake upsell over them.
-  const isFreeTier = statementsLive
+  const isFreeTier = isLivePortal
     ? false
     : !subscription || ['FREE', 'Free', 'ESSENTIAL', 'Essential'].includes(subscription.tier);
   const canExport =
@@ -371,11 +387,23 @@ const Revenue = () => {
     (async () => {
       setIsLoading(true);
       try {
-        const ws = await listMyWriters();
-        const list = Array.isArray(ws) ? ws : [];
-        if (!cancelled) setPortalWriters(list);
-        const scope = list.some((w) => w.id === activeId) ? activeId : list[0]?.id;
-        const [rows, earnings] = await Promise.all([listMyTransactions(scope), getMyEarnings(scope)]);
+        let rows;
+        let earnings;
+        if (portalPreviewWriterId) {
+          // Admin preview: one client, fetched through the admin route. The
+          // payload is the portal's own earnings/transactions, so everything
+          // downstream of here is identical to the writer's own session.
+          const view = await getWriterPortalView(portalPreviewWriterId);
+          rows = view.transactions;
+          earnings = view.earnings;
+          if (!cancelled) setPortalWriters([{ id: view.writer.id, name: view.writer.name }]);
+        } else {
+          const ws = await listMyWriters();
+          const list = Array.isArray(ws) ? ws : [];
+          if (!cancelled) setPortalWriters(list);
+          const scope = list.some((w) => w.id === activeId) ? activeId : list[0]?.id;
+          [rows, earnings] = await Promise.all([listMyTransactions(scope), getMyEarnings(scope)]);
+        }
         if (!cancelled) {
           const all = Array.isArray(rows) ? rows : [];
           setUploadedTransactions(all.filter((r) => !r.is_song_row));
@@ -399,7 +427,7 @@ const Revenue = () => {
     return () => {
       cancelled = true;
     };
-  }, [isLivePortal, activeId]);
+  }, [isLivePortal, activeId, portalPreviewWriterId]);
 
   // ── Demo: inject mock transactions/statements per selected/preview writer ─
   // Re-run when distributedPeriodsKey changes (admin distributed a new period).
@@ -1782,8 +1810,7 @@ const Revenue = () => {
       if (isValidCountryCode) {
         // Normalize 3-letter codes (USA) to 2-letter (US) so they group together
         const code = normalizeTerritory(t.territory);
-        const territory =
-          COUNTRY_COORDINATES[code]?.name || (code === 'ROW' ? 'Rest of World' : t.territoryName || code);
+        const territory = territoryDisplayName(code, t.territoryName);
         if (!grouped[code]) {
           grouped[code] = { name: territory, amount: 0 };
         }
@@ -1859,7 +1886,7 @@ const Revenue = () => {
         const code = normalizeTerritory(t.territory);
         if (!grouped[code]) {
           grouped[code] = {
-            name: COUNTRY_COORDINATES[code]?.name || (code === 'ROW' ? 'Rest of World' : t.territoryName || code),
+            name: territoryDisplayName(code, t.territoryName),
             amount: 0,
           };
         }
@@ -2263,7 +2290,7 @@ const Revenue = () => {
   const formatLargeNumber = (n) => {
     if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(n >= 10_000_000 ? 0 : 1).replace(/\.0$/, '')}M`;
     if (n >= 1_000) return `${(n / 1_000).toFixed(n >= 10_000 ? 0 : 1).replace(/\.0$/, '')}k`;
-    return n.toLocaleString();
+    return n.toLocaleString('en-US');
   };
 
   // Calculate comprehensive catalog health using weighted component scoring
@@ -2752,7 +2779,7 @@ const Revenue = () => {
           lon: coords.lon,
           lat: coords.lat,
           name: coords.name || t.territory,
-          address: `Revenue: $${t.amount.toLocaleString()}`,
+          address: `Revenue: ${formatCurrency(t.amount)}`,
           phone: `Territory: ${t.territory}`,
         };
       })
@@ -3807,7 +3834,7 @@ const Revenue = () => {
                   <div className="summary-content">
                     <div className="summary-label">{t('earnings.works')}</div>
                     <div className="summary-value">
-                      {(effectiveClientHasData ? getWorksCount(effectiveClientId) : 0).toLocaleString()}
+                      {(effectiveClientHasData ? getWorksCount(effectiveClientId) : 0).toLocaleString('en-US')}
                     </div>
                     <div className="summary-change" style={{ color: 'var(--soft-text)' }}>
                       registered with publisher
@@ -4244,7 +4271,19 @@ const Revenue = () => {
                         .slice(0, 10)
                         .map((territory, index) => {
                           const coords = globeTerritoryCoords[territory.territory];
-                          const countryName = coords?.name || territory.territory;
+                          // Resolve the NAME independently of the coordinates.
+                          // Reading it off globeTerritoryCoords meant anything
+                          // unmappable showed as a bare code: this panel said
+                          // "ROW" while the rest of the page said "Rest of
+                          // World" for the same row.
+                          const countryName = territoryDisplayName(territory.territory, coords?.name);
+                          // An aggregate is not a place. It legitimately has no
+                          // pin on the globe beside this list, so the row says
+                          // so rather than leaving the mismatch unexplained.
+                          const isAggregate = isAggregateTerritory(territory.territory);
+                          const aggregateNote = isAggregate
+                            ? AGGREGATE_TERRITORIES[territory.territory.toUpperCase()].explain
+                            : null;
                           const percentage = (
                             (territory.amount / globeTerritories.reduce((sum, t) => sum + t.amount, 0)) *
                             100
@@ -4306,6 +4345,10 @@ const Revenue = () => {
                               {/* Country Info */}
                               <div style={{ flex: 1, minWidth: 0 }}>
                                 <div
+                                  // The full explanation for an aggregate, the
+                                  // plain name otherwise — the column is 140px,
+                                  // so any name can be cut and needs recovering.
+                                  title={aggregateNote || countryName}
                                   style={{
                                     fontSize: '13px',
                                     fontWeight: '600',
@@ -4322,9 +4365,33 @@ const Revenue = () => {
                                   style={{
                                     fontSize: '11px',
                                     color: isDark ? 'rgba(255, 255, 255, 0.6)' : 'rgba(0, 0, 0, 0.6)',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '4px',
+                                    minWidth: 0,
                                   }}
                                 >
-                                  {percentage}% of total
+                                  <span>{percentage}% of total</span>
+                                  {isAggregate && (
+                                    <span
+                                      title={aggregateNote}
+                                      style={{
+                                        flexShrink: 0,
+                                        fontSize: '9px',
+                                        fontWeight: 700,
+                                        lineHeight: 1,
+                                        padding: '2px 4px',
+                                        borderRadius: '3px',
+                                        textTransform: 'uppercase',
+                                        letterSpacing: '0.03em',
+                                        color: isDark ? 'rgba(255,255,255,0.75)' : 'rgba(0,0,0,0.65)',
+                                        background: isDark ? 'rgba(255,255,255,0.12)' : 'rgba(0,0,0,0.08)',
+                                        cursor: 'help',
+                                      }}
+                                    >
+                                      Aggregate
+                                    </span>
+                                  )}
                                 </div>
                               </div>
 
@@ -4341,7 +4408,7 @@ const Revenue = () => {
                                     color: isDark ? '#00D9FF' : '#0099CC',
                                   }}
                                 >
-                                  ${territory.amount.toLocaleString()}
+                                  {formatCurrency(territory.amount)}
                                 </div>
                               </div>
                             </div>
@@ -4381,7 +4448,7 @@ const Revenue = () => {
                             color: currentTheme === 'dark' ? '#00D9FF' : '#0099CC',
                           }}
                         >
-                          ${globeTerritories.reduce((sum, t) => sum + t.amount, 0).toLocaleString()}
+                          {formatCurrency(globeTerritories.reduce((sum, t) => sum + t.amount, 0))}
                         </div>
                       </div>
                     )}
@@ -4887,7 +4954,9 @@ const Revenue = () => {
                           )}
 
                           <div className="song-info">
-                            <div className="song-title">{song.product}</div>
+                            <div className="song-title" title={song.product}>
+                              {song.product}
+                            </div>
                             {displayArtist && <div className="song-artist">{displayArtist}</div>}
                             {!displayArtist && displayWriter && (
                               <div className="song-artist" style={{ opacity: 0.6, fontStyle: 'italic' }}>
@@ -5017,14 +5086,18 @@ const Revenue = () => {
                     {/* Song Info */}
                     <div style={{ flex: 1, minWidth: 0 }}>
                       <div
+                        title={song.title}
                         style={{
                           fontSize: '14px',
                           fontWeight: 600,
                           color: currentTheme === 'dark' ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 0, 0, 0.9)',
                           marginBottom: '4px',
+                          display: '-webkit-box',
+                          WebkitLineClamp: 2,
+                          WebkitBoxOrient: 'vertical',
                           overflow: 'hidden',
-                          textOverflow: 'ellipsis',
-                          whiteSpace: 'nowrap',
+                          overflowWrap: 'anywhere',
+                          lineHeight: 1.3,
                         }}
                       >
                         {song.title}
@@ -5054,7 +5127,7 @@ const Revenue = () => {
                             color: currentTheme === 'dark' ? 'rgba(255, 255, 255, 0.6)' : 'rgba(0, 0, 0, 0.6)',
                           }}
                         >
-                          {song.totalStreams.toLocaleString()} streams
+                          {song.totalStreams.toLocaleString('en-US')} streams
                         </div>
                         {song.potentialRevenue > 0 && (
                           <div

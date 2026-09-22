@@ -93,7 +93,7 @@ class SongstatsAPI {
         icon: '🎵',
         color: '#1DB954',
         count: data.data.spotify,
-        formatted: data.data.spotify.toLocaleString(),
+        formatted: data.data.spotify.toLocaleString('en-US'),
       });
       total += data.data.spotify;
     }
@@ -105,7 +105,7 @@ class SongstatsAPI {
         icon: '🍎',
         color: '#FA243C',
         count: data.data.apple_music,
-        formatted: data.data.apple_music.toLocaleString(),
+        formatted: data.data.apple_music.toLocaleString('en-US'),
       });
       total += data.data.apple_music;
     }
@@ -117,7 +117,7 @@ class SongstatsAPI {
         icon: '📹',
         color: '#FF0000',
         count: data.data.youtube,
-        formatted: data.data.youtube.toLocaleString(),
+        formatted: data.data.youtube.toLocaleString('en-US'),
       });
       total += data.data.youtube;
     }
@@ -125,7 +125,7 @@ class SongstatsAPI {
     return {
       platforms,
       total,
-      formatted_total: total.toLocaleString(),
+      formatted_total: total.toLocaleString('en-US'),
       timestamp: data.data.timestamp,
     };
   }

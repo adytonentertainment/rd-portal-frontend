@@ -68,7 +68,7 @@ export default function PublishingAnalysis() {
         setStatements(statementsData.statements || []);
 
         // Index streaming data by title
-        let streamingByTitle = {};
+        const streamingByTitle = {};
         if (streamingResponse.ok) {
           const streamingResponseData = await streamingResponse.json();
           (streamingResponseData.tracks || []).forEach((track) => {
@@ -382,7 +382,7 @@ export default function PublishingAnalysis() {
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Catalog Health & Revenue Analysis</h1>
         <p className="text-gray-600 mb-4">
           {catalogSongs > 0 && `${catalogSongs} songs in catalog • `}
-          {statements.length} statement(s) • {transactionCount.toLocaleString()} transactions
+          {statements.length} statement(s) • {transactionCount.toLocaleString('en-US')} transactions
         </p>
 
         <div
@@ -445,7 +445,7 @@ export default function PublishingAnalysis() {
               <DollarSign className="w-5 h-5 text-blue-600 mr-2" />
               <h3 className="font-bold text-blue-900">Total Revenue</h3>
             </div>
-            <p className="text-3xl font-bold text-blue-600">${totalReported.toLocaleString()}</p>
+            <p className="text-3xl font-bold text-blue-600">${totalReported.toLocaleString('en-US')}</p>
             <p className="text-sm text-blue-700">Across all statements</p>
           </div>
 
@@ -484,7 +484,7 @@ export default function PublishingAnalysis() {
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="statement" />
               <YAxis />
-              <Tooltip formatter={(value) => `$${value.toLocaleString()}`} labelStyle={{ color: '#000' }} />
+              <Tooltip formatter={(value) => `$${value.toLocaleString('en-US')}`} labelStyle={{ color: '#000' }} />
               <Legend />
               <Bar dataKey="amount" fill="#3b82f6" name="Revenue Amount" />
             </BarChart>
@@ -501,7 +501,7 @@ export default function PublishingAnalysis() {
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis dataKey="year" />
               <YAxis />
-              <Tooltip formatter={(value) => `$${value.toLocaleString()}`} labelStyle={{ color: '#000' }} />
+              <Tooltip formatter={(value) => `$${value.toLocaleString('en-US')}`} labelStyle={{ color: '#000' }} />
               <Legend />
               <Bar dataKey="amount" name="Total Revenue">
                 {yearlyIncome.map((entry, index) => (
@@ -644,7 +644,7 @@ export default function PublishingAnalysis() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="p-4 bg-gray-50 rounded border">
             <p className="text-sm text-gray-600 mb-1">Total Transactions</p>
-            <p className="text-2xl font-bold text-gray-900">{transactionCount.toLocaleString()}</p>
+            <p className="text-2xl font-bold text-gray-900">{transactionCount.toLocaleString('en-US')}</p>
           </div>
           <div className="p-4 bg-gray-50 rounded border">
             <p className="text-sm text-gray-600 mb-1">Unique Songs</p>

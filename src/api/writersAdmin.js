@@ -40,6 +40,11 @@ export const listWriters = ({
 // GET /admin/writers/{id} → writer fields + contacts + read-only accounts + invites
 export const getWriter = (id) => request({ url: `/admin/writers/${id}` });
 
+// GET /admin/writers/{id}/portal-view → READ-ONLY copy of what this client
+// sees in their own portal. Served by the same aggregation functions the
+// portal itself uses, so the preview cannot drift from the real page.
+export const getWriterPortalView = (id) => request({ url: `/admin/writers/${id}/portal-view` });
+
 // POST /admin/writers → create (canonical_name required)
 export const createWriter = (data) => request({ url: '/admin/writers', method: 'POST', data });
 

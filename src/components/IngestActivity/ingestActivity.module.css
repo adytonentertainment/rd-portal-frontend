@@ -173,3 +173,119 @@
   opacity: 0.6;
   cursor: default;
 }
+
+/* A run that finished but threw files away. Not green — "Done" alone read as
+   a clean ingest while statements were sitting unparsed. */
+.warned {
+  background: rgba(245, 158, 11, 0.14);
+  color: #f59e0b;
+}
+
+/* ----------------------------------------------------------------------
+   Failure detail
+   The counts were always on screen; the reasons behind them never were.
+   Collapsed by default so a clean run stays a one-line row.
+   ---------------------------------------------------------------------- */
+
+.problems {
+  margin-top: 8px;
+}
+
+.problemsToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 2px 6px 2px 4px;
+  margin-left: -4px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--accent, #6366f1);
+  background: none;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.problemsToggle:hover {
+  background: var(--hover-overlay, rgba(127, 127, 127, 0.12));
+}
+
+.problemBody {
+  margin-top: 8px;
+  padding: 10px 12px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--panel-bg, rgba(127, 127, 127, 0.05));
+  cursor: default;
+}
+
+.problemList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.problemList li {
+  padding-left: 10px;
+  border-left: 3px solid transparent;
+}
+
+/* Blockers lost data; warnings did not. Keeping them visually apart matters
+   because a big drop's warning tail would otherwise bury the real failures. */
+.sev_blocker {
+  border-left-color: #ef4444 !important;
+}
+.sev_warning {
+  border-left-color: #f59e0b !important;
+}
+
+/* The identity an admin can act on: account + client + period for a parsed
+   statement, or the filename for one the sorter never got that far with. */
+.problemWho {
+  font-size: 12px;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.problemWhy {
+  font-size: 12px;
+  margin-top: 1px;
+  overflow-wrap: anywhere;
+}
+
+.problemFix {
+  font-size: 11.5px;
+  margin-top: 2px;
+  color: var(--soft-text, #8a8f98);
+  overflow-wrap: anywhere;
+}
+
+.problemNote {
+  font-size: 11.5px;
+  color: var(--soft-text, #8a8f98);
+  padding: 2px 0;
+}
+
+.problemDownload {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 10px;
+  padding: 4px 9px;
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--text);
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  cursor: pointer;
+}
+.problemDownload:hover:not(:disabled) {
+  background: var(--hover-overlay, rgba(127, 127, 127, 0.12));
+}
+.problemDownload:disabled {
+  opacity: 0.6;
+  cursor: default;
+}

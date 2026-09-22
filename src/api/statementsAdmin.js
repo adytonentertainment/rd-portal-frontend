@@ -313,6 +313,37 @@ export const getUpload = (id) => request({ url: `/admin/statements/uploads/${id}
 // so the upload UI shows true amounts instead of a size-based estimate.
 export const getUploadStatements = (id) => request({ url: `/admin/statements/uploads/${id}/statements` });
 
+// Every problem an upload hit — sort-stage file rejections AND parse-stage
+// statement failures — each with a plain reason and what to do about it. The
+// activity panel could only show a count; the detail behind it was recorded
+// all along and never read back, so "3 failed" meant reading the server log.
+export const getUploadFailures = (id) => request({ url: `/admin/statements/uploads/${id}/failures` });
+
+// Same list as a file, so a failure report can be forwarded to the statement
+// source. Fetched rather than linked: the endpoint needs the auth header, and
+// a bare <a href> sends none.
+export const downloadUploadFailuresCsv = async (id) => {
+  try {
+    const response = await axios({
+      url: `${baseUrl()}/admin/statements/uploads/${id}/failures.csv`,
+      responseType: 'blob',
+      headers: { accept: 'text/csv', ...authHeaders() },
+    });
+    const href = URL.createObjectURL(response.data);
+    const a = document.createElement('a');
+    a.href = href;
+    a.download = `upload-${id}-failures.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    // Freed on the next tick — revoking synchronously races the download in
+    // Safari and hands the user an empty file.
+    setTimeout(() => URL.revokeObjectURL(href), 0);
+  } catch (error) {
+    throw normalizeError(error);
+  }
+};
+
 export const listBatches = (params = {}) => request({ url: '/admin/statements/batches', params });
 
 export const getBatch = (id) => request({ url: `/admin/statements/batches/${id}` });

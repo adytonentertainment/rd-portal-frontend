@@ -859,7 +859,7 @@ export default function CatalogHealthSummary({
     // Calculate total expected streaming revenue based on publishing equity
     let totalStreamingDiscrepancy = 0;
     let totalExpectedRevenue = 0;
-    let totalActualRevenue = 0;
+    const totalActualRevenue = 0;
     let songsWithDiscrepancy = 0;
 
     if (streamingDataParam && Object.keys(streamingDataParam).length > 0) {
@@ -1268,7 +1268,7 @@ export default function CatalogHealthSummary({
             <div class="stat-label">Missing</div>
           </div>
           <div class="stat">
-            <div class="stat-value">$${totalRevenue.toLocaleString()}</div>
+            <div class="stat-value">$${totalRevenue.toLocaleString('en-US')}</div>
             <div class="stat-label">Total Revenue</div>
           </div>
         </div>
