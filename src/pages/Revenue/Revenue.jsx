@@ -1993,6 +1993,61 @@ const Revenue = ({ portalPreviewWriterId = null }) => {
     // Group transactions by Income Period quarter (not transaction date)
     const quarterlyRevenue = {};
 
+    // ── Live portal: one bar per STATEMENT PERIOD, not per calendar quarter ──
+    //
+    // A publisher pays on a cadence, and the statement IS the period: most RD
+    // clients are settled twice a year (H1/H2), some quarterly (Q1..Q4). The
+    // calendar-quarter bucketing below derived a quarter from each row's DATE,
+    // so a semiannual client's two statements — dated mid-period, 15 Jun and
+    // 15 Dec — landed in Q2 and Q4 with an empty Q1 between them. Three bars
+    // for two payments, labelled with quarters the client is never paid on.
+    //
+    // The period is already on every row ('H2 2025', 'Q4 2025'), resolved from
+    // the statement's own period code. Bucketing on it gives each client the
+    // cadence they are actually paid on, and a client on a mixed cadence gets
+    // each period as it really was — no cadence flag to read, and nothing to
+    // keep in sync when one changes.
+    if (isLivePortal) {
+      const byPeriod = {};
+      filteredTransactions.forEach((t) => {
+        const label = t.period || t.incomePeriod;
+        if (!label) return;
+        if (!byPeriod[label]) byPeriod[label] = { amount: 0, sort: t.date || '' };
+        byPeriod[label].amount += t.amount || 0;
+        // Sort chronologically by the period's own date, not alphabetically:
+        // 'H1 2026' must follow 'H2 2025'.
+        if (t.date && (!byPeriod[label].sort || t.date < byPeriod[label].sort)) {
+          byPeriod[label].sort = t.date;
+        }
+      });
+
+      const ordered = Object.entries(byPeriod).sort((a, b) => String(a[1].sort).localeCompare(String(b[1].sort)));
+
+      const labels = [];
+      const keys = [];
+      const data = [];
+      const cumulative = [];
+      let running = 0;
+      ordered.forEach(([label, v]) => {
+        // 'H2 2025' -> "H2 '25", matching the compact axis style.
+        const m = label.match(/^([QH]\d)\s+(\d{4})$/);
+        labels.push(m ? `${m[1]} '${m[2].slice(-2)}` : label);
+        keys.push(label);
+        data.push(v.amount);
+        running += v.amount;
+        cumulative.push(running);
+      });
+
+      return {
+        labels,
+        quarterKeys: keys,
+        quarterlyData: data,
+        // The writer portal has no separate "expected" series to align against.
+        statementData: data.map(() => null),
+        cumulativeActualLine: cumulative,
+      };
+    }
+
     filteredTransactions.forEach((t) => {
       let quarterKey;
 
@@ -2200,6 +2255,7 @@ const Revenue = ({ portalPreviewWriterId = null }) => {
       cumulativeActualLine: cumulativeActualLine,
     };
   }, [
+    isLivePortal,
     transactions,
     filteredTransactions,
     filteredStatements,
