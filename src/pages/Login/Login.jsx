@@ -8,9 +8,8 @@ import CircularProgress from '@mui/material/CircularProgress';
 import axios from 'axios';
 import urlJoin from 'url-join';
 import { UserContextProvider } from '../../components/UserContext/UserContext';
-import { FaArrowLeft, FaEye, FaEyeSlash, FaGoogle } from 'react-icons/fa';
+import { FaArrowLeft, FaEye, FaEyeSlash } from 'react-icons/fa';
 import VeraxLogo from '../../components/VeraxLogo/VeraxLogo';
-import { useGoogleLogin } from '@react-oauth/google';
 import { brand } from '../../config/brand';
 import { statementsLive } from '../../config/featureFlags';
 
@@ -76,32 +75,6 @@ const Login = () => {
     }
   };
 
-  // Google OAuth login
-  const googleLogin = useGoogleLogin({
-    onSuccess: async (tokenResponse) => {
-      setLoginLoading(true);
-      setErrorMessage('');
-      try {
-        const res = await fetch(
-          urlJoin(process.env.REACT_APP_BACKEND_URL, `/auth/google-login/${tokenResponse.access_token}`),
-          { method: 'POST' }
-        );
-        const data = await res.json();
-        if (res.ok) {
-          localStorage.setItem('token', data.access_token);
-          window.location.href = redirectURL;
-        } else {
-          setErrorMessage(data.detail || 'Google login failed');
-        }
-      } catch (err) {
-        console.error('Google login error:', err);
-        setErrorMessage('Google login failed. Please try again.');
-      } finally {
-        setLoginLoading(false);
-      }
-    },
-  });
-
   useEffect(() => {
     if (user) navigate(redirectURL);
     const listener = (event) => {
@@ -139,58 +112,6 @@ const Login = () => {
               Welcome back
             </h2>
             <p style={{ fontSize: '13px', color: 'var(--soft-text)', marginBottom: '20px' }}>{brand.signInHeadline}</p>
-
-            {/* Sign in with Google */}
-            <button
-              onClick={() => googleLogin()}
-              disabled={loginLoading}
-              style={{
-                width: '100%',
-                maxWidth: '300px',
-                padding: '12px 16px',
-                borderRadius: '40px',
-                border: 'none',
-                background: '#fff',
-                color: '#1a1a1a',
-                fontSize: '14px',
-                fontWeight: 500,
-                fontFamily: 'var(--font)',
-                cursor: 'pointer',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                gap: '10px',
-                transition: 'opacity 150ms ease',
-                opacity: loginLoading ? 0.6 : 1,
-              }}
-              onMouseEnter={(e) => (e.currentTarget.style.opacity = loginLoading ? '0.6' : '0.9')}
-              onMouseLeave={(e) => (e.currentTarget.style.opacity = loginLoading ? '0.6' : '1')}
-            >
-              {loginLoading ? (
-                <CircularProgress size={18} style={{ color: '#1a1a1a' }} />
-              ) : (
-                <>
-                  <FaGoogle size={18} style={{ color: '#4285F4' }} />
-                  Sign in with Google
-                </>
-              )}
-            </button>
-
-            {/* Divider */}
-            <div
-              style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: '12px',
-                width: '100%',
-                maxWidth: '300px',
-                margin: '10px 0',
-              }}
-            >
-              <div style={{ flex: 1, height: '1px', background: 'var(--border)' }} />
-              <span style={{ fontSize: '13px', color: 'var(--muted-text)' }}>or</span>
-              <div style={{ flex: 1, height: '1px', background: 'var(--border)' }} />
-            </div>
 
             {/* Continue with Email */}
             <button
