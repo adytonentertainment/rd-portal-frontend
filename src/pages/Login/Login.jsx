@@ -143,23 +143,12 @@ const Login = () => {
             <div
               style={{ marginTop: '14px', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '6px' }}
             >
-              <span style={{ fontSize: '13px', color: 'var(--muted-text)' }}>
-                Don't have an account?{' '}
-                <button
-                  onClick={() => navigate('/register')}
-                  style={{
-                    background: 'none',
-                    border: 'none',
-                    color: 'var(--text)',
-                    fontWeight: 600,
-                    cursor: 'pointer',
-                    fontSize: '13px',
-                    fontFamily: 'var(--font)',
-                    padding: 0,
-                  }}
-                >
-                  Create account
-                </button>
+              {/* The portal is invite-only, so there is no account to
+                  create: registration returns 403. Pointing a confused writer
+                  at a form that can only fail is worse than telling them how
+                  access actually works. */}
+              <span style={{ fontSize: '13px', color: 'var(--muted-text)', textAlign: 'center' }}>
+                Access is by invitation. Check your email for your invite from {brand.publisherName}.
               </span>
               <button
                 onClick={() => navigate(lastPageURL)}
@@ -232,12 +221,9 @@ const Login = () => {
                 }
               />
 
-              <div className="flex justify-between items-center" style={{ marginTop: '4px' }}>
+              <div className="flex items-center" style={{ marginTop: '4px' }}>
                 <button className={styles.linkButton} onClick={() => navigate('/forgotPassword')}>
                   Forgot password?
-                </button>
-                <button className={styles.linkButton} onClick={() => navigate('/register')}>
-                  Create account
                 </button>
               </div>
 
