@@ -1,6 +1,5 @@
 import { useContext, useEffect } from 'react';
 import ReactDOM from 'react-dom/client';
-import Clarity from '@microsoft/clarity';
 import './index.css';
 import Settings from './pages/Settings/Settings';
 import reportWebVitals from './reportWebVitals';
@@ -44,13 +43,6 @@ import AdminDistributionDetail from './pages/AdminDistributionDetail/AdminDistri
 import AdminAccounts from './pages/AdminAccounts/AdminAccounts';
 import { HelmetProvider } from 'react-helmet-async';
 import { HeroUIProvider } from '@heroui/react';
-import { PostHogProvider } from 'posthog-js/react';
-
-// Initialize Microsoft Clarity for UX analytics (at module level, runs once)
-const clarityProjectId = process.env.REACT_APP_CLARITY_PROJECT_ID;
-if (clarityProjectId) {
-  Clarity.init(clarityProjectId);
-}
 
 // Root is the portal, nothing else: a signed-in user goes to their portal
 // (admins → dashboard, writers → earnings); anyone not logged in goes to the
@@ -148,19 +140,7 @@ const App = () => {
 };
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
-root.render(
-  <PostHogProvider
-    apiKey={process.env.REACT_APP_POSTHOG_KEY}
-    options={{
-      api_host: process.env.REACT_APP_POSTHOG_HOST,
-      defaults: '2025-05-24',
-      capture_exceptions: true,
-      debug: process.env.NODE_ENV === 'development',
-    }}
-  >
-    <App />
-  </PostHogProvider>
-);
+root.render(<App />);
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
