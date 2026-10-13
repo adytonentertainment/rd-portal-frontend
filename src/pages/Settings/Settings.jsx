@@ -4,7 +4,6 @@ import urlJoin from 'url-join';
 import axios from 'axios';
 import NavBar from '../../components/NavBar/NavBar';
 import { UserContextProvider } from '../../components/UserContext/UserContext';
-import { SubscriptionContextProvider } from '../../components/SubscriptionContext/SubscriptionContext';
 import { ThemeContext } from '../../components/ThemeProvider/ThemeProvider';
 import { useClientContext } from '../../components/ClientContext/ClientContext';
 import styles from './settings.module.css';
@@ -14,8 +13,6 @@ import { validatePassword } from '../../utils/passwordValidator';
 const Settings = () => {
   const navigate = useNavigate();
   const user = useContext(UserContextProvider);
-  const subscriptionContext = useContext(SubscriptionContextProvider);
-  const subscription = subscriptionContext?.subscription;
   const { currentTheme } = useContext(ThemeContext);
   const { selectedClient } = useClientContext();
 
@@ -155,30 +152,6 @@ const Settings = () => {
       } else {
         alert('Failed to change password');
       }
-    }
-  };
-
-  const handleOpenBillingSession = async () => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      navigate('/');
-      return;
-    }
-
-    try {
-      const response = await axios({
-        method: 'GET',
-        url: urlJoin(process.env.REACT_APP_BACKEND_URL, 'stripe/billing-portal'),
-        headers: {
-          accept: 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-      });
-      if (response.status === 200) {
-        window.location.href = response.data;
-      }
-    } catch (error) {
-      console.error('Error opening billing session:', error);
     }
   };
 

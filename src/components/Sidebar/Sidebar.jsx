@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   FaDollarSign,
@@ -6,28 +6,20 @@ import {
   FaSignOutAlt,
   FaMoon,
   FaSun,
-  FaPlus,
   FaCheck,
   FaHome,
   FaFileInvoiceDollar,
   FaMoneyCheckAlt,
   FaUsers,
 } from 'react-icons/fa';
-import { HiUsers } from 'react-icons/hi2';
 import { useIsAdmin } from '../../utils/auth';
 import { statementsLive } from '../../config/featureFlags';
 import VeraxLogo from '../VeraxLogo/VeraxLogo';
 import Tooltip from '@mui/material/Tooltip';
-import { CircularProgress } from '@mui/material';
 import { ThemeContext } from '../ThemeProvider/ThemeProvider';
 import { useClientContext } from '../ClientContext/ClientContext';
 import styles from './sidebar.module.css';
 import { useLanguage } from '../../i18n/LanguageContext';
-
-const API_BASE_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:8000';
-
-// Tiers that can have multiple clients (Enterprise only)
-const MULTI_CLIENT_TIERS = ['Enterprise'];
 
 // Writer-facing nav labels follow the portal language switch; admin nav stays
 // English (the admin UI is not translated).
@@ -37,47 +29,7 @@ const Sidebar = () => {
   const location = useLocation();
   const theme = useContext(ThemeContext);
   const isAdmin = useIsAdmin();
-  const {
-    clients,
-    selectedClientId,
-    selectedClient,
-    selectClient,
-    clearSelection,
-    createClient,
-    loading: clientsLoading,
-  } = useClientContext();
-  const [showClientDropdown, setShowClientDropdown] = useState(false);
-  const [showAddClient, setShowAddClient] = useState(false);
-  const [newClientName, setNewClientName] = useState('');
-  const [newClientColor, setNewClientColor] = useState('#3b82f6');
-  const [creatingClient, setCreatingClient] = useState(false);
-  const [subscription, setSubscription] = useState(null);
-
-  const clientColors = ['#3b82f6', '#8b5cf6', '#ec4899', '#f59e0b', '#22c55e', '#06b6d4', '#ef4444', '#6366f1'];
-
-  useEffect(() => {
-    const fetchSubscription = async () => {
-      try {
-        const token = localStorage.getItem('token');
-        if (!token) return;
-
-        const response = await fetch(`${API_BASE_URL}/auth/user/subscription`, {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-
-        if (response.ok) {
-          const data = await response.json();
-          setSubscription(data);
-        }
-      } catch {
-        // Silently fail - subscription data is not critical
-      }
-    };
-
-    fetchSubscription();
-  }, []);
+  const { selectedClientId } = useClientContext();
 
   const handleSignOut = () => {
     localStorage.removeItem('token');
@@ -161,118 +113,12 @@ const Sidebar = () => {
     return location.pathname === path;
   };
 
-  const handleCreateClient = async () => {
-    if (!newClientName.trim()) return;
-    setCreatingClient(true);
-    try {
-      await createClient({ name: newClientName.trim(), color: newClientColor });
-      setNewClientName('');
-      setShowAddClient(false);
-    } catch (error) {
-      console.error('Failed to create client:', error);
-    } finally {
-      setCreatingClient(false);
-    }
-  };
-
   return (
     <div className={styles.container}>
       {/* Logo Section */}
       <div className={styles.logo}>
         <VeraxLogo height={36} />
       </div>
-
-      {/* Client Selector - Only visible for Elite/Enterprise tiers */}
-      {subscription && MULTI_CLIENT_TIERS.includes(subscription.tier) && (
-        <div
-          className={styles.clientSelectorWrapper}
-          onMouseEnter={() => setShowClientDropdown(true)}
-          onMouseLeave={() => {
-            setShowClientDropdown(false);
-            setShowAddClient(false);
-          }}
-        >
-          <Tooltip title={selectedClient ? selectedClient.name : 'Publisher Account'} placement="right">
-            <button className={styles.clientSelector}>
-              {clientsLoading ? (
-                <CircularProgress size={16} sx={{ color: 'inherit' }} />
-              ) : selectedClient ? (
-                <div className={styles.clientDot} style={{ backgroundColor: selectedClient.color }} />
-              ) : (
-                <HiUsers size={18} />
-              )}
-            </button>
-          </Tooltip>
-
-          {/* Client Dropdown */}
-          {showClientDropdown && (
-            <div className={styles.clientDropdown}>
-              <div className={styles.clientDropdownHeader}>Clients</div>
-              <div className={styles.clientList}>
-                {/* Publisher-wide (no client filter) */}
-                <button
-                  className={`${styles.clientOption} ${!selectedClientId ? styles.clientOptionActive : ''}`}
-                  onClick={() => clearSelection()}
-                >
-                  <HiUsers size={16} />
-                  <span>Publisher Account</span>
-                  {!selectedClientId && <FaCheck size={12} className={styles.checkIcon} />}
-                </button>
-
-                {/* Individual Clients */}
-                {clients.map((client) => (
-                  <button
-                    key={client.id}
-                    className={`${styles.clientOption} ${selectedClientId === client.id ? styles.clientOptionActive : ''}`}
-                    onClick={() => selectClient(client.id)}
-                  >
-                    <div className={styles.clientDot} style={{ backgroundColor: client.color }} />
-                    <span>{client.name}</span>
-                    {selectedClientId === client.id && <FaCheck size={12} className={styles.checkIcon} />}
-                  </button>
-                ))}
-              </div>
-
-              {/* Add Client Section */}
-              {!showAddClient ? (
-                <button className={styles.addClientButton} onClick={() => setShowAddClient(true)}>
-                  <FaPlus size={12} />
-                  <span>Add Client</span>
-                </button>
-              ) : (
-                <div className={styles.addClientForm}>
-                  <input
-                    type="text"
-                    placeholder="Client name"
-                    value={newClientName}
-                    onChange={(e) => setNewClientName(e.target.value)}
-                    className={styles.addClientInput}
-                    autoFocus
-                    onKeyDown={(e) => e.key === 'Enter' && handleCreateClient()}
-                  />
-                  <div className={styles.colorPicker}>
-                    {clientColors.map((color) => (
-                      <button
-                        key={color}
-                        className={`${styles.colorOption} ${newClientColor === color ? styles.colorOptionActive : ''}`}
-                        style={{ backgroundColor: color }}
-                        onClick={() => setNewClientColor(color)}
-                      />
-                    ))}
-                  </div>
-                  <button
-                    className={styles.createClientButton}
-                    onClick={handleCreateClient}
-                    disabled={!newClientName.trim() || creatingClient}
-                  >
-                    {creatingClient ? <CircularProgress size={14} sx={{ color: 'white' }} /> : 'Create'}
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-      )}
 
       {/* Navigation Items */}
       <nav className={styles.nav}>

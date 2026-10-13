@@ -5,7 +5,6 @@ import './index.css';
 import Settings from './pages/Settings/Settings';
 import reportWebVitals from './reportWebVitals';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { GoogleOAuthProvider } from '@react-oauth/google';
 import PrivacyPolicy from './pages/PrivacyPolicy/PrivacyPolicy';
 import TermsOfService from './pages/TermsOfService/TermsOfService';
 import { ThemeProvider } from './components/ThemeProvider/ThemeProvider';
@@ -28,9 +27,6 @@ import ResetPassword from './pages/ResetPassword/ResetPassword';
 import ForgotPassword from './pages/ForgotPassword/ForgotPassword';
 import Revenue from './pages/Revenue/Revenue';
 import TokenWatcher from './components/TokenWatcher/TokenWatcher';
-import { statementsLive } from './config/featureFlags';
-import CrispChat from './components/CrispChat/CrispChat';
-import AutoRegister from './pages/AutoRegister/AutoRegister';
 import WriterStatements from './pages/WriterStatements/WriterStatements';
 import AdminOverview from './pages/AdminOverview/AdminOverview';
 import AdminStatements from './pages/AdminStatements/AdminStatements';
@@ -84,59 +80,49 @@ const App = () => {
                       best-effort — a signed-out visitor has nowhere to save it,
                       and the switch must work regardless. */}
                   <LanguageProvider persist={setMyLanguage}>
-                    <GoogleOAuthProvider clientId="456632936333-6nob9vo959nuhchsb5c6usm3eeb08gbj.apps.googleusercontent.com">
-                      <BrowserRouter>
-                        <TokenWatcher />
-                        {/* Verax's own support chat. A publisher's writers are
-                            not Verax customers and must not be routed to Verax
-                            support — nor have a third-party script load on a
-                            page showing their royalties. */}
-                        {!statementsLive && <CrispChat />}
-                        <Routes>
-                          <Route element={<RootRoute />} path="/" />
-                          {/* One way in: /signup is the historical URL, /register is the page.
-                            The legacy SignUpWizard (TuneScan captcha/Stripe flow) is retired
-                            from routing but still on disk at pages/SignUp/SignUpWizard.jsx. */}
-                          <Route element={<Navigate to="/register" replace />} path="/signup" />
-                          <Route element={<Register />} path="/register" />
-                          <Route element={<InviteAccept />} path="/invite/:token" />
-                          <Route element={<Login />} path="/login" />
-                          <Route element={<EmailConfirmed />} path="/email-confirmed" />
-                          <Route element={<EmailInvalid />} path="/email-invalid" />
-                          <Route element={<SignUpSuccessful />} path="/signup-successful" />
-                          <Route element={<PageMessage />} path="/page-message" />
-                          {/* Legal pages (kept — linked from login/register) */}
-                          <Route element={<PrivacyPolicy />} path="/pp" />
-                          <Route element={<TermsOfService />} path="/tos" />
-                          <Route element={<Imprint />} path="/imprint" />
-                          {/* Settings doesn't require email verification */}
-                          <Route element={<ProtectedRoutes requireEmailVerification={false} />}>
-                            <Route element={<Settings />} path="/settings" />
-                          </Route>
-                          <Route element={<ProtectedRoutes />}>
-                            <Route element={<Navigate to="/earnings" replace />} path="/dashboard" />
-                            {/* Admin (publisher) app */}
-                            <Route element={<AdminOverview />} path="/admin" />
-                            <Route element={<AdminStatements />} path="/admin/statements" />
-                            <Route element={<AdminStatementUpload />} path="/admin/statements/upload" />
-                            <Route element={<AdminStatementDetail />} path="/admin/statements/:id" />
-                            <Route element={<AdminWriters />} path="/admin/writers" />
-                            <Route element={<AdminWriterDetail />} path="/admin/writers/:id" />
-                            <Route element={<AdminWriterPreview />} path="/admin/writers/:id/preview" />
-                            <Route element={<AdminClientImport />} path="/admin/client-imports/:id" />
-                            <Route element={<AdminDistributions />} path="/admin/distributions" />
-                            <Route element={<AdminDistributionDetail />} path="/admin/distributions/:periodId" />
-                            <Route element={<AdminAccounts />} path="/admin/accounts" />
-                            <Route element={<AutoRegister />} path="/auto-register" />
-                            {/* Writer portal */}
-                            <Route element={<Revenue />} path="/earnings" />
-                            <Route element={<WriterStatements />} path="/statements" />
-                          </Route>
-                          <Route element={<ResetPassword />} path="/resetPassword" />
-                          <Route element={<ForgotPassword />} path="/forgotPassword" />
-                        </Routes>
-                      </BrowserRouter>
-                    </GoogleOAuthProvider>
+                    <BrowserRouter>
+                      <TokenWatcher />
+                      <Routes>
+                        <Route element={<RootRoute />} path="/" />
+                        {/* One way in: /signup is the historical URL, /register is the page. */}
+                        <Route element={<Navigate to="/register" replace />} path="/signup" />
+                        <Route element={<Register />} path="/register" />
+                        <Route element={<InviteAccept />} path="/invite/:token" />
+                        <Route element={<Login />} path="/login" />
+                        <Route element={<EmailConfirmed />} path="/email-confirmed" />
+                        <Route element={<EmailInvalid />} path="/email-invalid" />
+                        <Route element={<SignUpSuccessful />} path="/signup-successful" />
+                        <Route element={<PageMessage />} path="/page-message" />
+                        {/* Legal pages (kept — linked from login/register) */}
+                        <Route element={<PrivacyPolicy />} path="/pp" />
+                        <Route element={<TermsOfService />} path="/tos" />
+                        <Route element={<Imprint />} path="/imprint" />
+                        {/* Settings doesn't require email verification */}
+                        <Route element={<ProtectedRoutes requireEmailVerification={false} />}>
+                          <Route element={<Settings />} path="/settings" />
+                        </Route>
+                        <Route element={<ProtectedRoutes />}>
+                          <Route element={<Navigate to="/earnings" replace />} path="/dashboard" />
+                          {/* Admin (publisher) app */}
+                          <Route element={<AdminOverview />} path="/admin" />
+                          <Route element={<AdminStatements />} path="/admin/statements" />
+                          <Route element={<AdminStatementUpload />} path="/admin/statements/upload" />
+                          <Route element={<AdminStatementDetail />} path="/admin/statements/:id" />
+                          <Route element={<AdminWriters />} path="/admin/writers" />
+                          <Route element={<AdminWriterDetail />} path="/admin/writers/:id" />
+                          <Route element={<AdminWriterPreview />} path="/admin/writers/:id/preview" />
+                          <Route element={<AdminClientImport />} path="/admin/client-imports/:id" />
+                          <Route element={<AdminDistributions />} path="/admin/distributions" />
+                          <Route element={<AdminDistributionDetail />} path="/admin/distributions/:periodId" />
+                          <Route element={<AdminAccounts />} path="/admin/accounts" />
+                          {/* Writer portal */}
+                          <Route element={<Revenue />} path="/earnings" />
+                          <Route element={<WriterStatements />} path="/statements" />
+                        </Route>
+                        <Route element={<ResetPassword />} path="/resetPassword" />
+                        <Route element={<ForgotPassword />} path="/forgotPassword" />
+                      </Routes>
+                    </BrowserRouter>
                   </LanguageProvider>
                 </ThemeProvider>
               </HelmetProvider>

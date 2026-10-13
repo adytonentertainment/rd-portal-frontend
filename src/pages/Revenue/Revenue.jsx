@@ -84,7 +84,6 @@ import StatementsModal from '../../components/StatementsModal/StatementsModal';
 import ParsingDetailsModal from '../../components/ParsingDetailsModal/ParsingDetailsModal';
 import ColumnMappingModal from '../../components/ColumnMappingModal/ColumnMappingModal';
 import AutoDetectConfirmModal from '../../components/AutoDetectConfirmModal/AutoDetectConfirmModal';
-import CatalogHealthSummary from '../../components/CatalogHealthSummary/CatalogHealthSummary';
 import ExportReportModal from '../../components/ExportReportModal/ExportReportModal';
 import EditMappingModal from '../../components/EditMappingModal/EditMappingModal';
 import { statementsLive } from '../../config/featureFlags';
@@ -329,7 +328,6 @@ const Revenue = ({ portalPreviewWriterId = null }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(50);
   const [sortByAmount, setSortByAmount] = useState('desc'); // 'asc', 'desc', or null
-  const [showAuditCatalog, setShowAuditCatalog] = useState(false);
   const [isExportModalOpen, setIsExportModalOpen] = useState(false);
   const [activeTransactionTab, setActiveTransactionTab] = useState('top-songs'); // 'transactions' or 'top-songs'
   const [songCatalogData, setSongCatalogData] = useState({}); // Map of song keys to {albumArt, artist} from catalog
@@ -5321,29 +5319,6 @@ const Revenue = ({ portalPreviewWriterId = null }) => {
           detectedProfile={detectedProfile}
           fileName={pendingFile?.name || ''}
         />
-
-        {/* Audit Catalog Modal */}
-        {showAuditCatalog && (
-          <div className="modal-overlay" onClick={() => setShowAuditCatalog(false)}>
-            <div className="modal-content audit-catalog-modal" onClick={(e) => e.stopPropagation()}>
-              <div className="modal-header">
-                <h2>Catalog Health Report</h2>
-                <button className="modal-close" onClick={() => setShowAuditCatalog(false)}>
-                  ×
-                </button>
-              </div>
-              <div className="modal-body" style={{ maxHeight: '85vh', overflow: 'auto' }}>
-                <CatalogHealthSummary
-                  healthPercentageOverride={catalogHealth.percentage}
-                  revenueDataOverride={{
-                    totalRevenue: allTimeReportedRevenue,
-                    totalExpectedRevenue: allTimeExpectedRevenue,
-                  }}
-                />
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Export Report Modal */}
         <ExportReportModal

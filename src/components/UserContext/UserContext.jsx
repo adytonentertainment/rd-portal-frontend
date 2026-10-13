@@ -2,7 +2,6 @@ import { useEffect, createContext, useState, useCallback } from 'react';
 import urlJoin from 'url-join';
 import axios from 'axios';
 import { isTokenExpired, clearAuthAndRedirect } from '../../utils/tokenUtils';
-import { initializePush } from '../../services/pushNotificationService';
 import { ADMIN_PERSONA, getPersona } from '../../utils/persona';
 import { MOCK_WRITERS } from '../../mocks/roster';
 import { statementsLive } from '../../config/featureFlags';
@@ -11,7 +10,6 @@ const UserContextProvider = createContext();
 
 const UserContext = ({ children }) => {
   const [user, setUser] = useState(undefined);
-  const [pushInitialized, setPushInitialized] = useState(false);
 
   const fetchUser = useCallback(async () => {
     const token = localStorage.getItem('token');
@@ -123,23 +121,6 @@ const UserContext = ({ children }) => {
   useEffect(() => {
     fetchUser();
   }, [fetchUser]);
-
-  // Initialize push notifications when user is logged in
-  useEffect(() => {
-    if (user && !pushInitialized) {
-      initializePush()
-        .then((success) => {
-          if (success) {
-            console.log('[Push] Notifications initialized');
-          }
-          setPushInitialized(true);
-        })
-        .catch((error) => {
-          console.error('[Push] Failed to initialize:', error);
-          setPushInitialized(true);
-        });
-    }
-  }, [user, pushInitialized]);
 
   // Check token when user returns to the tab/window
   useEffect(() => {

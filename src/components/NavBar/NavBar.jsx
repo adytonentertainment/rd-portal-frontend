@@ -1,5 +1,4 @@
 import { useRef, useState, useContext } from 'react';
-// import { useGoogleLogin } from '@react-oauth/google'; // Temporarily disabled
 // import { FaGoogle, FaApple, FaFacebook } from 'react-icons/fa';
 // import CircularProgress from '@mui/material/CircularProgress';
 import { statementsLive } from '../../config/featureFlags';
@@ -12,7 +11,6 @@ import urlJoin from 'url-join';
 import axios from 'axios';
 import TransparentButton from '../Buttons/TransparentButton/TransparentButton';
 import { UserContextProvider } from '../UserContext/UserContext';
-// import GoogleAuthButton from '../Buttons/AuthButtons/GoogleAuthButton'; // Temporarily disabled
 // import FlatButton from '../Buttons/FlatButton/FlatButton';
 import VeraxLogo from '../VeraxLogo/VeraxLogo';
 // import GlassButton from '../Buttons/GlassButton/GlassButton';
@@ -25,13 +23,6 @@ import ThemeButton from '../Buttons/ThemeButton/ThemeButton';
 // not serve, so in a portal build these are dead links. Defaulted off there.
 // `showDashboard` — the Dashboard button; see dashboardTarget below.
 const NavBar = ({ marketingLinks = !statementsLive, showDashboard = true }) => {
-  // Google login temporarily disabled
-  // const googleLogin = useGoogleLogin({
-  //   onSuccess: async (tokenResponse) => {
-  //     login_google(tokenResponse.access_token);
-  //   },
-  // });
-
   const navigate = useNavigate();
   const usernameRef = useRef();
   const passwordRef = useRef();
@@ -81,25 +72,6 @@ const NavBar = ({ marketingLinks = !statementsLive, showDashboard = true }) => {
       }
     } catch (error) {
       setErrorMessage(error.response.data.detail);
-    } finally {
-      setLoginLoading(false);
-    }
-  };
-
-  // login with google auth token
-  const login_google = async (token) => {
-    setLoginLoading(true);
-    try {
-      const response = await fetch(urlJoin(process.env.REACT_APP_BACKEND_URL, `/auth/google-login/${token}`), {
-        method: 'POST',
-      });
-      const data = await response.json();
-      if (response.ok) {
-        localStorage.setItem('token', data.access_token);
-        window.location.reload();
-      }
-    } catch (error) {
-      console.error(error);
     } finally {
       setLoginLoading(false);
     }
