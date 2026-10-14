@@ -46,9 +46,29 @@ import { HelmetProvider } from 'react-helmet-async';
 import { HeroUIProvider } from '@heroui/react';
 import { PostHogProvider } from 'posthog-js/react';
 
-// Initialize Microsoft Clarity for UX analytics (at module level, runs once)
+// Invite and password-reset links carry a one-time secret in the URL.
+// Analytics must not record that address.
+const SENSITIVE_PATH = /^\/invite(?:\/|$)|\/resetPassword$/;
+
+const redactSecrets = (value) => {
+  if (typeof value !== 'string' || !value) return value;
+  try {
+    const url = new URL(value, window.location.origin);
+    if (url.pathname.startsWith('/invite/')) url.pathname = '/invite/[redacted]';
+    if (url.searchParams.has('token')) url.searchParams.set('token', '[redacted]');
+    return url.toString();
+  } catch {
+    return value;
+  }
+};
+
+const isSensitiveLocation = () =>
+  SENSITIVE_PATH.test(window.location.pathname) || new URLSearchParams(window.location.search).has('token');
+
+// Initialize Microsoft Clarity for UX analytics (at module level, runs once).
+// Skip it on the invite and reset pages so the token in the address is never sent.
 const clarityProjectId = process.env.REACT_APP_CLARITY_PROJECT_ID;
-if (clarityProjectId) {
+if (clarityProjectId && !isSensitiveLocation()) {
   Clarity.init(clarityProjectId);
 }
 
@@ -156,6 +176,20 @@ root.render(
       defaults: '2025-05-24',
       capture_exceptions: true,
       debug: process.env.NODE_ENV === 'development',
+      before_send: (event) => {
+        if (!event) return event;
+        const properties = event.properties;
+        if (properties) {
+          for (const key of ['$current_url', '$referrer', '$pathname']) {
+            if (key === '$pathname' && typeof properties[key] === 'string' && properties[key].startsWith('/invite/')) {
+              properties[key] = '/invite/[redacted]';
+            } else if (key !== '$pathname') {
+              properties[key] = redactSecrets(properties[key]);
+            }
+          }
+        }
+        return event;
+      },
     }}
   >
     <App />

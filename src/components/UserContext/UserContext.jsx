@@ -4,7 +4,7 @@ import axios from 'axios';
 import { isTokenExpired, clearAuthAndRedirect } from '../../utils/tokenUtils';
 import { ADMIN_PERSONA, getPersona } from '../../utils/persona';
 import { MOCK_WRITERS } from '../../mocks/roster';
-import { statementsLive } from '../../config/featureFlags';
+import { demoAutoLogin } from '../../config/featureFlags';
 
 const UserContextProvider = createContext();
 
@@ -27,6 +27,7 @@ const UserContext = ({ children }) => {
       last_name: 'Admin',
       account_activated: true,
       activated: true,
+      is_admin: true,
     };
     const writerForPersona = () => {
       const writer = MOCK_WRITERS.find((w) => String(w.id) === String(persona));
@@ -41,13 +42,15 @@ const UserContext = ({ children }) => {
         last_name: rest.join(' '),
         account_activated: true,
         activated: true,
+        is_admin: false,
       };
     };
     const DEMO_USER = persona === ADMIN_PERSONA ? ADMIN_USER : writerForPersona() || ADMIN_USER;
-    // In live mode there is NO demo auto-sign-in: a missing/expired token means
-    // logged-out (null), so /login and logout actually take effect. The demo
-    // persona fallback only applies to the localStorage-only demo build.
-    const NO_SESSION = statementsLive ? null : DEMO_USER;
+    // Live mode, and a production build that forgot the live flag, do not
+    // auto-sign-in. A missing or expired token means logged-out. The demo
+    // persona is local development, or a demo deploy that sets
+    // REACT_APP_DEMO_AUTO_LOGIN=1.
+    const NO_SESSION = demoAutoLogin ? DEMO_USER : null;
 
     if (!token) {
       setUser(NO_SESSION);
@@ -108,10 +111,9 @@ const UserContext = ({ children }) => {
         ...account,
       };
     } catch {
-      // Live mode: a token that fails to verify (invalid/expired/backend down)
-      // means logged-out, so re-login is required. Demo mode falls back to the
-      // demo user so the localStorage-only build keeps working offline.
-      userData = statementsLive ? null : DEMO_USER;
+      // A token that fails to verify means logged-out, so re-login is required.
+      // Demo auto-login still substitutes the demo user when that mode is on.
+      userData = demoAutoLogin ? DEMO_USER : null;
     } finally {
       setUser(userData ?? NO_SESSION);
     }
