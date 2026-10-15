@@ -87,7 +87,6 @@ export const unlinkContact = (id, contactId) =>
 export const revokeInvite = (id, inviteId) =>
   request({ url: `/admin/writers/${id}/invites/${inviteId}/revoke`, method: 'POST' });
 
-// POST /admin/writers/reset-all → DEV/testing: wipe all client + statement data
 // Accept a "did you mean X?" guess: hand the unmatched account's statements to
 // that client. Only an unmatched row can be assigned, and never one whose
 // statements have already gone out — the backend enforces both.
@@ -117,8 +116,6 @@ export const distributeToWriter = (writerId) =>
 // client stops seeing it — the response says how many copies were withdrawn.
 export const deleteWriterStatement = (writerId, statementId) =>
   request({ url: `/admin/writers/${writerId}/statements/${statementId}`, method: 'DELETE' });
-
-export const resetAllData = () => request({ url: '/admin/writers/reset-all', method: 'POST' });
 
 // GET /admin/writers/summary → roster-wide rollup for the dashboard header
 export const getRosterSummary = () => request({ url: '/admin/writers/summary' });

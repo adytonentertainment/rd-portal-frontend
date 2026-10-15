@@ -34,14 +34,7 @@ import {
 } from '../../mocks/distributionState';
 import { brand } from '../../config/brand';
 import { statementsLive } from '../../config/featureFlags';
-import {
-  listWriters,
-  archiveWriter,
-  createWriter,
-  resetAllData,
-  getRosterSummary,
-  distributeAll,
-} from '../../api/writersAdmin';
+import { listWriters, archiveWriter, createWriter, getRosterSummary, distributeAll } from '../../api/writersAdmin';
 import { getIngestionAudit } from '../../api/statementsAdmin';
 
 // The audit blocks sending, so "2 issue(s)" on its own is a dead end: it says
@@ -179,8 +172,6 @@ const AdminOverview = () => {
   // True while any upload is transferring/sorting/parsing. Sending is blocked
   // server-side too — this just explains the disabled button.
   const [ingestActive, setIngestActive] = useState(false);
-  const [confirmReset, setConfirmReset] = useState(false);
-  const [resetting, setResetting] = useState(false);
   const [summary, setSummary] = useState(null);
   const [audit, setAudit] = useState(null);
   const [auditOpen, setAuditOpen] = useState(false);
@@ -426,19 +417,6 @@ const AdminOverview = () => {
     setDeletingWriter(null);
   };
 
-  const handleResetAll = () => {
-    if (resetting) return;
-    setResetting(true);
-    resetAllData()
-      .then(() => {
-        toast.success('All client & statement data cleared');
-        setConfirmReset(false);
-        loadLive();
-      })
-      .catch((err) => toast.error(err?.message || 'Could not reset data'))
-      .finally(() => setResetting(false));
-  };
-
   return (
     <>
       <Helmet>
@@ -526,16 +504,6 @@ const AdminOverview = () => {
               <button className={styles.secondaryBtn} onClick={() => setShowUpload(true)}>
                 <FaUpload size={11} /> Upload statements
               </button>
-              {live && (
-                <button
-                  className={styles.secondaryBtn}
-                  style={{ color: 'var(--error)', borderColor: 'var(--error)' }}
-                  onClick={() => setConfirmReset(true)}
-                  title="Testing only: wipe all clients & statement data"
-                >
-                  <FaTimes size={11} /> Delete all data
-                </button>
-              )}
               {/* Distribution in live mode runs through the batch gate flow, not
                   the demo per-writer distribute — so hide the demo action live. */}
               {!live && (
@@ -1222,40 +1190,6 @@ const AdminOverview = () => {
             <div className={styles.confirmActions}>
               <button className={styles.primaryBtn} onClick={() => setSendResult(null)}>
                 Done
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {confirmReset && (
-        <div className={styles.confirmOverlay} onClick={() => !resetting && setConfirmReset(false)}>
-          <div className={styles.confirmModal} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.confirmTitle}>Delete ALL data?</div>
-            <div className={styles.confirmBody}>
-              Testing reset. This permanently wipes every client, beneficiary account, statement, upload, distribution,
-              contact, portal invite, and client import from the database. Your admin login is kept. This cannot be
-              undone.
-            </div>
-            <div className={styles.confirmActions}>
-              <button className={styles.cancelBtn} onClick={() => setConfirmReset(false)} disabled={resetting}>
-                Cancel
-              </button>
-              <button
-                className={styles.primaryBtn}
-                style={{ background: 'var(--error)' }}
-                onClick={handleResetAll}
-                disabled={resetting}
-              >
-                {resetting ? (
-                  <>
-                    <FaSpinner size={11} className={styles.spinner} /> Deleting…
-                  </>
-                ) : (
-                  <>
-                    <FaTimes size={11} /> Yes, delete everything
-                  </>
-                )}
               </button>
             </div>
           </div>
