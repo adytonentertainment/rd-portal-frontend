@@ -13,7 +13,6 @@ import {
 } from 'react-icons/fa';
 import { MOCK_WRITERS } from '../../mocks/roster';
 import { ingestUpload, REQUIRED_STATEMENT_TYPES, CURRENT_PERIOD, addWriter } from '../../mocks/distributionState';
-import { REDZED_REAL_PROFILE } from '../../mocks/redZedRealData';
 import { statementsLive } from '../../config/featureFlags';
 import { createUpload, getUploadStatements } from '../../api/statementsAdmin';
 import styles from './adminUploadModal.module.css';
@@ -29,7 +28,7 @@ const STATEMENT_TYPES = REQUIRED_STATEMENT_TYPES;
 // Periods the publisher closes (half-year)
 const PERIODS = ['H2 2025', 'H1 2025', 'H1 2026'];
 
-// Try to detect statement type from filename, e.g. "RedZed (YouTube Publishing).xlsx"
+// Try to detect statement type from filename, e.g. "Night Static (YouTube Publishing).xlsx"
 const detectStatementType = (name) => {
   const m = name.match(/\(([^)]+)\)\s*\.(xlsx|csv|tsv|pdf)$/i);
   if (m) {
@@ -60,8 +59,8 @@ const detectWriter = (name) => {
 // filename_parser: name is what follows the beneficiary code, separated by
 // "_" (xlsx form) or " - " (pdf form). Any trailing group parenthetical
 // (e.g. "(Luna Negra)") is kept; only the royalty-type parens are dropped.
-//   "Ben_PUB25H2_C00616_RedZed (YouTube Publishing).xlsx"      → "RedZed"
-//   "Ben_PUB25H2_C00616 - RedZed (YouTube Publishing).pdf"     → "RedZed"
+//   "Ben_PUB25H2_C09905_Night Static (YouTube Publishing).xlsx"      → "Night Static"
+//   "Ben_PUB25H2_C09905 - Night Static (YouTube Publishing).pdf"     → "Night Static"
 //   "Ben_PUB25H2_C00139f - Edipurepecha (Luna Negra) (…).pdf"  → "Edipurepecha (Luna Negra)"
 // Returns null if it can't find a plausible name.
 const extractWriterName = (filename) => {
@@ -88,27 +87,7 @@ const detectPeriod = (name) => {
   return CURRENT_PERIOD;
 };
 
-// Raw data-row counts of the two real RedZed statement files we ship with the
-// demo (used only for a believable "lines" figure in the preview).
-const REDZED_FILE_LINES = { 'Mechanical Royalties': 13483, 'YouTube Publishing': 3381 };
-
-// For the known RedZed statement files, surface the ACTUAL extracted figures
-// (from redZedRealData) so the upload preview matches the writer portal. Any
-// other file falls through to the size-based estimate below.
-const redZedRealParse = (file, statementType) => {
-  if (!/ben_pub25h2.*redzed/i.test(file?.name || '')) return null;
-  const stmt = REDZED_REAL_PROFILE.statements.find((s) =>
-    s.source.toLowerCase().includes(statementType.split(' ')[0].toLowerCase())
-  );
-  const lines = REDZED_FILE_LINES[statementType];
-  if (!stmt || !lines) return null;
-  const matched = Math.round(lines * 0.99);
-  return { lines, matched, unmapped: lines - matched, total: stmt.amount };
-};
-
 const fakeParse = (file, statementType) => {
-  const real = redZedRealParse(file, statementType);
-  if (real) return real;
   const size = file.size || 12000;
   // Real files are large — base lines on size but cap appropriately
   const lines = Math.max(80, Math.min(20000, Math.round(size / 110)));
@@ -451,7 +430,7 @@ const AdminUploadModal = ({ open, onClose, onComplete }) => {
   // writer must not accidentally shrink what "Create writers now" or Ingest
   // operate on.
   const autoCreatable = files.filter((f) => f.writerId == null && f.proposedWriterName);
-  // Multiple files can propose the same writer (e.g. RedZed's two statements) —
+  // Multiple files can propose the same writer (e.g. Night Static's two statements) —
   // count distinct names so the preview doesn't overstate how many are created.
   const autoCreatableCount = new Set(autoCreatable.map((f) => f.proposedWriterName.toLowerCase())).size;
   const trulyUnassigned = files.filter((f) => f.writerId == null && !f.proposedWriterName);
@@ -605,7 +584,7 @@ const AdminUploadModal = ({ open, onClose, onComplete }) => {
           <FaUpload size={22} />
           <div className={styles.dropTitle}>Drop PDF / XLSX / CSV files</div>
           <div className={styles.dropHint}>
-            Filenames like <code>Ben_PUB25H2_C00616_RedZed (YouTube Publishing).xlsx</code> are auto-mapped.
+            Filenames like <code>Ben_PUB25H2_C09905_Night Static (YouTube Publishing).xlsx</code> are auto-mapped.
           </div>
         </div>
 

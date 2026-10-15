@@ -1,5 +1,4 @@
 import { MOCK_WRITERS } from './roster';
-import { REDZED_REAL_PROFILE, getRedZedRealTransactions } from './redZedRealData';
 
 // Per-writer earnings, last 12 months (most-recent month last).
 // Monthly $ totals chosen to roughly average the writer's profile, with seasonal jitter.
@@ -78,86 +77,24 @@ const WRITER_EARNINGS = {
       { date: '2026-03-12', source: 'YouTube CMS', period: 'Q1 2026', amount: 84.6 },
     ],
   },
-  // RedZed — derived directly from the real Ben_PUB25H2 statements ($36,294.94)
+  // Night Static — streaming-heavy act, mechanical + YouTube statements (fictional)
   '-5': {
-    monthly: [
-      // 12-month series: most of the $36,295 falls in H2 2025 (Jul–Dec), tail of H1 in Jun,
-      // small H1 2026 accruals after.
-      { month: 'Jun', amount: 95 },
-      { month: 'Jul', amount: 5410 },
-      { month: 'Aug', amount: 6120 },
-      { month: 'Sep', amount: 5840 },
-      { month: 'Oct', amount: 6400 },
-      { month: 'Nov', amount: 5920 },
-      { month: 'Dec', amount: 6605 },
-      { month: 'Jan', amount: 110 },
-      { month: 'Feb', amount: 125 },
-      { month: 'Mar', amount: 140 },
-      { month: 'Apr', amount: 115 },
-      { month: 'May', amount: 95 },
-    ],
-    // Sum of Units columns across both files (YouTube + Mechanical)
-    totalUsages: 444_154_449,
-    worksCount: 124,
-    // Real income-type split from the two files
-    bySource: { Performance: 9189, Streaming: 27106, Sync: 0, Mechanical: 0 },
-    // Platforms/organizations actually present in the Ben PUB25H2 statements.
-    // Drives the Top 3 Platforms card + by-source pie chart breakdown.
-    sourceDetails: {
-      Streaming: {
-        incomeName: 'Streaming',
-        platforms: [
-          'ICE',
-          'Spotify',
-          'Apple Music',
-          'Amazon Music',
-          'YouTube',
-          'SoundCloud',
-          'Tidal',
-          'Qobuz',
-          'Deezer',
-          'OSA',
-          'YouTube Red',
-          'YouTube Pub',
-          'YouTube Shorts',
-          'YouTube AVOD',
-        ],
-        organizations: ['ICE', 'OSA', 'Harry Fox', 'MLC'],
-      },
-      Performance: {
-        incomeName: 'Performance',
-        platforms: ['APRA AMCOS', 'GEMA', 'PRS for Music', 'SACEM', 'BMI', 'ASCAP', 'SoundExchange', 'ICE'],
-        organizations: ['APRA AMCOS', 'GEMA', 'PRS for Music', 'SACEM', 'BMI', 'ASCAP'],
-      },
-    },
-    // Real top territories by earnings (sums across both files)
-    byTerritory: {
-      US: 19692,
-      DE: 3615,
-      AU: 2487,
-      FI: 1693,
-      FR: 1335,
-      GB: 987,
-      CA: 912,
-      PL: 746,
-      Other: 4828,
-    },
-    // Top 8 songs by combined H2 2025 earnings (YouTube + Mechanical).
-    // Excludes the "Performance and Mechanical Royalties" lump-sum line ($9,188)
-    // since it's a publisher catch-all payment, not a song-level allocation.
+    monthly: profile(2300, 520, 35),
+    totalUsages: 38_400_000,
+    worksCount: 6,
+    bySource: { Performance: 6400, Streaming: 17800, Sync: 0, Mechanical: 3100 },
+    byTerritory: { US: 12100, MX: 3900, ES: 2600, DE: 1900, CO: 1500, AR: 1100, BR: 900, Other: 3300 },
     topWorks: [
-      { title: 'Rave In The Grave', amount: 5450.63, plays: 78_400_000 },
-      { title: 'Meth Phonk', amount: 2365.99, plays: 32_100_000 },
-      { title: 'Straight Outta Flames', amount: 2152.31, plays: 28_600_000 },
-      { title: 'Deadboy98', amount: 1890.6, plays: 24_500_000 },
-      { title: 'Drugs = Magic', amount: 1635.07, plays: 22_900_000 },
-      { title: 'Counting Days Till Suicide', amount: 1363.14, plays: 18_700_000 },
-      { title: 'Dead Bodies Everywhere', amount: 1012.04, plays: 14_200_000 },
-      { title: 'Blood Spillin On Concrete', amount: 913.64, plays: 12_300_000 },
+      { title: 'Low Signal', amount: 6840.2, plays: 9_100_000 },
+      { title: 'Glass Hour', amount: 4912.5, plays: 6_600_000 },
+      { title: 'Northbound', amount: 3705.8, plays: 5_000_000 },
+      { title: 'Paper Saints', amount: 2618.4, plays: 3_500_000 },
+      { title: 'Afterimage', amount: 1904.1, plays: 2_600_000 },
+      { title: 'Slow Burn City', amount: 1288.6, plays: 1_700_000 },
     ],
     statements: [
-      { date: '2026-04-22', source: 'Ben Mechanical Royalties', period: 'H2 2025', amount: 35014.66 },
-      { date: '2026-04-22', source: 'Ben YouTube Publishing', period: 'H2 2025', amount: 1280.28 },
+      { date: '2026-04-22', source: 'Mechanical Royalties', period: 'H2 2025', amount: 9214.4 },
+      { date: '2026-04-22', source: 'YouTube Publishing', period: 'H2 2025', amount: 2186.9 },
     ],
   },
   // The Vine Sessions — mid-tier band, sync-heavy
@@ -264,12 +201,10 @@ const writerExists = (id) => MOCK_WRITERS.some((w) => w.id === Number(id));
 
 export const getEarningsForClient = (clientId, clientName) => {
   if (clientId == null) {
-    // Publisher Account: aggregate all mock writers still on the roster
-    // (substitute RedZed's real profile for -5 so the publisher totals reflect
-    // the actual statement reality).
+    // Publisher Account: aggregate all mock writers still on the roster.
     const all = Object.entries(WRITER_EARNINGS)
       .filter(([k]) => writerExists(k))
-      .map(([k, v]) => (k === '-5' ? REDZED_REAL_PROFILE : v));
+      .map(([, v]) => v);
     return {
       writerName: 'Publisher Account',
       monthly: aggregateMonthly(all),
@@ -280,19 +215,8 @@ export const getEarningsForClient = (clientId, clientName) => {
     };
   }
   // A deleted mock writer (negative id no longer on the roster) has no data —
-  // covers RedZed (-5) and any auto-created writer once it has been removed.
+  // covers a seeded writer and any auto-created writer once it has been removed.
   if (Number(clientId) < 0 && !writerExists(clientId)) return null;
-  // RedZed uses the real statement data extracted from the actual Ben PUB25H2 files.
-  if (Number(clientId) === -5) {
-    return {
-      writerName: clientName || 'RedZed',
-      monthly: REDZED_REAL_PROFILE.monthly,
-      bySource: REDZED_REAL_PROFILE.bySource,
-      byTerritory: REDZED_REAL_PROFILE.byTerritory,
-      topWorks: REDZED_REAL_PROFILE.topWorks,
-      statements: REDZED_REAL_PROFILE.statements,
-    };
-  }
   // Direct mock match (negative-id mocks)
   let data = WRITER_EARNINGS[String(clientId)];
 
@@ -450,7 +374,7 @@ const buildTransactions = (writerKey, profileData, writerName) => {
   const totalsBySource = profileData.bySource;
   const totalsByTerritory = profileData.byTerritory;
   const works = profileData.topWorks;
-  // Optional per-writer override of platforms/organizations (e.g., RedZed uses ICE/APRA/etc.)
+  // Optional per-writer override of platforms/organizations (e.g., a writer paid through ICE/APRA/etc.)
   const sourceDetailsOverride = profileData.sourceDetails || {};
 
   // Weight catalog items by their amount so top earners get more line items.
@@ -557,23 +481,17 @@ const buildStatements = (writerKey, profileData) =>
 export const getTransactionsForClient = (clientId, clientName) => {
   // A deleted mock writer (negative id no longer on the roster) has no data.
   if (Number(clientId) < 0 && !writerExists(clientId)) return [];
-  // RedZed: return the actual line items extracted from the real statement files.
-  if (Number(clientId) === -5) return getRedZedRealTransactions();
 
   // Resolve to the same archetype the chart panels use
   let key = String(clientId);
   let data = WRITER_EARNINGS[key];
   if (clientId == null) {
     // Publisher Account: combine all writers' transactions, attributed to their writer name.
-    // RedZed contributes its real line items; everyone else gets synthesized data.
-    const synthesized = Object.entries(WRITER_EARNINGS).flatMap(([k, p]) => {
-      if (k === '-5') return []; // skip; we add real RedZed below
+    return Object.entries(WRITER_EARNINGS).flatMap(([k, p]) => {
       if (!writerExists(k)) return []; // skip writers removed from the roster
       const w = MOCK_WRITERS.find((mw) => mw.id === Number(k));
       return buildTransactions(k, p, w?.name || 'Writer');
     });
-    const redZed = writerExists(-5) ? getRedZedRealTransactions() : [];
-    return [...redZed, ...synthesized];
   }
   if (!data) {
     key = archetypeForId(clientId);

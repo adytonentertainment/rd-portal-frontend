@@ -1095,7 +1095,7 @@ const AdminOverview = () => {
               type="text"
               autoFocus
               value={newWriterName}
-              placeholder="Writer name (e.g. RedZed)"
+              placeholder="Writer name (e.g. Night Static)"
               onChange={(e) => setNewWriterName(e.target.value)}
               onKeyDown={(e) => e.key === 'Enter' && handleAddWriter()}
               style={{

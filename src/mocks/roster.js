@@ -28,27 +28,10 @@ export const MOCK_WRITERS = [
   },
   {
     id: -5,
-    name: 'RedZed',
+    name: 'Night Static',
     color: '#8b5cf6',
-    beneficiaryCodes: ['C00616', 'JN0232'],
-    catalog: [
-      'Rave In The Grave',
-      'Explode',
-      'Meth Phonk',
-      'Straight Outta Flames',
-      'Deadboy98',
-      'Drugs = Magic',
-      'Counting Days Till Suicide',
-      'Dead Bodies Everywhere',
-      'Blood Spillin On Concrete',
-      "Sippin' Blood",
-      'Necromancer',
-      'Cradle Of Filth',
-      'Horror',
-      'Burn My Bridges',
-      'Junkie',
-      'Ghoul',
-    ],
+    beneficiaryCodes: ['C09905', 'JN0905'],
+    catalog: ['Low Signal', 'Glass Hour', 'Northbound', 'Paper Saints', 'Afterimage', 'Slow Burn City'],
   },
 ];
 
@@ -56,8 +39,8 @@ export const getWriterById = (id) => MOCK_WRITERS.find((w) => w.id === id);
 
 // Immutable snapshot of the seed roster, taken before any runtime mutation
 // (deletions splice MOCK_WRITERS in place). Used to restore a deleted seeded
-// writer under its ORIGINAL id — e.g. recreating RedZed by re-uploading their
-// statement files, so the real-data wiring keyed on id -5 keeps working.
+// writer under its ORIGINAL id — e.g. recreating Night Static by re-uploading their
+// statement files, so the earnings profile keyed on id -5 keeps working.
 export const SEED_WRITERS = MOCK_WRITERS.map((w) => ({
   ...w,
   catalog: [...(w.catalog || [])],

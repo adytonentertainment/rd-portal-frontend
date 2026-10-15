@@ -83,7 +83,7 @@ const DemoWriterStatements = () => {
   const downloadStatement = (statement) => {
     const allTxns = getTransactionsForClient(writerId, selectedClient?.name);
     // Match the statement's line items: same period, and same statement type if the
-    // transaction carries one (RedZed real data does; synthesized writers may not).
+    // transaction carries one (not every synthesized writer does).
     const typeKey = statement.source
       .replace(/^Ben\s+/i, '')
       .trim()

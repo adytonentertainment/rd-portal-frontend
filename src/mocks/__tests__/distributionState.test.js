@@ -11,7 +11,7 @@ import {
 } from '../distributionState';
 
 const [MECH, YT] = REQUIRED_STATEMENT_TYPES; // ['Mechanical Royalties', 'YouTube Publishing']
-const WRITER = -5; // RedZed (seeded)
+const WRITER = -5; // Night Static (seeded)
 
 // Start each test from a clean receipt state for the writer under test.
 const resetWriter = (id = WRITER) => {

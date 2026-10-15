@@ -63,7 +63,7 @@ export const normalizeReceipt = (raw) => {
   ['-2', ['Mechanical Royalties', 'Performance Royalties', 'YouTube Publishing', 'Synchronization']], // Ava — complete
   ['-3', ['Mechanical Royalties']], // M. Okonkwo — only 1 type
   ['-4', ['Mechanical Royalties', 'Performance Royalties', 'YouTube Publishing']], // Vine Sessions
-  ['-5', ['Mechanical Royalties', 'YouTube Publishing']], // RedZed — the two real files we have
+  ['-5', ['Mechanical Royalties', 'YouTube Publishing']], // Night Static
 ].forEach(([writerId, types]) => {
   const rec = emptyReceipt();
   for (const t of types) rec.xlsx[t] = true;
@@ -383,9 +383,9 @@ export const addWriter = ({ name, color } = {}) => {
   // No duplicates (case-insensitive)
   const existing = MOCK_WRITERS.find((w) => w.name.toLowerCase() === trimmed.toLowerCase());
   if (existing) return existing;
-  // Recreating a previously-deleted seeded writer (e.g. re-uploading RedZed's
+  // Recreating a previously-deleted seeded writer (e.g. re-uploading Night Static's
   // statement files): restore them under their ORIGINAL id so any real-data
-  // wiring keyed on that id (RedZed → -5) keeps working.
+  // wiring keyed on that id (Night Static → -5) keeps working.
   const seed = SEED_WRITERS.find((w) => w.name.toLowerCase() === trimmed.toLowerCase());
   if (seed && deletedWriterIds.has(seed.id)) {
     deletedWriterIds.delete(seed.id);
