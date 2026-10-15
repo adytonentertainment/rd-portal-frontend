@@ -106,7 +106,7 @@ export default function GlobeIframe({ territories = [], territoryCoordinates = {
 
     const root = ReactDOM.createRoot(document.getElementById('root'));
 
-    const pins = ${JSON.stringify(pins)};
+    const pins = ${JSON.stringify(pins).replace(/</g, '\\u003c')};
 
     root.render(
       React.createElement(Globe_Pins, {
@@ -231,6 +231,8 @@ export default function GlobeIframe({ territories = [], territoryCoordinates = {
       <iframe
         key={reloadKey}
         ref={iframeRef}
+        title="Territory globe"
+        sandbox="allow-scripts"
         srcDoc={globeHTML}
         style={{
           width: '100%',
@@ -238,8 +240,6 @@ export default function GlobeIframe({ territories = [], territoryCoordinates = {
           border: 0,
           background: 'transparent',
         }}
-        title="Interactive Globe"
-        sandbox="allow-scripts allow-same-origin allow-downloads"
         allow="autoplay; fullscreen"
       />
 

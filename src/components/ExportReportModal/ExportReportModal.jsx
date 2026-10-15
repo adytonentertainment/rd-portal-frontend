@@ -3,6 +3,25 @@ import { FaTimes, FaFileExport, FaCalendarAlt, FaUser, FaFileDownload } from 're
 import IncomePeriodParser from '../../utils/incomePeriodParser';
 import './exportReportModal.css';
 
+// Statement fields are untrusted. The print window shares this origin, so a
+// value that contains markup must not be written as HTML.
+const escapeHtml = (value) =>
+  String(value ?? '')
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+
+// Excel treats a cell that starts with =, +, -, or @ as a formula, even inside quotes.
+// A plain number, including a negative amount, stays numeric.
+const csvCell = (value) => {
+  let text = String(value ?? '');
+  const plainNumber = /^-?\d+(\.\d+)?$/.test(text);
+  if (!plainNumber && /^[=+\-@\t\r]/.test(text)) text = `'${text}`;
+  return `"${text.replace(/"/g, '""')}"`;
+};
+
 const ExportReportModal = ({ isOpen, onClose, transactions, username, currency = 'GBP' }) => {
   const [periodType, setPeriodType] = useState('quarterly');
   const [selectedPeriods, setSelectedPeriods] = useState([]);
@@ -158,7 +177,7 @@ const ExportReportModal = ({ isOpen, onClose, transactions, username, currency =
       t.territory || '',
     ]);
 
-    const csvContent = [headers, ...rows].map((row) => row.map((cell) => `"${cell}"`).join(',')).join('\n');
+    const csvContent = [headers, ...rows].map((row) => row.map((cell) => csvCell(cell)).join(',')).join('\n');
     const blob = new Blob([csvContent], { type: 'text/csv' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -180,7 +199,7 @@ const ExportReportModal = ({ isOpen, onClose, transactions, username, currency =
       <!DOCTYPE html>
       <html>
       <head>
-        <title>Royalty Statement - ${selectedUser}</title>
+        <title>Royalty Statement - ${escapeHtml(selectedUser)}</title>
         <style>
           body { font-family: Arial, sans-serif; padding: 40px; max-width: 600px; margin: 0 auto; }
           .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; }
@@ -205,16 +224,16 @@ const ExportReportModal = ({ isOpen, onClose, transactions, username, currency =
         </div>
         <div class="title">
           <h1>ROYALTY STATEMENT</h1>
-          <div class="period">${periodLabel}</div>
+          <div class="period">${escapeHtml(periodLabel)}</div>
         </div>
-        <div class="client-name">${selectedUser}</div>
+        <div class="client-name">${escapeHtml(selectedUser)}</div>
         
         <div class="section">
           <div class="section-title">INCOME</div>
           ${Object.entries(breakdown)
             .map(
               ([category, amount]) =>
-                `<div class="line-item indent">${category} <span>${currencySymbol}${amount.toFixed(2)}</span></div>`
+                `<div class="line-item indent">${escapeHtml(category)} <span>${currencySymbol}${amount.toFixed(2)}</span></div>`
             )
             .join('')}
         </div>
@@ -326,7 +345,7 @@ const ExportReportModal = ({ isOpen, onClose, transactions, username, currency =
       <!DOCTYPE html>
       <html>
       <head>
-        <title>Statement of Account - ${selectedUser}</title>
+        <title>Statement of Account - ${escapeHtml(selectedUser)}</title>
         <style>
           body { font-family: Arial, sans-serif; padding: 40px; max-width: 700px; margin: 0 auto; }
           .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 30px; }
@@ -353,9 +372,9 @@ const ExportReportModal = ({ isOpen, onClose, transactions, username, currency =
         </div>
         <div class="title">
           <h1>STATEMENT OF ACCOUNT</h1>
-          <div class="date">${dateStr}</div>
+          <div class="date">${escapeHtml(dateStr)}</div>
         </div>
-        <div class="client-name">${selectedUser}</div>
+        <div class="client-name">${escapeHtml(selectedUser)}</div>
         
         <table>
           <thead>
@@ -377,8 +396,8 @@ const ExportReportModal = ({ isOpen, onClose, transactions, username, currency =
               .map(
                 (row) => `
               <tr>
-                <td>${row.date}</td>
-                <td>${row.description}</td>
+                <td>${escapeHtml(row.date)}</td>
+                <td>${escapeHtml(row.description)}</td>
                 <td>${currencySymbol}${row.amount.toFixed(2)}</td>
                 <td>${currencySymbol}${row.balance.toFixed(2)}</td>
               </tr>

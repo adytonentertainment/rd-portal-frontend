@@ -52,48 +52,6 @@ const getCurrentTheme = () => {
   } else return themeCookie;
 };
 
-const generateRandomString = (length) => {
-  let result = '';
-  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
-  const charactersLength = characters.length;
-  let counter = 0;
-  while (counter < length) {
-    result += characters.charAt(Math.floor(Math.random() * charactersLength));
-    counter += 1;
-  }
-  return result;
-};
-
-const handleSpotifyAuth = (redirectUri) => {
-  const clientId = process.env.REACT_APP_SPOTIFY_CLIENT_ID;
-  const state = 'spotify' + generateRandomString(16);
-  const scope = 'user-read-private user-library-read';
-
-  let url = 'https://accounts.spotify.com/authorize';
-  url += '?response_type=token';
-  url += '&client_id=' + encodeURIComponent(clientId);
-  url += '&scope=' + encodeURIComponent(scope);
-  url += '&redirect_uri=' + encodeURIComponent(redirectUri);
-  url += '&state=' + encodeURIComponent(state);
-
-  window.location.href = url;
-};
-
-const handleGeniusAuth = (redirectUri) => {
-  const clientId = process.env.REACT_APP_GENIUS_CLIENT_ID;
-  const state = 'genius' + generateRandomString(16);
-  const scope = 'me';
-
-  let url = 'https://api.genius.com/oauth/authorize';
-  url += '?response_type=token';
-  url += '&client_id=' + encodeURIComponent(clientId);
-  url += '&scope=' + encodeURIComponent(scope);
-  url += '&redirect_uri=' + encodeURIComponent(redirectUri);
-  url += '&state=' + encodeURIComponent(state);
-
-  window.location.href = url;
-};
-
 const isValidHttpUrl = (string) => {
   let url;
 
@@ -111,13 +69,4 @@ const isValidEmailAddress = (email) => {
   return pattern.test(email);
 };
 
-export {
-  makeRequest,
-  changeTheme,
-  getCurrentTheme,
-  handleGeniusAuth,
-  handleSpotifyAuth,
-  generateRandomString,
-  isValidHttpUrl,
-  isValidEmailAddress,
-};
+export { makeRequest, changeTheme, getCurrentTheme, isValidHttpUrl, isValidEmailAddress };

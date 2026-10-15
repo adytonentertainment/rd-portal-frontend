@@ -1,8 +1,10 @@
-import { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useContext, useEffect, useState } from 'react';
+import { Navigate, useParams } from 'react-router-dom';
 import { FaEye, FaExclamationTriangle } from 'react-icons/fa';
 import Revenue from '../Revenue/Revenue';
 import { getWriter } from '../../api/writersAdmin';
+import { UserContextProvider } from '../../components/UserContext/UserContext';
+import { useIsAdmin } from '../../utils/auth';
 import styles from './adminWriterPreview.module.css';
 
 // READ-ONLY preview of one client's portal, opened from the admin panel.
@@ -24,12 +26,16 @@ import styles from './adminWriterPreview.module.css';
 
 const AdminWriterPreview = () => {
   const { id } = useParams();
+  const user = useContext(UserContextProvider);
+  const isAdmin = useIsAdmin();
   const [writer, setWriter] = useState(null);
   const [error, setError] = useState(null);
 
   // Only the identity, for the banner — the page's money comes from the
   // portal-view endpoint via <Revenue portalPreviewWriterId>.
+  // Non-admins never call it; the redirect below is the gate.
   useEffect(() => {
+    if (!isAdmin) return undefined;
     let cancelled = false;
     (async () => {
       try {
@@ -42,7 +48,12 @@ const AdminWriterPreview = () => {
     return () => {
       cancelled = true;
     };
-  }, [id]);
+  }, [id, isAdmin]);
+
+  // Wait until the session is known. Redirecting while it is still loading
+  // would bounce a real admin to /earnings.
+  if (user === undefined) return null;
+  if (!isAdmin) return <Navigate to="/earnings" replace />;
 
   if (error) {
     return (

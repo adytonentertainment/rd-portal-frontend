@@ -18,12 +18,21 @@ import { statementsLive } from '../../config/featureFlags';
 // writer→/statements by their real account; the demo build keeps /earnings.
 const defaultLanding = () => (statementsLive ? '/' : '/earnings');
 
-// Validate redirect URL to prevent open redirect attacks
+// Validate redirect URL to prevent open redirect attacks.
+// Only a same-origin path is allowed. Control characters are removed first so
+// a tab or newline after the slash cannot be read as a protocol-relative URL.
 const getSafeRedirectUrl = (url) => {
   if (!url) return defaultLanding();
-  const decoded = decodeURIComponent(url);
-  if (decoded.startsWith('/') && !decoded.startsWith('//') && !decoded.toLowerCase().startsWith('/\\')) {
-    return decoded;
+  let decoded;
+  try {
+    decoded = decodeURIComponent(url);
+  } catch {
+    return defaultLanding();
+  }
+  // eslint-disable-next-line no-control-regex -- matching control characters is the point
+  const stripped = decoded.replace(/[\u0000-\u001F\u007F\u2028\u2029]/g, '');
+  if (stripped.startsWith('/') && !stripped.startsWith('//') && !stripped.toLowerCase().startsWith('/\\')) {
+    return stripped;
   }
   return defaultLanding();
 };
