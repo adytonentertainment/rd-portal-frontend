@@ -1452,6 +1452,9 @@ const Revenue = ({ portalPreviewWriterId = null }) => {
   // Fetch catalog data (album art + resolved artist) for top earning songs
   useEffect(() => {
     const fetchCatalogData = async () => {
+      // The catalog belongs to the old Verax product; the portal has none, and
+      // the API no longer serves /catalog/tracks.
+      if (isLivePortal) return;
       if (topEarningSongs.length === 0 || activeTransactionTab !== 'top-songs') {
         return;
       }
@@ -1661,7 +1664,7 @@ const Revenue = ({ portalPreviewWriterId = null }) => {
     };
 
     fetchCatalogData();
-  }, [topEarningSongs, activeTransactionTab]);
+  }, [topEarningSongs, activeTransactionTab, isLivePortal]);
 
   // Filter statements based on timeframe (using income period from transactions, not statement date)
   const filteredStatements = useMemo(() => {
