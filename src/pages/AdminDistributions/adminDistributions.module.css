@@ -130,3 +130,20 @@
   background: var(--accent);
   color: var(--secondary-text);
 }
+
+.releaseBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+  padding: 14px 18px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg, 12px);
+  background: var(--card-bg);
+}
+
+.releaseTitle {
+  font-weight: 600;
+  margin-bottom: 4px;
+}

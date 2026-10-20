@@ -40,7 +40,7 @@ const AdminDistributions = () => {
   const isAdmin = useIsAdmin();
   const [periods, setPeriods] = useState(null);
   const [error, setError] = useState(null);
-  const [notifying, setNotifying] = useState(null); // the period whose Notify dialog is open
+  const [notifying, setNotifying] = useState(false); // Notify dialog open
 
   const loadPeriods = useCallback(async () => {
     try {
@@ -55,6 +55,12 @@ const AdminDistributions = () => {
     if (!statementsLive) return;
     loadPeriods();
   }, [loadPeriods]);
+
+  const releaseLabel = (periods || [])
+    .filter((p) => p.notifiable)
+    .map((p) => p.label)
+    .sort((a, b) => (a.startsWith('H') === b.startsWith('H') ? 0 : a.startsWith('H') ? -1 : 1))
+    .join(' + ');
 
   if (!isAdmin) {
     return <Navigate to="/earnings" replace />;
@@ -80,6 +86,21 @@ const AdminDistributions = () => {
           </div>
 
           {error && <div className={styles.errorBanner}>{error}</div>}
+
+          {releaseLabel && (
+            <div className={styles.releaseBar}>
+              <div>
+                <div className={styles.releaseTitle}>Newest release · {releaseLabel}</div>
+                <div className={styles.muted}>
+                  Email writers that their new statements are ready. Each person is emailed once per release; older
+                  periods are never emailed.
+                </div>
+              </div>
+              <button className={styles.notifyBtn} onClick={() => setNotifying(true)}>
+                Notify writers
+              </button>
+            </div>
+          )}
 
           <div className={styles.tableWrapper}>
             <table className={styles.table}>
@@ -125,22 +146,15 @@ const AdminDistributions = () => {
                         </td>
                         <td className={styles.date}>{fmtDate(p.distributed_at)}</td>
                         <td className={styles.notifyCell}>
-                          {/* Only the newest period can be notified: older (or backfilled)
+                          {/* Only the newest release can be notified: older (or backfilled)
                               periods never email anyone. */}
-                          {!p.notifiable ? (
-                            <span className={styles.muted}>Historical</span>
+                          {p.notifiable ? (
+                            <span className={styles.amount}>
+                              {(p.writers_notified || 0).toLocaleString('en-US')} /{' '}
+                              {((p.writers_notified || 0) + (p.writers_not_notified || 0)).toLocaleString('en-US')}
+                            </span>
                           ) : (
-                            <>
-                              <span className={styles.amount}>
-                                {(p.writers_notified || 0).toLocaleString('en-US')} /{' '}
-                                {((p.writers_notified || 0) + (p.writers_not_notified || 0)).toLocaleString('en-US')}
-                              </span>
-                              {p.writers_not_notified > 0 && (
-                                <button className={styles.notifyBtn} onClick={() => setNotifying(p)}>
-                                  Notify writers
-                                </button>
-                              )}
-                            </>
+                            <span className={styles.muted}>Historical</span>
                           )}
                         </td>
                       </tr>
@@ -150,9 +164,7 @@ const AdminDistributions = () => {
               </tbody>
             </table>
           </div>
-          {notifying && (
-            <NotifyWritersDialog period={notifying} onClose={() => setNotifying(null)} onChanged={loadPeriods} />
-          )}
+          {notifying && <NotifyWritersDialog onClose={() => setNotifying(false)} onChanged={loadPeriods} />}
         </main>
       </div>
     </>
