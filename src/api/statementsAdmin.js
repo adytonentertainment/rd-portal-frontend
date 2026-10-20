@@ -361,6 +361,16 @@ export const acknowledgeFinding = (id) => request({ url: `/admin/findings/${id}/
 // total net payable to writers, distribution status/date). Net only.
 export const listDistributionPeriods = () => request({ url: '/admin/distributions/periods' });
 
+// "Notify writers": email each portal contact once that a period's new
+// statements are ready. Only the newest period is accepted (older periods are
+// historical); publishing itself never emails anyone.
+const notifyUrl = (periodCode) => `/admin/distributions/periods/${encodeURIComponent(periodCode)}/notify`;
+export const getPeriodNotify = (periodCode) => request({ url: notifyUrl(periodCode) });
+export const notifyPeriod = (periodCode) => request({ url: notifyUrl(periodCode), method: 'POST' });
+export const retryPeriodNotify = (periodCode) => request({ url: `${notifyUrl(periodCode)}/retry`, method: 'POST' });
+// Sends the English and Spanish versions to the signed-in admin only.
+export const previewPeriodNotify = (periodCode) => request({ url: `${notifyUrl(periodCode)}/preview`, method: 'POST' });
+
 // GET /admin/statements/reconcile — ingestion audit: proves the DB matches the
 // statement-filename ground truth (identity + ownership). ok=false blocks sending.
 export const getIngestionAudit = () => request({ url: '/admin/statements/reconcile' });

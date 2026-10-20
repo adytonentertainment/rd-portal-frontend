@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { Navigate } from 'react-router-dom';
 import Sidebar from '../../components/Sidebar/Sidebar';
@@ -7,6 +7,7 @@ import { statementsLive } from '../../config/featureFlags';
 import { getDistributionPeriods } from '../../mocks/statementsAdminData';
 import { listDistributionPeriods } from '../../api/statementsAdmin';
 import DemoDistributions from './DemoDistributions';
+import NotifyWritersDialog from './NotifyWritersDialog';
 import styles from './adminDistributions.module.css';
 
 const STATUS_COLORS = {
@@ -39,22 +40,21 @@ const AdminDistributions = () => {
   const isAdmin = useIsAdmin();
   const [periods, setPeriods] = useState(null);
   const [error, setError] = useState(null);
+  const [notifying, setNotifying] = useState(null); // the period whose Notify dialog is open
+
+  const loadPeriods = useCallback(async () => {
+    try {
+      const rows = await listDistributionPeriods();
+      setPeriods(Array.isArray(rows) ? rows : []);
+    } catch (err) {
+      setError(err?.message || 'Could not load distributions.');
+    }
+  }, []);
 
   useEffect(() => {
-    if (!statementsLive) return undefined;
-    let cancelled = false;
-    (async () => {
-      try {
-        const rows = await listDistributionPeriods();
-        if (!cancelled) setPeriods(Array.isArray(rows) ? rows : []);
-      } catch (err) {
-        if (!cancelled) setError(err?.message || 'Could not load distributions.');
-      }
-    })();
-    return () => {
-      cancelled = true;
-    };
-  }, []);
+    if (!statementsLive) return;
+    loadPeriods();
+  }, [loadPeriods]);
 
   if (!isAdmin) {
     return <Navigate to="/earnings" replace />;
@@ -91,18 +91,19 @@ const AdminDistributions = () => {
                   <th>Status</th>
                   <th>Sent</th>
                   <th>Distributed</th>
+                  <th>Writers notified</th>
                 </tr>
               </thead>
               <tbody>
                 {periods === null ? (
                   <tr>
-                    <td colSpan={6} className={styles.date}>
+                    <td colSpan={7} className={styles.date}>
                       Loading…
                     </td>
                   </tr>
                 ) : periods.length === 0 ? (
                   <tr>
-                    <td colSpan={6} className={styles.date}>
+                    <td colSpan={7} className={styles.date}>
                       No distributions yet — upload and distribute statements first.
                     </td>
                   </tr>
@@ -123,6 +124,25 @@ const AdminDistributions = () => {
                           {p.distributed.toLocaleString('en-US')} / {p.statements.toLocaleString('en-US')}
                         </td>
                         <td className={styles.date}>{fmtDate(p.distributed_at)}</td>
+                        <td className={styles.notifyCell}>
+                          {/* Only the newest period can be notified: older (or backfilled)
+                              periods never email anyone. */}
+                          {!p.notifiable ? (
+                            <span className={styles.muted}>Historical</span>
+                          ) : (
+                            <>
+                              <span className={styles.amount}>
+                                {(p.writers_notified || 0).toLocaleString('en-US')} /{' '}
+                                {((p.writers_notified || 0) + (p.writers_not_notified || 0)).toLocaleString('en-US')}
+                              </span>
+                              {p.writers_not_notified > 0 && (
+                                <button className={styles.notifyBtn} onClick={() => setNotifying(p)}>
+                                  Notify writers
+                                </button>
+                              )}
+                            </>
+                          )}
+                        </td>
                       </tr>
                     );
                   })
@@ -130,6 +150,9 @@ const AdminDistributions = () => {
               </tbody>
             </table>
           </div>
+          {notifying && (
+            <NotifyWritersDialog period={notifying} onClose={() => setNotifying(null)} onChanged={loadPeriods} />
+          )}
         </main>
       </div>
     </>

@@ -101,3 +101,32 @@
   color: #f87171;
   font-size: 14px;
 }
+
+.notifyCell {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  white-space: nowrap;
+}
+
+.muted {
+  color: var(--secondary-text);
+  font-size: 13px;
+}
+
+.notifyBtn {
+  padding: 6px 12px;
+  border-radius: var(--radius-md);
+  border: 1px solid var(--accent);
+  background: transparent;
+  color: var(--accent);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  font-family: var(--font-body);
+}
+
+.notifyBtn:hover {
+  background: var(--accent);
+  color: var(--secondary-text);
+}

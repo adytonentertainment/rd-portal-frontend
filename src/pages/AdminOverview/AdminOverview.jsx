@@ -1181,6 +1181,10 @@ const AdminOverview = () => {
                 Published <strong>{sendResult.sent_batches}</strong> batch{sendResult.sent_batches === 1 ? '' : 'es'} to
                 client portals.
                 {sendResult.skipped_batches > 0 && ` ${sendResult.skipped_batches} batch(es) were skipped (not ready).`}
+                <br />
+                <br />
+                Writers have not been emailed yet. When everything for the period is out, use{' '}
+                <strong>Notify writers</strong> on the Distributions page.
               </div>
             ) : (
               <div className={styles.confirmBody} style={{ color: 'var(--error)' }}>
