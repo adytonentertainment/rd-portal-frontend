@@ -92,13 +92,9 @@ const InviteAccept = () => {
     setSubmitting(true);
     setError('');
     try {
-      const res = await acceptInvite(token, preview?.needs_password ? password : undefined, username.trim());
-      if (res.access_token) {
-        localStorage.setItem('token', res.access_token);
-        window.location.href = '/earnings';
-      } else {
-        setError('Something went wrong finishing your access. Please try again.');
-      }
+      await acceptInvite(token, preview?.needs_password ? password : undefined, username.trim());
+      // Accepting signs this browser in (HttpOnly session cookie set by the API).
+      window.location.href = '/earnings';
     } catch (err) {
       setError(messageFor(err));
     } finally {

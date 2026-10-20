@@ -3,14 +3,13 @@ import Dropdown from '../Dropdown/Dropdown';
 import { CiUser, CiLogout, CiSettings } from 'react-icons/ci';
 import { useNavigate } from 'react-router-dom';
 import GlassButton from '../Buttons/GlassButton/GlassButton';
+import { logout } from '../../api/session';
 
 const UserControl = ({ username }) => {
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    localStorage.removeItem('token');
-    window.location.reload();
-  };
+  // Ends the server session (clears the HttpOnly cookie), then shows login.
+  const handleLogout = () => logout();
 
   const handleSettings = () => {
     navigate('/settings');

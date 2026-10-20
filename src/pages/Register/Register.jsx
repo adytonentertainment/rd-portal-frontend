@@ -49,7 +49,6 @@ const Register = () => {
     setError('');
     try {
       const account = await registerAccount({ email, username, password, role, adminCode });
-      if (account.access_token) localStorage.setItem('token', account.access_token);
       if (account.pending_admin_approval) {
         // Admin created but not yet approved — don't drop them into a dashboard
         // they can't use; show them exactly where they stand.

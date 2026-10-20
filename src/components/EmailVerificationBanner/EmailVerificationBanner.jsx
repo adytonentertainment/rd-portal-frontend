@@ -11,13 +11,9 @@ const EmailVerificationBanner = ({ email }) => {
 
     setResending(true);
     try {
-      const token = localStorage.getItem('token');
       await axios({
         url: urlJoin(process.env.REACT_APP_BACKEND_URL, 'auth/resend-verification'),
         method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
       });
       setResent(true);
     } catch (error) {

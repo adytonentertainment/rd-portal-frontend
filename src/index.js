@@ -25,7 +25,7 @@ import { ToastContainer, Bounce } from 'react-toastify';
 import ResetPassword from './pages/ResetPassword/ResetPassword';
 import ForgotPassword from './pages/ForgotPassword/ForgotPassword';
 import Revenue from './pages/Revenue/Revenue';
-import TokenWatcher from './components/TokenWatcher/TokenWatcher';
+import { configureHttp } from './api/session';
 import WriterStatements from './pages/WriterStatements/WriterStatements';
 import AdminOverview from './pages/AdminOverview/AdminOverview';
 import AdminStatements from './pages/AdminStatements/AdminStatements';
@@ -73,7 +73,6 @@ const App = () => {
                       and the switch must work regardless. */}
                   <LanguageProvider persist={setMyLanguage}>
                     <BrowserRouter>
-                      <TokenWatcher />
                       <Routes>
                         <Route element={<RootRoute />} path="/" />
                         {/* One way in: /signup is the historical URL, /register is the page. */}
@@ -138,6 +137,17 @@ const App = () => {
     </>
   );
 };
+
+// The session cookie belongs to the portal's own domain. Visitors arriving on
+// another hostname (the hosting provider's default address) are sent to the
+// canonical one, where signing in works.
+const CANONICAL_ORIGIN = (process.env.REACT_APP_CANONICAL_ORIGIN || '').replace(/\/+$/, '');
+if (CANONICAL_ORIGIN && window.location.origin !== CANONICAL_ORIGIN) {
+  window.location.replace(CANONICAL_ORIGIN + window.location.pathname + window.location.search + window.location.hash);
+}
+
+// Every API request carries the session cookie and the CSRF header.
+configureHttp();
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(<App />);

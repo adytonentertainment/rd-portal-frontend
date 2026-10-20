@@ -1,7 +1,6 @@
 import { useEffect, createContext, useState, useCallback } from 'react';
 import urlJoin from 'url-join';
 import axios from 'axios';
-import { isTokenExpired, clearAuthAndRedirect } from '../../utils/tokenUtils';
 import { ADMIN_PERSONA, getPersona } from '../../utils/persona';
 import { MOCK_WRITERS } from '../../mocks/roster';
 import { demoAutoLogin } from '../../config/featureFlags';
@@ -12,7 +11,6 @@ const UserContext = ({ children }) => {
   const [user, setUser] = useState(undefined);
 
   const fetchUser = useCallback(async () => {
-    const token = localStorage.getItem('token');
     let userData = undefined;
 
     // Demo mode: auto-sign-in based on the active persona.
@@ -47,42 +45,24 @@ const UserContext = ({ children }) => {
     };
     const DEMO_USER = persona === ADMIN_PERSONA ? ADMIN_USER : writerForPersona() || ADMIN_USER;
     // Live mode, and a production build that forgot the live flag, do not
-    // auto-sign-in. A missing or expired token means logged-out. The demo
-    // persona is local development, or a demo deploy that sets
-    // REACT_APP_DEMO_AUTO_LOGIN=1.
+    // auto-sign-in. No valid session means logged-out. The demo persona is
+    // local development, or a demo deploy that sets REACT_APP_DEMO_AUTO_LOGIN=1.
     const NO_SESSION = demoAutoLogin ? DEMO_USER : null;
 
-    if (!token) {
-      setUser(NO_SESSION);
-      return;
-    }
-
-    if (isTokenExpired(token)) {
-      setUser(NO_SESSION);
-      return;
-    }
-
     try {
-      // First verify the token. The token goes in the Authorization header,
-      // never in the URL — request lines end up verbatim in server access logs,
-      // which is how live session tokens leaked to disk.
+      // The session is an HttpOnly cookie the page cannot read, so the only way
+      // to know whether someone is signed in is to ask the API.
       const verifyResponse = await axios({
         url: urlJoin(process.env.REACT_APP_BACKEND_URL, 'auth/verify-token'),
         method: 'GET',
-        headers: {
-          accept: 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { accept: 'application/json' },
       });
 
       // Then fetch the full user profile to get account_activated status
       const profileResponse = await axios({
         url: urlJoin(process.env.REACT_APP_BACKEND_URL, 'auth/user'),
         method: 'GET',
-        headers: {
-          accept: 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { accept: 'application/json' },
       });
 
       // And the Verax account role — the authoritative answer to "is this an
@@ -94,10 +74,7 @@ const UserContext = ({ children }) => {
         const accountResponse = await axios({
           url: urlJoin(process.env.REACT_APP_BACKEND_URL, 'auth/me/account'),
           method: 'GET',
-          headers: {
-            accept: 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { accept: 'application/json' },
         });
         account = accountResponse.data || {};
       } catch {
@@ -111,8 +88,8 @@ const UserContext = ({ children }) => {
         ...account,
       };
     } catch {
-      // A token that fails to verify means logged-out, so re-login is required.
-      // Demo auto-login still substitutes the demo user when that mode is on.
+      // No session, an expired one, or one ended by a password change: signed
+      // out. Demo auto-login still substitutes the demo user when that mode is on.
       userData = demoAutoLogin ? DEMO_USER : null;
     } finally {
       setUser(userData ?? NO_SESSION);
@@ -124,43 +101,15 @@ const UserContext = ({ children }) => {
     fetchUser();
   }, [fetchUser]);
 
-  // Check token when user returns to the tab/window
+  // Re-check the session when a signed-in user returns to the tab: it may have
+  // expired, or ended because the password changed elsewhere. A null user sends
+  // protected pages back to the login screen.
   useEffect(() => {
     const handleVisibilityChange = () => {
-      if (document.visibilityState === 'visible') {
-        const token = localStorage.getItem('token');
-        if (token && isTokenExpired(token)) {
-          console.log('Token expired while tab was inactive, logging out');
-          clearAuthAndRedirect();
-          setUser(null);
-        } else if (token && user) {
-          // Token exists and is valid, optionally refresh user data
-          fetchUser();
-        }
-      }
+      if (document.visibilityState === 'visible' && user) fetchUser();
     };
-
-    const handleFocus = () => {
-      const token = localStorage.getItem('token');
-      if (token && isTokenExpired(token)) {
-        console.log('Token expired while window was unfocused, logging out');
-        clearAuthAndRedirect();
-        setUser(null);
-      } else if (token && user) {
-        // Token exists and is valid, optionally refresh user data
-        fetchUser();
-      }
-    };
-
-    // Listen for visibility changes (tab switching)
     document.addEventListener('visibilitychange', handleVisibilityChange);
-    // Listen for window focus (window switching)
-    window.addEventListener('focus', handleFocus);
-
-    return () => {
-      document.removeEventListener('visibilitychange', handleVisibilityChange);
-      window.removeEventListener('focus', handleFocus);
-    };
+    return () => document.removeEventListener('visibilitychange', handleVisibilityChange);
   }, [user, fetchUser]);
 
   return (

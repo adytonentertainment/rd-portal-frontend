@@ -20,6 +20,7 @@ import { ThemeContext } from '../ThemeProvider/ThemeProvider';
 import { useClientContext } from '../ClientContext/ClientContext';
 import styles from './sidebar.module.css';
 import { useLanguage } from '../../i18n/LanguageContext';
+import { logout } from '../../api/session';
 
 // Writer-facing nav labels follow the portal language switch; admin nav stays
 // English (the admin UI is not translated).
@@ -31,10 +32,8 @@ const Sidebar = () => {
   const isAdmin = useIsAdmin();
   const { selectedClientId } = useClientContext();
 
-  const handleSignOut = () => {
-    localStorage.removeItem('token');
-    window.location.href = '/login';
-  };
+  // Ends the server session (clears the HttpOnly cookie), then shows login.
+  const handleSignOut = () => logout();
 
   const toggleTheme = () => {
     theme.toggleTheme();

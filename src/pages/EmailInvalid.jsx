@@ -1,9 +1,9 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import urlJoin from 'url-join';
 import NavBar from '../components/NavBar/NavBar';
-import { getValidToken } from '../utils/tokenUtils';
+import { UserContextProvider } from '../components/UserContext/UserContext';
 
 const EmailInvalid = () => {
   const navigate = useNavigate();
@@ -11,7 +11,8 @@ const EmailInvalid = () => {
   const [sent, setSent] = useState(false);
   const [error, setError] = useState('');
 
-  const token = getValidToken();
+  // Signed in? (The session is an HttpOnly cookie; the user context knows.)
+  const signedIn = Boolean(useContext(UserContextProvider));
 
   const handleResend = async () => {
     if (sending || sent) return;
@@ -23,9 +24,6 @@ const EmailInvalid = () => {
       await axios({
         url: urlJoin(process.env.REACT_APP_BACKEND_URL, 'auth/resend-verification'),
         method: 'POST',
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
       });
       setSent(true);
     } catch (err) {
@@ -112,7 +110,7 @@ const EmailInvalid = () => {
             }}
           >
             Your verification link has expired or is invalid.
-            {token
+            {signedIn
               ? ' Click below to receive a new verification link.'
               : ' Please log in to resend the verification email.'}
           </p>
@@ -125,7 +123,7 @@ const EmailInvalid = () => {
               gap: '12px',
             }}
           >
-            {token ? (
+            {signedIn ? (
               sent ? (
                 <div
                   style={{
@@ -178,17 +176,17 @@ const EmailInvalid = () => {
               onClick={() => navigate('/login')}
               style={{
                 padding: '14px 24px',
-                background: token ? 'transparent' : 'var(--secondary)',
-                border: token ? '1px solid var(--button-border)' : 'none',
+                background: signedIn ? 'transparent' : 'var(--secondary)',
+                border: signedIn ? '1px solid var(--button-border)' : 'none',
                 borderRadius: '8px',
-                color: token ? 'var(--text)' : 'var(--secondary-text)',
+                color: signedIn ? 'var(--text)' : 'var(--secondary-text)',
                 fontSize: '16px',
-                fontWeight: token ? 500 : 600,
+                fontWeight: signedIn ? 500 : 600,
                 cursor: 'pointer',
                 transition: 'all 0.2s ease',
               }}
               onMouseEnter={(e) => {
-                if (token) {
+                if (signedIn) {
                   e.currentTarget.style.background = 'var(--input-bg)';
                 } else {
                   e.currentTarget.style.opacity = '0.9';
@@ -196,7 +194,7 @@ const EmailInvalid = () => {
                 }
               }}
               onMouseLeave={(e) => {
-                if (token) {
+                if (signedIn) {
                   e.currentTarget.style.background = 'transparent';
                 } else {
                   e.currentTarget.style.opacity = '1';

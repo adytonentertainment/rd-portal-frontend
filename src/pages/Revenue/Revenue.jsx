@@ -461,9 +461,7 @@ const Revenue = ({ portalPreviewWriterId = null }) => {
         const transactionsResponse = await fetch(
           urlJoin(process.env.REACT_APP_BACKEND_URL, `revenue/transactions${clientParam}`),
           {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`,
-            },
+            headers: {},
           }
         );
 
@@ -479,9 +477,7 @@ const Revenue = ({ portalPreviewWriterId = null }) => {
         const statementsResponse = await fetch(
           urlJoin(process.env.REACT_APP_BACKEND_URL, `revenue/statements${clientParam}`),
           {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`,
-            },
+            headers: {},
           }
         );
 
@@ -496,9 +492,7 @@ const Revenue = ({ portalPreviewWriterId = null }) => {
         const missingSongsResponse = await fetch(
           urlJoin(process.env.REACT_APP_BACKEND_URL, `revenue/missing-from-statements${clientParam}`),
           {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`,
-            },
+            headers: {},
           }
         );
 
@@ -511,9 +505,7 @@ const Revenue = ({ portalPreviewWriterId = null }) => {
         const quarterlyRevenueResponse = await fetch(
           urlJoin(process.env.REACT_APP_BACKEND_URL, `stats/quarterly-revenue${clientParam}`),
           {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`,
-            },
+            headers: {},
           }
         );
 
@@ -631,9 +623,7 @@ const Revenue = ({ portalPreviewWriterId = null }) => {
       const response = await fetch(
         urlJoin(process.env.REACT_APP_BACKEND_URL, `stats/quarterly-revenue${clientParam}`),
         {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-          },
+          headers: {},
         }
       );
 
@@ -747,7 +737,6 @@ const Revenue = ({ portalPreviewWriterId = null }) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
         body: JSON.stringify({ songs: uniqueSongs }),
       });
@@ -759,9 +748,7 @@ const Revenue = ({ portalPreviewWriterId = null }) => {
         try {
           const resolveResponse = await fetch(urlJoin(process.env.REACT_APP_BACKEND_URL, 'catalog/resolve-artists'), {
             method: 'POST',
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`,
-            },
+            headers: {},
           });
 
           if (resolveResponse.ok) {
@@ -943,7 +930,6 @@ const Revenue = ({ portalPreviewWriterId = null }) => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          Authorization: `Bearer ${localStorage.getItem('token')}`,
         },
         body: JSON.stringify({
           transactions: transactions,
@@ -962,9 +948,7 @@ const Revenue = ({ portalPreviewWriterId = null }) => {
         const transactionsResponse = await fetch(
           urlJoin(process.env.REACT_APP_BACKEND_URL, `revenue/transactions${clientParam}`),
           {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`,
-            },
+            headers: {},
           }
         );
 
@@ -977,9 +961,7 @@ const Revenue = ({ portalPreviewWriterId = null }) => {
         const statementsResponse = await fetch(
           urlJoin(process.env.REACT_APP_BACKEND_URL, `revenue/statements${clientParam}`),
           {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`,
-            },
+            headers: {},
           }
         );
 
@@ -1194,9 +1176,7 @@ const Revenue = ({ portalPreviewWriterId = null }) => {
       try {
         const response = await fetch(urlJoin(process.env.REACT_APP_BACKEND_URL, `revenue/statements/${statementId}`), {
           method: 'DELETE',
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`,
-          },
+          headers: {},
         });
 
         if (response.ok) {
@@ -1208,9 +1188,7 @@ const Revenue = ({ portalPreviewWriterId = null }) => {
           const transactionsResponse = await fetch(
             urlJoin(process.env.REACT_APP_BACKEND_URL, `revenue/transactions${clientParam}`),
             {
-              headers: {
-                Authorization: `Bearer ${localStorage.getItem('token')}`,
-              },
+              headers: {},
             }
           );
 
@@ -1459,11 +1437,6 @@ const Revenue = ({ portalPreviewWriterId = null }) => {
         return;
       }
 
-      const token = localStorage.getItem('token');
-      if (!token) {
-        return;
-      }
-
       // Helper function to normalize ISRC (remove spaces, dashes, uppercase)
       const normalizeIsrc = (isrc) => {
         if (!isrc) return null;
@@ -1498,9 +1471,7 @@ const Revenue = ({ portalPreviewWriterId = null }) => {
         const clientParam = selectedClientId ? `?client_id=${selectedClientId}` : '';
         const catalogResponse = await fetch(
           urlJoin(process.env.REACT_APP_BACKEND_URL, `catalog/tracks${clientParam}`),
-          {
-            headers: { Authorization: `Bearer ${token}` },
-          }
+          {}
         );
         if (catalogResponse.ok) {
           const data = await catalogResponse.json();
@@ -1633,7 +1604,6 @@ const Revenue = ({ portalPreviewWriterId = null }) => {
           const spotifyResponse = await fetch(urlJoin(process.env.REACT_APP_BACKEND_URL, 'search/lookup-isrcs'), {
             method: 'POST',
             headers: {
-              Authorization: `Bearer ${token}`,
               'Content-Type': 'application/json',
             },
             body: JSON.stringify(unmatchedIsrcs),
@@ -5240,9 +5210,7 @@ const Revenue = ({ portalPreviewWriterId = null }) => {
             const response = await fetch(
               urlJoin(process.env.REACT_APP_BACKEND_URL, `revenue/transactions${clientParam}`),
               {
-                headers: {
-                  Authorization: `Bearer ${localStorage.getItem('token')}`,
-                },
+                headers: {},
               }
             );
             if (response.ok) {

@@ -60,13 +60,13 @@ const Login = () => {
     formDetails.append('password', password);
 
     try {
-      const response = await axios({
+      await axios({
         url: urlJoin(process.env.REACT_APP_BACKEND_URL, '/auth/token'),
         method: 'POST',
         headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
         data: formDetails,
       });
-      localStorage.setItem('token', response.data.access_token);
+      // The API set the session as an HttpOnly cookie; a full load picks it up.
       window.location.href = redirectURL;
     } catch (error) {
       if (error.response) {

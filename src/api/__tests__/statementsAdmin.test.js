@@ -52,9 +52,12 @@ describe('statementsAdmin URL + method mapping', () => {
     expect(config.method || 'GET').toBe(method);
   });
 
-  it('attaches the bearer token from localStorage', async () => {
+  it('sends the session cookie and CSRF header, never a token', async () => {
     await listBatches();
-    expect(lastConfig().headers.Authorization).toBe('Bearer test-token');
+    const cfg = lastConfig();
+    expect(cfg.withCredentials).toBe(true);
+    expect(cfg.headers['X-Requested-With']).toBe('XMLHttpRequest');
+    expect(cfg.headers.Authorization).toBeUndefined();
   });
 
   it('resolves with the response body', async () => {

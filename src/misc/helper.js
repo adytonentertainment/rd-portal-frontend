@@ -1,39 +1,3 @@
-import axios from 'axios';
-
-/**
- * Performs an HTTP request to the TuneScan backend server.
- */
-const makeRequest = async ({ url, method = 'GET', data = {}, isProtectedRoute = true }) => {
-  const token = localStorage.getItem('token');
-  if (isProtectedRoute && !token) window.location.href = '/';
-  try {
-    const response = await axios({
-      url,
-      method,
-      headers: {
-        accept: 'application/json',
-        Authorization: `Bearer ${token}`,
-      },
-      data,
-    });
-    if (response.ok) {
-      return {
-        response: response.data,
-      };
-    } else {
-      return {
-        code: response.status,
-        detail: response.data,
-      };
-    }
-  } catch (error) {
-    return {
-      code: error.response ? error.response.status : 400,
-      detail: 'An error has occured.',
-    };
-  }
-};
-
 const changeTheme = (theme) => {
   if (!theme) theme = 'dark';
   if (theme !== 'light' && theme !== 'dark')
@@ -69,4 +33,4 @@ const isValidEmailAddress = (email) => {
   return pattern.test(email);
 };
 
-export { makeRequest, changeTheme, getCurrentTheme, isValidHttpUrl, isValidEmailAddress };
+export { changeTheme, getCurrentTheme, isValidHttpUrl, isValidEmailAddress };

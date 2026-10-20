@@ -31,20 +31,11 @@ const Settings = () => {
   // Fetch user info on component mount
   useEffect(() => {
     const fetchUserInfo = async () => {
-      const token = localStorage.getItem('token');
-      if (!token) {
-        navigate('/');
-        return;
-      }
-
       try {
         const response = await axios({
           method: 'GET',
           url: urlJoin(process.env.REACT_APP_BACKEND_URL, 'auth/user'),
-          headers: {
-            accept: 'application/json',
-            Authorization: `Bearer ${token}`,
-          },
+          headers: { accept: 'application/json' },
         });
 
         if (response.status === 200) {
@@ -56,9 +47,8 @@ const Settings = () => {
         }
       } catch (error) {
         console.error('Error fetching user info:', error);
-        // If unauthorized, redirect to login
+        // Not signed in (or the session ended): back to the start.
         if (error.response?.status === 401 || error.response?.status === 403) {
-          localStorage.clear();
           navigate('/');
         }
       }
@@ -68,19 +58,12 @@ const Settings = () => {
   }, [navigate, selectedClient]);
 
   const handleDeleteAccount = async () => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      navigate('/');
-      return;
-    }
     try {
+      // The API also clears the session cookie on success.
       const response = await axios({
         method: 'DELETE',
         url: urlJoin(process.env.REACT_APP_BACKEND_URL, 'auth/user'),
-        headers: {
-          accept: 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { accept: 'application/json' },
       });
       if (response.status === 204) {
         // Clear all authentication data
@@ -118,20 +101,11 @@ const Settings = () => {
       return;
     }
 
-    const token = localStorage.getItem('token');
-    if (!token) {
-      navigate('/');
-      return;
-    }
-
     try {
       const response = await axios({
         method: 'POST',
         url: urlJoin(process.env.REACT_APP_BACKEND_URL, 'auth/change-password'),
-        headers: {
-          accept: 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { accept: 'application/json' },
         data: {
           password_old: oldPasswordRef.current.value,
           password_new: newPasswordRef.current.value,
@@ -156,12 +130,6 @@ const Settings = () => {
   };
 
   const handleSaveAccount = async () => {
-    const token = localStorage.getItem('token');
-    if (!token) {
-      navigate('/');
-      return;
-    }
-
     try {
       // Save user account fields (first name, last name)
       const response = await axios({
@@ -169,7 +137,6 @@ const Settings = () => {
         url: urlJoin(process.env.REACT_APP_BACKEND_URL, 'auth/user'),
         headers: {
           accept: 'application/json',
-          Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
         data: {
@@ -210,12 +177,6 @@ const Settings = () => {
       return;
     }
 
-    const token = localStorage.getItem('token');
-    if (!token) {
-      navigate('/');
-      return;
-    }
-
     try {
       const formData = new FormData();
       formData.append('file', file);
@@ -223,9 +184,6 @@ const Settings = () => {
       const response = await axios({
         method: 'POST',
         url: urlJoin(process.env.REACT_APP_BACKEND_URL, 'auth/user/avatar'),
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
         data: formData,
       });
 

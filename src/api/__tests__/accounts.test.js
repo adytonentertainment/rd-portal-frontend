@@ -26,7 +26,11 @@ describe('URL + method mapping', () => {
     const cfg = last();
     expect((cfg.method || 'GET').toUpperCase()).toBe(method);
     expect(cfg.url).toBe(`${BASE}${path}`);
-    expect(cfg.headers.Authorization).toBe('Bearer test-token');
+    // Session is the HttpOnly cookie: credentials + CSRF header, never a token,
+    // even when a stale pre-cookie token is still sitting in localStorage.
+    expect(cfg.withCredentials).toBe(true);
+    expect(cfg.headers['X-Requested-With']).toBe('XMLHttpRequest');
+    expect(cfg.headers.Authorization).toBeUndefined();
   });
 });
 

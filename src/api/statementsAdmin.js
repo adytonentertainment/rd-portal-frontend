@@ -7,10 +7,9 @@ import axios from 'axios';
 
 const baseUrl = () => (process.env.REACT_APP_BACKEND_URL || '').replace(/\/+$/, '');
 
-const authHeaders = () => {
-  const token = localStorage.getItem('token');
-  return token ? { Authorization: `Bearer ${token}` } : {};
-};
+// The session is an HttpOnly cookie (see ./session.js): send credentials and the
+// API's CSRF header, never a token.
+const SESSION_HEADERS = { 'X-Requested-With': 'XMLHttpRequest' };
 
 export const normalizeError = (error) => {
   const response = error && error.response;
@@ -34,8 +33,9 @@ const request = async (config) => {
   try {
     const response = await axios({
       ...config,
+      withCredentials: true,
       url: `${baseUrl()}${config.url}`,
-      headers: { accept: 'application/json', ...authHeaders(), ...(config.headers || {}) },
+      headers: { accept: 'application/json', ...SESSION_HEADERS, ...(config.headers || {}) },
     });
     return response.data;
   } catch (error) {
@@ -320,14 +320,15 @@ export const getUploadStatements = (id) => request({ url: `/admin/statements/upl
 export const getUploadFailures = (id) => request({ url: `/admin/statements/uploads/${id}/failures` });
 
 // Same list as a file, so a failure report can be forwarded to the statement
-// source. Fetched rather than linked: the endpoint needs the auth header, and
-// a bare <a href> sends none.
+// source. Fetched rather than linked, so the download stays inside the
+// session request path (credentials + CSRF header) like every other call.
 export const downloadUploadFailuresCsv = async (id) => {
   try {
     const response = await axios({
       url: `${baseUrl()}/admin/statements/uploads/${id}/failures.csv`,
       responseType: 'blob',
-      headers: { accept: 'text/csv', ...authHeaders() },
+      withCredentials: true,
+      headers: { accept: 'text/csv', ...SESSION_HEADERS },
     });
     const href = URL.createObjectURL(response.data);
     const a = document.createElement('a');

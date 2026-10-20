@@ -65,7 +65,7 @@ const NavBar = ({ marketingLinks = !statementsLive, showDashboard = true }) => {
       const data = response.data;
 
       if (response.status === 200) {
-        localStorage.setItem('token', data.access_token);
+        // Session cookie is set by the API; reload to pick it up.
         window.location.reload();
       } else {
         setErrorMessage(data.detail);

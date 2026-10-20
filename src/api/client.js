@@ -8,10 +8,12 @@ import axios from 'axios';
 
 export const baseUrl = () => (process.env.REACT_APP_BACKEND_URL || '').replace(/\/+$/, '');
 
-export const authHeaders = () => {
-  const token = localStorage.getItem('token');
-  return token ? { Authorization: `Bearer ${token}` } : {};
-};
+// The session is an HttpOnly cookie (see ./session.js): requests carry
+// credentials plus the API's CSRF header, and never a token.
+export const sessionRequestOptions = () => ({
+  withCredentials: true,
+  headers: { 'X-Requested-With': 'XMLHttpRequest' },
+});
 
 export const normalizeError = (error) => {
   const response = error && error.response;
@@ -33,10 +35,12 @@ export const normalizeError = (error) => {
 
 export const request = async (config) => {
   try {
+    const session = sessionRequestOptions();
     const response = await axios({
       ...config,
+      withCredentials: session.withCredentials,
       url: `${baseUrl()}${config.url}`,
-      headers: { accept: 'application/json', ...authHeaders(), ...(config.headers || {}) },
+      headers: { accept: 'application/json', ...session.headers, ...(config.headers || {}) },
     });
     return response.data;
   } catch (error) {

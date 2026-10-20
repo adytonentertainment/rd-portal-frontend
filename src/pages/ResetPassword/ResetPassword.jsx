@@ -47,7 +47,6 @@ const ResetPassword = () => {
         },
       });
       if (response.status === 200) {
-        localStorage.removeItem('token');
         navigate('/login');
       }
     } catch (error) {
