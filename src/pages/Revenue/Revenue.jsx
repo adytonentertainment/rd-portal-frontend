@@ -3453,7 +3453,7 @@ const Revenue = ({ portalPreviewWriterId = null }) => {
                 onClick={() => requireSubscription(() => setIsExportModalOpen(true), true, 'Earnings Export')}
               >
                 <FaDownload />
-                Export
+                {t('earnings.export')}
               </button>
               <input
                 type="file"
@@ -4601,13 +4601,13 @@ const Revenue = ({ portalPreviewWriterId = null }) => {
                   className={`tab-button ${activeTransactionTab === 'top-songs' ? 'active' : ''}`}
                   onClick={() => setActiveTransactionTab('top-songs')}
                 >
-                  Top Earning Songs ({topEarningSongs.length})
+                  {t('earnings.topSongsTab', { count: topEarningSongs.length })}
                 </button>
                 <button
                   className={`tab-button ${activeTransactionTab === 'transactions' ? 'active' : ''}`}
                   onClick={() => setActiveTransactionTab('transactions')}
                 >
-                  All Transactions ({filteredTransactions.length})
+                  {t('earnings.allTransactionsTab', { count: filteredTransactions.length })}
                 </button>
               </div>
               {activeTransactionTab === 'top-songs' ? (

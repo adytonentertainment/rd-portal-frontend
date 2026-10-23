@@ -83,7 +83,9 @@ const AdminWriterPreview = () => {
         </span>
       </div>
 
-      <div className={styles.page}>
+      {/* data-portal-view: what the client sees, as opposed to the admin banner
+          above (the browser suite checks its language and figures). */}
+      <div className={styles.page} data-portal-view>
         <Revenue portalPreviewWriterId={id} />
       </div>
     </div>

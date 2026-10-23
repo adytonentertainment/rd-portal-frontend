@@ -60,8 +60,9 @@
   border-bottom: none;
 }
 
+/* Rows highlight on hover for reading across, but they open nothing: no pointer
+   cursor, or the row promises a click that does nothing. */
 .table tbody tr {
-  cursor: pointer;
   transition: background 0.15s;
 }
 

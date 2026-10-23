@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { FaTimes, FaFileExport, FaCalendarAlt, FaUser, FaFileDownload } from 'react-icons/fa';
 import IncomePeriodParser from '../../utils/incomePeriodParser';
+import { useLanguage } from '../../i18n/LanguageContext';
 import './exportReportModal.css';
 
 // Statement fields are untrusted. The print window shares this origin, so a
@@ -23,6 +24,7 @@ const csvCell = (value) => {
 };
 
 const ExportReportModal = ({ isOpen, onClose, transactions, username, currency = 'GBP' }) => {
+  const { t } = useLanguage();
   const [periodType, setPeriodType] = useState('quarterly');
   const [selectedPeriods, setSelectedPeriods] = useState([]);
   const [selectedUser, setSelectedUser] = useState(username || '');
@@ -451,7 +453,7 @@ const ExportReportModal = ({ isOpen, onClose, transactions, username, currency =
         <div className="export-modal-header">
           <div className="export-modal-title">
             <FaFileExport className="modal-title-icon" />
-            <h2>Create Custom Report</h2>
+            <h2>{t('export.title')}</h2>
           </div>
           <button className="modal-close-btn" onClick={onClose}>
             <FaTimes />
@@ -462,7 +464,7 @@ const ExportReportModal = ({ isOpen, onClose, transactions, username, currency =
           <div className="export-section">
             <div className="section-label">
               <FaCalendarAlt />
-              <span>Select Period Type</span>
+              <span>{t('export.periodType')}</span>
             </div>
             <div className="period-type-toggle">
               <button
@@ -472,7 +474,7 @@ const ExportReportModal = ({ isOpen, onClose, transactions, username, currency =
                   setSelectedPeriods([]);
                 }}
               >
-                Monthly
+                {t('export.monthly')}
               </button>
               <button
                 className={`toggle-btn ${periodType === 'quarterly' ? 'active' : ''}`}
@@ -481,7 +483,7 @@ const ExportReportModal = ({ isOpen, onClose, transactions, username, currency =
                   setSelectedPeriods([]);
                 }}
               >
-                Quarterly
+                {t('export.quarterly')}
               </button>
             </div>
           </div>
@@ -489,7 +491,7 @@ const ExportReportModal = ({ isOpen, onClose, transactions, username, currency =
           <div className="export-section">
             <div className="section-label">
               <FaCalendarAlt />
-              <span>Select Time Periods</span>
+              <span>{t('export.periods')}</span>
             </div>
             {availablePeriods.length > 0 && (
               <div className="period-actions">
@@ -498,16 +500,16 @@ const ExportReportModal = ({ isOpen, onClose, transactions, username, currency =
                   className="period-action-btn"
                   onClick={() => setSelectedPeriods([...availablePeriods])}
                 >
-                  Select All
+                  {t('export.selectAll')}
                 </button>
                 <button type="button" className="period-action-btn" onClick={() => setSelectedPeriods([])}>
-                  Clear All
+                  {t('export.clearAll')}
                 </button>
               </div>
             )}
             <div className="periods-list">
               {availablePeriods.length === 0 ? (
-                <div className="no-periods">No periods available</div>
+                <div className="no-periods">{t('export.noPeriods')}</div>
               ) : (
                 availablePeriods.map((period) => (
                   <label key={period} className="period-item">
@@ -526,11 +528,11 @@ const ExportReportModal = ({ isOpen, onClose, transactions, username, currency =
           <div className="export-section">
             <div className="section-label">
               <FaUser />
-              <span>Select User</span>
+              <span>{t('export.user')}</span>
             </div>
             <select className="user-dropdown" value={selectedUser} onChange={(e) => setSelectedUser(e.target.value)}>
               {users.length === 0 ? (
-                <option value="">No users available</option>
+                <option value="">{t('export.noUsers')}</option>
               ) : (
                 users.map((user) => (
                   <option key={user} value={user}>
@@ -544,7 +546,7 @@ const ExportReportModal = ({ isOpen, onClose, transactions, username, currency =
           <div className="export-section">
             <div className="section-label">
               <FaFileDownload />
-              <span>Export Options</span>
+              <span>{t('export.options')}</span>
             </div>
             <div className="export-options">
               <label className="export-option">
@@ -553,7 +555,7 @@ const ExportReportModal = ({ isOpen, onClose, transactions, username, currency =
                   checked={exportOptions.csvTransactions}
                   onChange={() => handleExportOptionChange('csvTransactions')}
                 />
-                <span>CSV of All Transactions</span>
+                <span>{t('export.csv')}</span>
               </label>
               <label className="export-option">
                 <input
@@ -561,7 +563,7 @@ const ExportReportModal = ({ isOpen, onClose, transactions, username, currency =
                   checked={exportOptions.summary}
                   onChange={() => handleExportOptionChange('summary')}
                 />
-                <span>Summary</span>
+                <span>{t('export.summary')}</span>
               </label>
               <label className="export-option">
                 <input
@@ -569,7 +571,7 @@ const ExportReportModal = ({ isOpen, onClose, transactions, username, currency =
                   checked={exportOptions.statementOfAccount}
                   onChange={() => handleExportOptionChange('statementOfAccount')}
                 />
-                <span>Statement of Account</span>
+                <span>{t('export.statementOfAccount')}</span>
               </label>
             </div>
           </div>
@@ -577,11 +579,11 @@ const ExportReportModal = ({ isOpen, onClose, transactions, username, currency =
 
         <div className="export-modal-footer">
           <button className="cancel-btn" onClick={onClose}>
-            Cancel
+            {t('export.cancel')}
           </button>
           <button className="export-btn" onClick={handleExport} disabled={!canExport}>
             <FaFileExport />
-            Export Report
+            {t('export.submit')}
           </button>
         </div>
       </div>

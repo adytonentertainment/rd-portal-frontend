@@ -5,13 +5,21 @@ import { FaUserPlus, FaSearch, FaPen, FaEnvelope, FaTrash, FaTimes, FaFileExcel,
 import Sidebar from '../../components/Sidebar/Sidebar';
 import { useIsAdmin } from '../../utils/auth';
 import { statementsLive } from '../../config/featureFlags';
-import { listWriters, getWriter, archiveWriter, bulkRemoveWriters, getRosterSummary } from '../../api/writersAdmin';
+import {
+  listWriters,
+  getWriter,
+  archiveWriter,
+  bulkRemoveWriters,
+  getRosterSummary,
+  downloadRosterXlsx,
+} from '../../api/writersAdmin';
 import { uploadClientList, applyClientImport } from '../../api/clientImportAdmin';
 import { adminBulkInvite } from '../../api/portal';
 import { assignUnmatchedToClient } from '../../api/writersAdmin';
 import { getWriterRoster, addWriter, removeWriter } from '../../mocks/distributionState';
 import WriterFormModal from './WriterFormModal';
 import InviteDialog from './InviteDialog';
+import CorrectionsDialog from './CorrectionsDialog';
 import styles from './adminWriters.module.css';
 
 const PAGE_SIZE_OPTIONS = [20, 50, 100];
@@ -107,6 +115,9 @@ const AdminWriters = () => {
   );
   const [roster, setRoster] = useState(null);
   const [importing, setImporting] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const correctionsRef = useRef(null);
+  const [correctionsFile, setCorrectionsFile] = useState(null);
   const [importResult, setImportResult] = useState(null); // { id, apply } | { error }
   const reqRef = useRef(0);
   const fileRef = useRef(null);
@@ -372,6 +383,45 @@ const AdminWriters = () => {
                   >
                     {importing ? <FaSpinner size={13} className={styles.spin} /> : <FaFileExcel size={13} />}
                     {importing ? 'Importing…' : 'Import client list'}
+                  </button>
+                  <button
+                    className={styles.inviteButton}
+                    style={{ background: 'transparent', color: 'var(--text)', border: '1px solid var(--border)' }}
+                    onClick={async () => {
+                      setExporting(true);
+                      setError(null);
+                      try {
+                        await downloadRosterXlsx();
+                      } catch (err) {
+                        setError(err?.message || 'Could not export the roster.');
+                      } finally {
+                        setExporting(false);
+                      }
+                    }}
+                    disabled={exporting}
+                    title="Download every client and commission partner with their codes and any problems found, to review and correct"
+                  >
+                    {exporting ? <FaSpinner size={13} className={styles.spin} /> : <FaFileExcel size={13} />}
+                    {exporting ? 'Exporting…' : 'Export roster'}
+                  </button>
+                  <input
+                    ref={correctionsRef}
+                    type="file"
+                    accept=".xlsx"
+                    style={{ display: 'none' }}
+                    onChange={(e) => {
+                      if (e.target.files?.[0]) setCorrectionsFile(e.target.files[0]);
+                      e.target.value = '';
+                    }}
+                  />
+                  <button
+                    className={styles.inviteButton}
+                    style={{ background: 'transparent', color: 'var(--text)', border: '1px solid var(--border)' }}
+                    onClick={() => correctionsRef.current?.click()}
+                    title="Upload a corrected roster export; you see every change before it is applied"
+                  >
+                    <FaFileExcel size={13} />
+                    Upload corrections
                   </button>
                 </>
               )}
@@ -767,6 +817,10 @@ const AdminWriters = () => {
             </footer>
           </div>
         </div>
+      )}
+
+      {correctionsFile && (
+        <CorrectionsDialog file={correctionsFile} onClose={() => setCorrectionsFile(null)} onApplied={() => load()} />
       )}
 
       {linking && (

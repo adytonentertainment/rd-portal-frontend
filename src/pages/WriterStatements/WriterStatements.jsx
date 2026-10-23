@@ -20,8 +20,7 @@ import LiveWriterStatements from './LiveWriterStatements';
 import '../Revenue/revenue.css';
 import styles from './writerStatements.module.css';
 
-const fmtMoney = (n) =>
-  '$' + (n || 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+const fmtMoney = (n) => '$' + (n || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 const fmtDate = (iso) => {
   if (!iso) return '—';

@@ -99,8 +99,7 @@ const fakeParse = (file, statementType) => {
   return { lines, matched, unmapped: lines - matched, total };
 };
 
-const fmtMoney = (n) =>
-  '$' + (n || 0).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+const fmtMoney = (n) => '$' + (n || 0).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 
 // Human-readable one-liner for a parsed row's second line of text.
 const subtitleFor = (f) => {

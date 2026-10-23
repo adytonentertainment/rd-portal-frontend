@@ -48,7 +48,9 @@
     "fix": "eslint --fix",
     "lint:fix": "eslint --fix",
     "prettier": "prettier --write \"./**/*.{js,jsx,mjs,cjs,ts,tsx,json}\"",
-    "clean:logs": "node remove-console-logs.js"
+    "clean:logs": "node remove-console-logs.js",
+    "e2e": "playwright test -c e2e/playwright.config.js",
+    "e2e:report": "playwright show-report e2e/.tmp/report"
   },
   "eslintConfig": {
     "extends": [
@@ -79,6 +81,7 @@
     ]
   },
   "devDependencies": {
+    "@playwright/test": "^1.48.2",
     "@typescript-eslint/eslint-plugin": "^8.56.0",
     "@typescript-eslint/parser": "^8.56.0",
     "autoprefixer": "^10.4.20",
@@ -91,5 +94,10 @@
     "postcss": "^8.4.49",
     "prettier": "^3.5.3",
     "tailwindcss": "^3.4.17"
+  },
+  "jest": {
+    "moduleNameMapper": {
+      "^axios$": "axios/dist/node/axios.cjs"
+    }
   }
 }

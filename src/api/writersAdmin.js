@@ -3,7 +3,8 @@
 // used by portal.js / clientImportAdmin.js. Every call resolves with the
 // response body or rejects with { status, message, detail } (status 0 =
 // backend unreachable).
-import { request } from './client';
+import axios from 'axios';
+import { baseUrl, normalizeError, request, sessionRequestOptions } from './client';
 
 // GET /admin/writers?page=&page_size=&search=&kind=&status=
 // → { items, total, page, page_size }
@@ -100,6 +101,19 @@ export const assignUnmatchedToClient = (writerId, targetWriterId) =>
 // Move one beneficiary account, and every statement under it, to another
 // client. Portal reads resolve ownership through the account's current writer,
 // so this takes effect immediately for both sides.
+// Register a beneficiary code on a client before its statements arrive, so
+// ingest files them there. The catalog follows from the code unless given.
+export const addAccount = (writerId, accountCode, catalog) =>
+  request({
+    url: `/admin/writers/${writerId}/accounts`,
+    method: 'POST',
+    data: { account_code: accountCode, ...(catalog ? { catalog } : {}) },
+  });
+
+// Take back a code added by mistake (only while no statement has arrived).
+export const removeAccount = (writerId, accountId) =>
+  request({ url: `/admin/writers/${writerId}/accounts/${accountId}`, method: 'DELETE' });
+
 export const moveAccount = (writerId, accountId, targetWriterId) =>
   request({
     url: `/admin/writers/${writerId}/accounts/${accountId}/move`,
@@ -125,3 +139,41 @@ export const getRosterSummary = () => request({ url: '/admin/writers/summary' })
 // statements / unmatched accounts); hard blockers can never be forced.
 export const distributeAll = (force = false) =>
   request({ url: '/admin/writers/distribute-all', method: 'POST', data: { force } });
+
+// The roster as a spreadsheet for review: every client and commission partner,
+// codes split by kind, contacts, and the problems found on each entry.
+// Fetched (not linked) so it rides the session cookie and CSRF header.
+export const downloadRosterXlsx = async () => {
+  try {
+    const session = sessionRequestOptions();
+    const response = await axios({
+      url: `${baseUrl()}/admin/writers/export/roster`,
+      responseType: 'blob',
+      ...session,
+    });
+    const name = (response.headers?.['content-disposition'] || '').match(/filename="([^"]+)"/)?.[1] || 'rd-roster.xlsx';
+    const href = URL.createObjectURL(response.data);
+    const a = document.createElement('a');
+    a.href = href;
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    // Freed on the next tick: revoking synchronously races the download in Safari.
+    setTimeout(() => URL.revokeObjectURL(href), 0);
+  } catch (error) {
+    throw normalizeError(error);
+  }
+};
+
+// Bulk roster corrections: the roster export, edited. Preview first (changes
+// nothing), then apply — all of it or none of it.
+const sheetForm = (file) => {
+  const form = new FormData();
+  form.append('file', file, file.name);
+  return form;
+};
+export const previewRosterCorrections = (file) =>
+  request({ url: '/admin/writers/corrections/preview', method: 'POST', data: sheetForm(file) });
+export const applyRosterCorrections = (file) =>
+  request({ url: '/admin/writers/corrections/apply', method: 'POST', data: sheetForm(file) });

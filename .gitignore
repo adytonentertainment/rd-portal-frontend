@@ -49,3 +49,6 @@ packages/react-devtools-shell/dist
 packages/react-devtools-timeline/dist
 yarn-debug.log*
 yarn-error.log*
+
+# Browser suite: throwaway database copy, build, reports
+/e2e/.tmp

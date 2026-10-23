@@ -9,12 +9,14 @@ import { useClientContext } from '../../components/ClientContext/ClientContext';
 import styles from './settings.module.css';
 import { Helmet } from 'react-helmet-async';
 import { validatePassword } from '../../utils/passwordValidator';
+import { useLanguage } from '../../i18n/LanguageContext';
 
 const Settings = () => {
   const navigate = useNavigate();
   const user = useContext(UserContextProvider);
   const { currentTheme } = useContext(ThemeContext);
   const { selectedClient } = useClientContext();
+  const { t } = useLanguage();
 
   const [selectedTab, setSelectedTab] = useState('account');
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -90,14 +92,14 @@ const Settings = () => {
 
   const handleChangePassword = async () => {
     if (newPasswordRef.current.value !== confirmNewPasswordRef.current.value) {
-      alert('Passwords do not match');
+      alert(t('settings.passwordsMismatch'));
       return;
     }
 
     // Validate password strength
     const validation = validatePassword(newPasswordRef.current.value);
     if (!validation.isValid) {
-      alert('Password does not meet requirements:\n' + validation.errors.join('\n'));
+      alert(t('settings.passwordWeak') + '\n' + validation.errors.join('\n'));
       return;
     }
 
@@ -112,7 +114,7 @@ const Settings = () => {
         },
       });
       if (response.status === 200) {
-        alert('Password changed successfully');
+        alert(t('settings.passwordChanged'));
         oldPasswordRef.current.value = '';
         newPasswordRef.current.value = '';
         confirmNewPasswordRef.current.value = '';
@@ -122,9 +124,9 @@ const Settings = () => {
       // Show backend validation errors if available
       const errorDetail = error.response?.data?.detail;
       if (errorDetail) {
-        alert('Failed to change password: ' + errorDetail);
+        alert(t('settings.passwordFailed') + ': ' + errorDetail);
       } else {
-        alert('Failed to change password');
+        alert(t('settings.passwordFailed'));
       }
     }
   };
@@ -149,11 +151,11 @@ const Settings = () => {
         setUserInfo(response.data);
         localStorage.removeItem('verax_audit_cache_v1');
         localStorage.setItem('verax_settings_modified_at', Date.now().toString());
-        alert('Account information saved successfully');
+        alert(t('settings.saved'));
       }
     } catch (error) {
       console.error('Error saving account information:', error);
-      alert('Failed to save account information');
+      alert(t('settings.saveFailed'));
     }
   };
 
@@ -167,13 +169,13 @@ const Settings = () => {
 
     // Validate file type
     if (!file.type.startsWith('image/')) {
-      alert('Please select an image file');
+      alert(t('settings.imageOnly'));
       return;
     }
 
     // Validate file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      alert('Image must be smaller than 5MB');
+      alert(t('settings.imageTooBig'));
       return;
     }
 
@@ -189,11 +191,11 @@ const Settings = () => {
 
       if (response.status === 200) {
         setAvatarUrl(urlJoin(process.env.REACT_APP_BACKEND_URL, response.data.avatar_url));
-        alert('Avatar uploaded successfully');
+        alert(t('settings.avatarUploaded'));
       }
     } catch (error) {
       console.error('Error uploading avatar:', error);
-      alert('Failed to upload avatar');
+      alert(t('settings.avatarFailed'));
     }
   };
 
@@ -207,10 +209,10 @@ const Settings = () => {
         <div className={styles.settingsWrapper}>
           {/* Sidebar Menu */}
           <div className={styles.sidebar}>
-            <h2 className={styles.settingsTitle}>Settings</h2>
+            <h2 className={styles.settingsTitle}>{t('settings.title')}</h2>
 
             <div className={styles.menuSection}>
-              <h3 className={styles.menuSectionTitle}>Personal</h3>
+              <h3 className={styles.menuSectionTitle}>{t('settings.personal')}</h3>
               <button
                 className={`${styles.menuItem} ${selectedTab === 'account' ? styles.menuItemSelected : ''}`}
                 onClick={() => setSelectedTab('account')}
@@ -223,7 +225,7 @@ const Settings = () => {
                     d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
                   />
                 </svg>
-                Account
+                {t('settings.account')}
               </button>
             </div>
           </div>
@@ -233,16 +235,16 @@ const Settings = () => {
             {selectedTab === 'account' && (
               <div className={styles.contentSection}>
                 <div className={styles.header}>
-                  <h1 className={styles.pageTitle}>Account</h1>
-                  <p className={styles.pageSubtitle}>Update your profile and personal details here</p>
+                  <h1 className={styles.pageTitle}>{t('settings.account')}</h1>
+                  <p className={styles.pageSubtitle}>{t('settings.accountSubtitle')}</p>
                 </div>
 
                 {/* Profile Section */}
                 <div className={styles.section}>
-                  <h2 className={styles.sectionTitle}>Profile</h2>
+                  <h2 className={styles.sectionTitle}>{t('settings.profile')}</h2>
 
                   <div className={styles.formGroup}>
-                    <label className={styles.label}>Avatar</label>
+                    <label className={styles.label}>{t('settings.avatar')}</label>
                     <div className={styles.avatarGroup}>
                       <div className={styles.avatar}>
                         {avatarUrl ? (
@@ -270,26 +272,36 @@ const Settings = () => {
                               d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"
                             />
                           </svg>
-                          Upload
+                          {t('settings.upload')}
                         </button>
-                        <p className={styles.helpText}>For best results, upload an image 512x512 or larger.</p>
+                        <p className={styles.helpText}>{t('settings.avatarHelp')}</p>
                       </div>
                     </div>
                   </div>
 
                   <div className={styles.formRow}>
                     <div className={styles.formField}>
-                      <label className={styles.label}>First name</label>
-                      <input ref={firstNameRef} className={styles.input} type="text" placeholder="Josef" />
+                      <label className={styles.label}>{t('settings.firstName')}</label>
+                      <input
+                        ref={firstNameRef}
+                        className={styles.input}
+                        type="text"
+                        placeholder={t('settings.firstName')}
+                      />
                     </div>
                     <div className={styles.formField}>
-                      <label className={styles.label}>Last name</label>
-                      <input ref={lastNameRef} className={styles.input} type="text" placeholder="Albers" />
+                      <label className={styles.label}>{t('settings.lastName')}</label>
+                      <input
+                        ref={lastNameRef}
+                        className={styles.input}
+                        type="text"
+                        placeholder={t('settings.lastName')}
+                      />
                     </div>
                   </div>
 
                   <div className={styles.formField}>
-                    <label className={styles.label}>Email</label>
+                    <label className={styles.label}>{t('settings.email')}</label>
                     <input
                       className={styles.input}
                       type="email"
@@ -299,7 +311,7 @@ const Settings = () => {
                   </div>
 
                   <button className={styles.primaryButton} onClick={handleSaveAccount}>
-                    Save Changes
+                    {t('settings.save')}
                   </button>
                 </div>
 
@@ -307,30 +319,27 @@ const Settings = () => {
 
                 {/* Password Section */}
                 <div className={styles.section}>
-                  <h2 className={styles.sectionTitle}>Password</h2>
+                  <h2 className={styles.sectionTitle}>{t('settings.password')}</h2>
 
                   <div className={styles.formField}>
-                    <label className={styles.label}>Current password</label>
+                    <label className={styles.label}>{t('settings.currentPassword')}</label>
                     <input
                       ref={oldPasswordRef}
                       className={styles.input}
                       type="password"
-                      placeholder="Enter current password"
+                      placeholder={t('settings.currentPasswordPh')}
                     />
                   </div>
 
                   <div className={styles.formField}>
-                    <label className={styles.label}>New password</label>
+                    <label className={styles.label}>{t('settings.newPassword')}</label>
                     <input
                       ref={newPasswordRef}
                       className={styles.input}
                       type="password"
-                      placeholder="Enter new password"
+                      placeholder={t('settings.newPasswordPh')}
                     />
-                    <p className={styles.helpText}>
-                      Your password must have at least 8 characters, include one uppercase letter, one lowercase letter,
-                      one number, and one special character.
-                    </p>
+                    <p className={styles.helpText}>{t('settings.passwordRules')}</p>
                   </div>
 
                   <div className={styles.formField}>
@@ -338,12 +347,12 @@ const Settings = () => {
                       ref={confirmNewPasswordRef}
                       className={styles.input}
                       type="password"
-                      placeholder="Re-type new password"
+                      placeholder={t('settings.confirmPasswordPh')}
                     />
                   </div>
 
                   <button className={styles.primaryButton} onClick={handleChangePassword}>
-                    Change password
+                    {t('settings.changePassword')}
                   </button>
                 </div>
 
@@ -351,17 +360,15 @@ const Settings = () => {
 
                 {/* Danger Zone */}
                 <div className={styles.section}>
-                  <h2 className={styles.sectionTitle}>Danger zone</h2>
+                  <h2 className={styles.sectionTitle}>{t('settings.dangerZone')}</h2>
 
                   <div className={styles.dangerAlert}>
                     <div className={styles.dangerAlertContent}>
-                      <h3 className={styles.dangerAlertTitle}>Delete account</h3>
-                      <p className={styles.dangerAlertDescription}>
-                        Permanently remove your account. This action is not reversible.
-                      </p>
+                      <h3 className={styles.dangerAlertTitle}>{t('settings.deleteAccount')}</h3>
+                      <p className={styles.dangerAlertDescription}>{t('settings.deleteAccountHint')}</p>
                     </div>
                     <button className={styles.dangerButton} onClick={() => setShowDeleteModal(true)}>
-                      Delete account
+                      {t('settings.deleteAccount')}
                     </button>
                   </div>
                 </div>
@@ -374,16 +381,14 @@ const Settings = () => {
         {showDeleteModal && (
           <div className={styles.modalOverlay} onClick={() => setShowDeleteModal(false)}>
             <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-              <h2 className={styles.modalTitle}>Delete Account</h2>
-              <p className={styles.modalDescription}>
-                This action cannot be undone. Everything including the results of the scans will be wiped. Continue?
-              </p>
+              <h2 className={styles.modalTitle}>{t('settings.deleteAccount')}</h2>
+              <p className={styles.modalDescription}>{t('settings.deleteConfirm')}</p>
               <div className={styles.modalActions}>
                 <button className={styles.secondaryButton} onClick={() => setShowDeleteModal(false)}>
-                  Cancel
+                  {t('settings.cancel')}
                 </button>
                 <button className={styles.dangerButton} onClick={handleDeleteAccount}>
-                  Delete Account
+                  {t('settings.deleteAccount')}
                 </button>
               </div>
             </div>

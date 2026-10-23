@@ -39,8 +39,12 @@ const AccessPanel = ({ writer }) => {
     if (writer?.id) load();
   }, [writer?.id]); // eslint-disable-line
 
+  // The button waits for an address: enabled on an empty box, it looked like it
+  // did nothing at all.
+  const emailOk = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim());
+
   const handleInvite = async () => {
-    if (sending || !email.trim()) return;
+    if (sending || !emailOk) return;
     setSending(true);
     setError(null);
     try {
@@ -147,7 +151,7 @@ const AccessPanel = ({ writer }) => {
               </option>
             ))}
           </select>
-          <button className={styles.accessSend} onClick={handleInvite} disabled={sending}>
+          <button className={styles.accessSend} onClick={handleInvite} disabled={sending || !emailOk}>
             <FaUserPlus size={11} /> {sending ? t('access.sending') : t('access.send')}
           </button>
         </div>

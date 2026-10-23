@@ -73,7 +73,7 @@ import '../Revenue/revenue.css';
 import styles from './adminOverview.module.css';
 
 const fmtMoney = (n) =>
-  '$' + Math.round(n).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  '$' + Math.round(n).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 
 // Per-client statement status. Statement math is NOT audited — this answers one
 // question: is everything this client is owed actually in?

@@ -31,6 +31,7 @@ describe('formatCurrency is locale-independent', () => {
 
   it('does not follow the ambient locale', () => {
     // A bare toLocaleString would change with this; formatCurrency must not.
+    // eslint-disable-next-line no-restricted-syntax -- the point: show the bare call drifts
     const bare = (341871).toLocaleString();
     const pinned = formatCurrency(341871);
     expect(pinned).toBe('$341,871');

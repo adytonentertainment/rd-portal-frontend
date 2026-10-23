@@ -1,0 +1,32 @@
+name: Checks
+
+# Every push and pull request: lint (which bans locale-dependent number
+# formatting), unit tests, and the same production build Render runs.
+# The browser suite (npm run e2e) needs the backend and a database, so it runs
+# locally before each deploy; see e2e/README.md.
+on:
+  push:
+  pull_request:
+
+jobs:
+  checks:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Lint
+        run: npx eslint src e2e
+      - name: Unit tests
+        run: npm test -- --watchAll=false
+        env:
+          CI: 'true'
+      - name: Production build
+        run: npm run build
+        env:
+          # As on Render: lint warnings are reported, errors fail the build.
+          CI: 'false'

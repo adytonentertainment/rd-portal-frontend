@@ -27,7 +27,13 @@ describe('runLanes — parallel batch transfer', () => {
   it('sends every batch exactly once', async () => {
     const batches = Array.from({ length: 37 }, (_, i) => [i]);
     const seen = [];
-    await runLanes(batches, async (b) => { seen.push(b[0]); }, 4);
+    await runLanes(
+      batches,
+      async (b) => {
+        seen.push(b[0]);
+      },
+      4
+    );
     expect(seen.sort((a, z) => a - z)).toEqual(batches.map((b) => b[0]));
   });
 
@@ -85,7 +91,13 @@ describe('runLanes — parallel batch transfer', () => {
 
   it('handles fewer batches than lanes', async () => {
     const seen = [];
-    await runLanes([[1], [2]], async (b) => { seen.push(b[0]); }, 8);
+    await runLanes(
+      [[1], [2]],
+      async (b) => {
+        seen.push(b[0]);
+      },
+      8
+    );
     expect(seen.sort()).toEqual([1, 2]);
   });
 

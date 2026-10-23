@@ -49,7 +49,7 @@ const parsePeriod = (code = '') => {
 };
 
 const fmtMoney = (n) =>
-  '$' + Math.round(n).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+  '$' + Math.round(n).toLocaleString('en-US', { minimumFractionDigits: 0, maximumFractionDigits: 0 });
 
 const fmtDate = (iso) =>
   new Date(iso).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
@@ -471,7 +471,7 @@ const AdminWriterDetail = () => {
                     </span>
                   </div>
                   {w.accounts.length === 0 ? (
-                    <div className={styles.empty}>No accounts linked yet.</div>
+                    <div className={styles.empty}>No codes yet. Add them with Edit.</div>
                   ) : (
                     <div className={styles.liveRows}>
                       {w.accounts.map((a) => (
@@ -589,6 +589,120 @@ const AdminWriterDetail = () => {
             onClose={() => setShowInvite(false)}
             onChanged={loadLive}
           />
+        )}
+        {/* The account and statement actions above open these. They live in this
+            (live) view: rendered only in the demo view, the buttons set state and
+            nothing appeared, so Move and Delete did nothing at all. */}
+        {deletingStmt && (
+          <div className={styles.confirmOverlay} onClick={() => !deleteBusy && setDeletingStmt(null)}>
+            <div className={styles.confirmModal} onClick={(e) => e.stopPropagation()}>
+              <div className={styles.confirmTitle}>
+                Delete the {deletingStmt.catLabel} statement for {deletingStmt.periodLabel}?
+              </div>
+              <div className={styles.confirmBody}>
+                Removes the statement and all of its line detail from{' '}
+                <strong>{liveWriter?.canonical_name || 'this client'}</strong>. The uploaded file is kept, so a
+                re-upload can restore it.
+                {deletingStmt.distributed && (
+                  <div className={styles.deleteWarn}>
+                    This statement has already been published. Deleting it takes it out of their portal, and they will
+                    no longer be able to see or download it.
+                  </div>
+                )}
+              </div>
+              <div className={styles.confirmActions}>
+                <button className={styles.cancelBtn} onClick={() => setDeletingStmt(null)} disabled={deleteBusy}>
+                  Cancel
+                </button>
+                <button
+                  className={styles.deleteCta}
+                  disabled={deleteBusy}
+                  onClick={async () => {
+                    setDeleteBusy(true);
+                    try {
+                      await deleteWriterStatement(Number(id), deletingStmt.statement_id);
+                      setDeletingStmt(null);
+                      await loadLive();
+                    } catch (err) {
+                      setDeletingStmt(null);
+                      setSendBlockers([err?.message || 'Could not delete that statement.']);
+                    } finally {
+                      setDeleteBusy(false);
+                    }
+                  }}
+                >
+                  {deleteBusy ? 'Deleting…' : 'Delete statement'}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {movingAccount && (
+          <div className={styles.confirmOverlay} onClick={() => !moveBusy && setMovingAccount(null)}>
+            <div className={styles.confirmModal} onClick={(e) => e.stopPropagation()}>
+              <div className={styles.confirmTitle}>Move {movingAccount.account_code} to another client</div>
+              <div className={styles.confirmBody}>
+                This account and <strong>every statement under it</strong> move to the client you pick. They see it in
+                their portal immediately, and {liveWriter?.canonical_name || 'this client'} stops seeing it. Statements
+                already distributed move too, which is usually the point.
+              </div>
+
+              <input
+                className={styles.moveSearch}
+                placeholder="Search clients by name, payee or email"
+                value={moveSearch}
+                onChange={(e) => searchClients(e.target.value)}
+                autoFocus
+              />
+
+              <div className={styles.moveResults}>
+                {moveResults.map((c) => (
+                  <button
+                    key={c.id}
+                    className={`${styles.moveResult} ${moveTarget?.id === c.id ? styles.moveResultActive : ''}`}
+                    onClick={() => setMoveTarget(c)}
+                  >
+                    <span>{c.canonical_name}</span>
+                    <span className={styles.liveSoft}>
+                      {c.is_unmatched ? 'unmatched' : c.kind || '—'}
+                      {c.account_count ? ` · ${c.account_count} accounts` : ''}
+                    </span>
+                  </button>
+                ))}
+                {moveSearch.trim().length >= 2 && moveResults.length === 0 && (
+                  <div className={styles.empty}>No clients match that.</div>
+                )}
+              </div>
+
+              {moveError && <div className={styles.moveError}>{moveError}</div>}
+
+              <div className={styles.confirmActions}>
+                <button className={styles.cancelBtn} onClick={() => setMovingAccount(null)} disabled={moveBusy}>
+                  Cancel
+                </button>
+                <button
+                  className={styles.distributeCta}
+                  disabled={!moveTarget || moveBusy}
+                  onClick={async () => {
+                    setMoveBusy(true);
+                    setMoveError(null);
+                    try {
+                      await moveAccount(Number(id), movingAccount.id, moveTarget.id);
+                      setMovingAccount(null);
+                      await loadLive();
+                    } catch (err) {
+                      setMoveError(err?.message || 'Could not move that account.');
+                    } finally {
+                      setMoveBusy(false);
+                    }
+                  }}
+                >
+                  {moveBusy ? 'Moving…' : `Move to ${moveTarget?.canonical_name || '…'}`}
+                </button>
+              </div>
+            </div>
+          </div>
         )}
       </>
     );
@@ -799,117 +913,6 @@ const AdminWriterDetail = () => {
               </button>
               <button className={styles.distributeCta} onClick={handleDistribute}>
                 <FaPaperPlane size={11} /> Distribute
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-      {deletingStmt && (
-        <div className={styles.confirmOverlay} onClick={() => !deleteBusy && setDeletingStmt(null)}>
-          <div className={styles.confirmModal} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.confirmTitle}>
-              Delete the {deletingStmt.catLabel} statement for {deletingStmt.periodLabel}?
-            </div>
-            <div className={styles.confirmBody}>
-              Removes the statement and all of its line detail from{' '}
-              <strong>{liveWriter?.canonical_name || 'this client'}</strong>. The uploaded file is kept, so a re-upload
-              can restore it.
-              {deletingStmt.distributed && (
-                <div className={styles.deleteWarn}>
-                  This statement has already been published. Deleting it takes it out of their portal, and they will no
-                  longer be able to see or download it.
-                </div>
-              )}
-            </div>
-            <div className={styles.confirmActions}>
-              <button className={styles.cancelBtn} onClick={() => setDeletingStmt(null)} disabled={deleteBusy}>
-                Cancel
-              </button>
-              <button
-                className={styles.deleteCta}
-                disabled={deleteBusy}
-                onClick={async () => {
-                  setDeleteBusy(true);
-                  try {
-                    await deleteWriterStatement(Number(id), deletingStmt.statement_id);
-                    setDeletingStmt(null);
-                    await loadLive();
-                  } catch (err) {
-                    setDeletingStmt(null);
-                    setSendBlockers([err?.message || 'Could not delete that statement.']);
-                  } finally {
-                    setDeleteBusy(false);
-                  }
-                }}
-              >
-                {deleteBusy ? 'Deleting…' : 'Delete statement'}
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {movingAccount && (
-        <div className={styles.confirmOverlay} onClick={() => !moveBusy && setMovingAccount(null)}>
-          <div className={styles.confirmModal} onClick={(e) => e.stopPropagation()}>
-            <div className={styles.confirmTitle}>Move {movingAccount.account_code} to another client</div>
-            <div className={styles.confirmBody}>
-              This account and <strong>every statement under it</strong> move to the client you pick. They see it in
-              their portal immediately, and {liveWriter?.canonical_name || 'this client'} stops seeing it. Statements
-              already distributed move too, which is usually the point.
-            </div>
-
-            <input
-              className={styles.moveSearch}
-              placeholder="Search clients by name, payee or email"
-              value={moveSearch}
-              onChange={(e) => searchClients(e.target.value)}
-              autoFocus
-            />
-
-            <div className={styles.moveResults}>
-              {moveResults.map((c) => (
-                <button
-                  key={c.id}
-                  className={`${styles.moveResult} ${moveTarget?.id === c.id ? styles.moveResultActive : ''}`}
-                  onClick={() => setMoveTarget(c)}
-                >
-                  <span>{c.canonical_name}</span>
-                  <span className={styles.liveSoft}>
-                    {c.is_unmatched ? 'unmatched' : c.kind || '—'}
-                    {c.account_count ? ` · ${c.account_count} accounts` : ''}
-                  </span>
-                </button>
-              ))}
-              {moveSearch.trim().length >= 2 && moveResults.length === 0 && (
-                <div className={styles.empty}>No clients match that.</div>
-              )}
-            </div>
-
-            {moveError && <div className={styles.moveError}>{moveError}</div>}
-
-            <div className={styles.confirmActions}>
-              <button className={styles.cancelBtn} onClick={() => setMovingAccount(null)} disabled={moveBusy}>
-                Cancel
-              </button>
-              <button
-                className={styles.distributeCta}
-                disabled={!moveTarget || moveBusy}
-                onClick={async () => {
-                  setMoveBusy(true);
-                  setMoveError(null);
-                  try {
-                    await moveAccount(Number(id), movingAccount.id, moveTarget.id);
-                    setMovingAccount(null);
-                    await loadLive();
-                  } catch (err) {
-                    setMoveError(err?.message || 'Could not move that account.');
-                  } finally {
-                    setMoveBusy(false);
-                  }
-                }}
-              >
-                {moveBusy ? 'Moving…' : `Move to ${moveTarget?.canonical_name || '…'}`}
               </button>
             </div>
           </div>

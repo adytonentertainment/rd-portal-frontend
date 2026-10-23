@@ -1,6 +1,14 @@
 import { useEffect, useState } from 'react';
 import { FaTimes } from 'react-icons/fa';
-import { createWriter, updateWriter, unlinkContact, addContact } from '../../api/writersAdmin';
+import {
+  createWriter,
+  updateWriter,
+  unlinkContact,
+  addContact,
+  addAccount,
+  removeAccount,
+  getWriter,
+} from '../../api/writersAdmin';
 import styles from './adminWriters.module.css';
 
 const CATALOGS = ['MECH', 'YT', 'PERF'];
@@ -26,8 +34,9 @@ const STATUSES = [
 
 // Create/edit a writer's client-list-schema fields. `writer` is the detail
 // object from getWriter (edit) or null (create). On save, calls the live API
-// and hands the fresh detail back via onSaved. Contact-email + beneficiary
-// account panels are edit-only (a not-yet-created writer has neither).
+// and hands the fresh detail back via onSaved. Contact emails are edit-only;
+// beneficiary codes can be entered on create too, and are registered once the
+// client exists, so their first statements land on them.
 const WriterFormModal = ({ writer, onClose, onSaved }) => {
   const isEdit = !!writer;
   const [form, setForm] = useState({
@@ -47,9 +56,15 @@ const WriterFormModal = ({ writer, onClose, onSaved }) => {
   const [addingContact, setAddingContact] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
+  const [accounts, setAccounts] = useState(writer?.accounts || []);
+  // Codes typed on a new client, registered right after it is created.
+  const [pendingCodes, setPendingCodes] = useState([]);
+  const [newCode, setNewCode] = useState('');
+  const [codeBusy, setCodeBusy] = useState(false);
 
   useEffect(() => {
     setContacts(writer?.contacts || []);
+    setAccounts(writer?.accounts || []);
   }, [writer]);
 
   const set = (k, v) => setForm((prev) => ({ ...prev, [k]: v }));
@@ -97,14 +112,66 @@ const WriterFormModal = ({ writer, onClose, onSaved }) => {
         setNewEmail('');
         setNewName('');
       }
-      const saved = isEdit
+      // A code typed but not "Add"-ed is saved too, like the contact email.
+      const typedCode = newCode.trim().toUpperCase();
+      if (isEdit && typedCode) await addAccount(writer.id, typedCode);
+      let saved = isEdit
         ? await updateWriter(writer.id, { ...payload, status: form.status })
         : await createWriter(payload);
+      if (!isEdit) {
+        const codes = [...pendingCodes, ...(typedCode ? [typedCode] : [])];
+        const failed = [];
+        for (const code of codes) {
+          try {
+            await addAccount(saved.id, code);
+          } catch (err) {
+            failed.push(`${code}: ${err?.message || 'not added'}`);
+          }
+        }
+        if (codes.length) saved = await getWriter(saved.id);
+        if (failed.length) {
+          // The client exists now; say which codes did not make it.
+          setError(`Client created, but these codes were not added — ${failed.join(' · ')}`);
+          onSaved?.(saved);
+          return;
+        }
+      }
       onSaved?.(saved);
     } catch (err) {
       setError(err?.message || 'Could not save. Please try again.');
     } finally {
       setSaving(false);
+    }
+  };
+
+  const handleAddCode = async () => {
+    const code = newCode.trim().toUpperCase();
+    if (!code) return;
+    setError(null);
+    if (!isEdit) {
+      if (!pendingCodes.includes(code)) setPendingCodes((prev) => [...prev, code]);
+      setNewCode('');
+      return;
+    }
+    setCodeBusy(true);
+    try {
+      await addAccount(writer.id, code);
+      setAccounts((await getWriter(writer.id)).accounts || []);
+      setNewCode('');
+    } catch (err) {
+      setError(err?.message || 'Could not add that code.');
+    } finally {
+      setCodeBusy(false);
+    }
+  };
+
+  const handleRemoveCode = async (account) => {
+    setError(null);
+    try {
+      await removeAccount(writer.id, account.id);
+      setAccounts((prev) => prev.filter((a) => a.id !== account.id));
+    } catch (err) {
+      setError(err?.message || 'Could not remove that code.');
     }
   };
 
@@ -323,23 +390,60 @@ const WriterFormModal = ({ writer, onClose, onSaved }) => {
             </div>
           )}
 
-          {isEdit && writer.accounts?.length > 0 && (
-            <div className={styles.field}>
-              <span className={styles.fieldLabel}>Beneficiary accounts (read-only)</span>
+          <div className={styles.field}>
+            <span className={styles.fieldLabel}>Beneficiary codes</span>
+            {(accounts.length > 0 || pendingCodes.length > 0) && (
               <div className={styles.accountsBox}>
-                {writer.accounts.map((a) => (
+                {accounts.map((a) => (
                   <div key={a.id} className={styles.accountRow}>
                     <code>{a.account_code}</code>
                     <span>{a.catalog || '—'}</span>
                     <span className={styles.accountStatus}>{a.status}</span>
+                    {a.statement_count === 0 && (
+                      <button type="button" className={styles.linkDanger} onClick={() => handleRemoveCode(a)}>
+                        Remove
+                      </button>
+                    )}
+                  </div>
+                ))}
+                {pendingCodes.map((code) => (
+                  <div key={code} className={styles.accountRow}>
+                    <code>{code}</code>
+                    <span className={styles.accountStatus}>added on save</span>
+                    <button
+                      type="button"
+                      className={styles.linkDanger}
+                      onClick={() => setPendingCodes((prev) => prev.filter((c) => c !== code))}
+                    >
+                      Remove
+                    </button>
                   </div>
                 ))}
               </div>
-              <div className={styles.mutedNote}>
-                Re-point an account to a different client in the client-import resolution queue.
-              </div>
+            )}
+            <div className={styles.fieldRow} style={{ marginTop: accounts.length || pendingCodes.length ? 8 : 0 }}>
+              <input
+                className={styles.input}
+                placeholder="Add a code, e.g. C00122 or CSJ042"
+                value={newCode}
+                onChange={(e) => setNewCode(e.target.value)}
+                onKeyDown={(e) => e.key === 'Enter' && handleAddCode()}
+              />
+              <button
+                type="button"
+                className={styles.secondaryBtn}
+                onClick={handleAddCode}
+                disabled={codeBusy || !newCode.trim()}
+              >
+                {codeBusy ? 'Adding…' : 'Add'}
+              </button>
             </div>
-          )}
+            <div className={styles.mutedNote}>
+              Statements under these codes are filed to this client. Commission codes (CS…) go on a commission partner,
+              writer codes (C…, JN…) on a client. To give a code with statements to someone else, use Move on the
+              client&apos;s page.
+            </div>
+          </div>
 
           {error && <div className={styles.formError}>{error}</div>}
         </div>
