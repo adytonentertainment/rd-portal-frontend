@@ -18,26 +18,31 @@ export const SPECIAL_CHARS = '!@#$%^&*()_+-=[]{}|;\':",./<>?~`';
 export const PASSWORD_RULES = [
   {
     id: 'length',
+    key: 'password.rule.length',
     test: (password) => password.length >= MIN_LENGTH,
     description: `At least ${MIN_LENGTH} characters`,
   },
   {
     id: 'uppercase',
+    key: 'password.rule.uppercase',
     test: (password) => /[A-Z]/.test(password),
     description: 'At least one uppercase letter (A-Z)',
   },
   {
     id: 'lowercase',
+    key: 'password.rule.lowercase',
     test: (password) => /[a-z]/.test(password),
     description: 'At least one lowercase letter (a-z)',
   },
   {
     id: 'number',
+    key: 'password.rule.number',
     test: (password) => /[0-9]/.test(password),
     description: 'At least one number (0-9)',
   },
   {
     id: 'special',
+    key: 'password.rule.special',
     // eslint-disable-next-line no-useless-escape
     test: (password) => /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?~`]/.test(password),
     description: 'At least one special character (!@#$%^&*)',
@@ -47,9 +52,10 @@ export const PASSWORD_RULES = [
 /**
  * Validate password against all requirements
  * @param {string} password - The password to validate
+ * @param {Function} [t] - the portal's translate function; messages are English without it
  * @returns {{ isValid: boolean, errors: string[], passedRules: string[], failedRules: string[] }}
  */
-export const validatePassword = (password) => {
+export const validatePassword = (password, t) => {
   const errors = [];
   const passedRules = [];
   const failedRules = [];
@@ -59,7 +65,7 @@ export const validatePassword = (password) => {
       passedRules.push(rule.id);
     } else {
       failedRules.push(rule.id);
-      errors.push(rule.description);
+      errors.push(t ? t(rule.key, { min: MIN_LENGTH }) : rule.description);
     }
   }
 
@@ -75,7 +81,8 @@ export const validatePassword = (password) => {
  * Get a human-readable description of all password requirements
  * @returns {string}
  */
-export const getPasswordRequirements = () => {
+export const getPasswordRequirements = (t) => {
+  if (t) return t('password.requirements', { min: MIN_LENGTH });
   return `Password must be at least ${MIN_LENGTH} characters long and contain at least one uppercase letter, one lowercase letter, one number, and one special character.`;
 };
 

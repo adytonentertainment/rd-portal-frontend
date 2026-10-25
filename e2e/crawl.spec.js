@@ -5,6 +5,7 @@ const fs = require('fs');
 const path = require('path');
 const { test, expect } = require('@playwright/test');
 const { Crawler } = require('./lib/crawl');
+const { englishInSpanishAuth, LANGUAGE_SWITCH } = require('./lib/checks');
 const { API } = require('./global-setup');
 
 const MAX_PER_PAGE = Number(process.env.E2E_MAX_PER_PAGE || 80);
@@ -81,5 +82,31 @@ test.describe('signed out', () => {
     const message = report('public', result);
     console.log(message);
     expect(result.findings, message).toEqual([]);
+  });
+
+  // What a Spanish-speaking writer sees before they are in: sign in, forgot
+  // and reset password, and an invite link (seeded, left open).
+  test.describe('in Spanish', () => {
+    test.use({ locale: 'es-ES' });
+
+    test('sign-in pages are Spanish, with no dead clicks', async ({ page, baseURL }) => {
+      const invites = path.join(__dirname, '.tmp', 'invites.json');
+      const open = fs.existsSync(invites) ? JSON.parse(fs.readFileSync(invites, 'utf8'))['es-open'] : null;
+      const crawler = new Crawler(page, {
+        origin: new URL(baseURL).origin,
+        follow: false,
+        maxPerRoute: 5,
+        screenCheck: englishInSpanishAuth,
+        skip: LANGUAGE_SWITCH,
+        log: (m) => console.log(m),
+      });
+      const pages = ['/login', '/forgotPassword', '/resetPassword?token=e2e-not-a-token'];
+      if (open) pages.push(`/invite/${open.token}`);
+      const result = await crawler.run(pages);
+      const message = report('signin-es', result);
+      console.log(message);
+      expect(open, 'an open invite should have been seeded').toBeTruthy();
+      expect(result.findings, message).toEqual([]);
+    });
   });
 });

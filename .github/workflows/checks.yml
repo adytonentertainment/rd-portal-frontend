@@ -20,7 +20,8 @@ jobs:
           cache: npm
       - run: npm ci
       - name: Lint
-        run: npx eslint src e2e
+        # --ext: without it ESLint skips .jsx files in a folder — most of the app.
+        run: npx eslint --ext .js,.jsx src e2e
       - name: Unit tests
         run: npm test -- --watchAll=false
         env:

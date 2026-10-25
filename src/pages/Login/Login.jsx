@@ -12,6 +12,8 @@ import { FaArrowLeft, FaEye, FaEyeSlash } from 'react-icons/fa';
 import VeraxLogo from '../../components/VeraxLogo/VeraxLogo';
 import { brand } from '../../config/brand';
 import { statementsLive } from '../../config/featureFlags';
+import { useLanguage } from '../../i18n/LanguageContext';
+import LanguageToggle from '../../components/LanguageToggle/LanguageToggle';
 
 // Where to land after login when no explicit ?redirect is given. In live mode
 // send them through the root router, which routes admin→/admin and
@@ -47,6 +49,7 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [searchParams] = useSearchParams();
   const user = useContext(UserContextProvider);
+  const { t } = useLanguage();
 
   const redirectURL = getSafeRedirectUrl(searchParams.get('redirect'));
   const lastPageURL = searchParams.get('lastpage') ? getSafeRedirectUrl(searchParams.get('lastpage')) : '/';
@@ -70,14 +73,13 @@ const Login = () => {
       window.location.href = redirectURL;
     } catch (error) {
       if (error.response) {
-        if (error.response.status === 401) setErrorMessage('Invalid credentials. Please try again.');
-        else if (error.response.status === 429)
-          setErrorMessage(error.response.data?.detail || 'Too many login attempts. Please try again later.');
-        else setErrorMessage(error.response.data?.detail || 'Something went wrong. Please try again.');
+        if (error.response.status === 401) setErrorMessage(t('auth.invalidCredentials'));
+        else if (error.response.status === 429) setErrorMessage(t('auth.tooMany'));
+        else setErrorMessage(t('auth.somethingWrong'));
       } else if (error.request) {
-        setErrorMessage('Unable to connect to server. Please check your internet connection.');
+        setErrorMessage(t('auth.noConnection'));
       } else {
-        setErrorMessage('An error occurred. Please try again.');
+        setErrorMessage(t('auth.somethingWrong'));
       }
     } finally {
       setLoginLoading(false);
@@ -112,15 +114,21 @@ const Login = () => {
           background: 'var(--background)',
         }}
       >
+        {/* EN | ES: a writer can switch before signing in (the browser's language is the default). */}
+        <div style={{ position: 'absolute', top: 16, right: 16 }}>
+          <LanguageToggle />
+        </div>
         <VeraxLogo iconOnly width={70} className="mb-3 flex-shrink-0" style={{ maxWidth: '70px', opacity: 1 }} />
 
         {!showEmailForm ? (
           /* ─── Gateway view ─── */
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '0' }}>
             <h2 className={styles.loginHeading} style={{ fontSize: '20px', marginBottom: '4px', fontWeight: 700 }}>
-              Welcome back
+              {t('auth.welcomeBack')}
             </h2>
-            <p style={{ fontSize: '13px', color: 'var(--soft-text)', marginBottom: '20px' }}>{brand.signInHeadline}</p>
+            <p style={{ fontSize: '13px', color: 'var(--soft-text)', marginBottom: '20px' }}>
+              {t('auth.signInHeadline')}
+            </p>
 
             {/* Continue with Email */}
             <button
@@ -145,7 +153,7 @@ const Login = () => {
               onMouseEnter={(e) => (e.currentTarget.style.background = '#444')}
               onMouseLeave={(e) => (e.currentTarget.style.background = '#333')}
             >
-              Sign in with Email
+              {t('auth.signInWithEmail')}
             </button>
 
             {/* Links */}
@@ -157,7 +165,7 @@ const Login = () => {
                   at a form that can only fail is worse than telling them how
                   access actually works. */}
               <span style={{ fontSize: '13px', color: 'var(--muted-text)', textAlign: 'center' }}>
-                Access is by invitation. Check your email for your invite from {brand.publisherName}.
+                {t('auth.byInvitation', { publisher: brand.publisherName })}
               </span>
               <button
                 onClick={() => navigate(lastPageURL)}
@@ -171,7 +179,7 @@ const Login = () => {
                   padding: 0,
                 }}
               >
-                Go back
+                {t('auth.goBack')}
               </button>
             </div>
 
@@ -185,14 +193,14 @@ const Login = () => {
           /* ─── Email login form ─── */
           <div style={{ width: '100%', maxWidth: '300px' }}>
             <h2 className={styles.loginHeading} style={{ fontSize: '16px', marginBottom: '12px' }}>
-              Sign in with Email
+              {t('auth.signInWithEmail')}
             </h2>
 
             <form onSubmit={(e) => e.preventDefault()} style={{ display: 'flex', flexDirection: 'column', gap: '8px' }}>
               <Input
                 ref={usernameRef}
                 type="text"
-                label="Username"
+                label={t('auth.username')}
                 variant="bordered"
                 size="sm"
                 autoComplete="username"
@@ -204,7 +212,7 @@ const Login = () => {
               <Input
                 ref={passwordRef}
                 type={showPassword ? 'text' : 'password'}
-                label="Password"
+                label={t('auth.password')}
                 variant="bordered"
                 size="sm"
                 autoComplete="current-password"
@@ -232,7 +240,7 @@ const Login = () => {
 
               <div className="flex items-center" style={{ marginTop: '4px' }}>
                 <button className={styles.linkButton} onClick={() => navigate('/forgotPassword')}>
-                  Forgot password?
+                  {t('auth.forgot')}
                 </button>
               </div>
 
@@ -242,7 +250,7 @@ const Login = () => {
                   disabled={loginLoading}
                   style={{ width: '100%', maxWidth: '300px', opacity: loginLoading ? 0.6 : 1 }}
                 >
-                  {loginLoading ? <CircularProgress size={18} style={{ color: '#1a1a1a' }} /> : 'Sign in'}
+                  {loginLoading ? <CircularProgress size={18} style={{ color: '#1a1a1a' }} /> : t('auth.signIn')}
                 </FlatButton>
               </div>
 
@@ -270,7 +278,7 @@ const Login = () => {
                 }}
               >
                 <FaArrowLeft size={10} />
-                <span>Back</span>
+                <span>{t('auth.back')}</span>
               </button>
             </div>
           </div>

@@ -33,6 +33,9 @@ for lang, name in WRITERS.items():
         continue
     _, raw = create_invite(db, w.id, f"e2e-writer-{lang}@example.com", role=ContactRole.PRIMARY, is_admin_invite=True)
     tokens[lang] = {"token": raw, "writer_id": w.id, "writer": name}
+    # A second invite left OPEN, for testing the accept page itself.
+    _, raw = create_invite(db, w.id, f"e2e-open-{lang}@example.com", role=ContactRole.MANAGER, is_admin_invite=True)
+    tokens[f"{lang}-open"] = {"token": raw, "writer_id": w.id, "writer": name}
 db.commit()
 db.close()
 with open(out, "w") as fh:

@@ -27,6 +27,7 @@ module.exports = async () => {
   const invites = path.join(tmp, 'invites.json');
   const tokens = fs.existsSync(invites) ? JSON.parse(fs.readFileSync(invites, 'utf8')) : {};
   for (const [lang, inv] of Object.entries(tokens)) {
+    if (lang.endsWith('-open')) continue; // left open for the accept-page test
     const w = await request.newContext({ baseURL: API, extraHTTPHeaders: { 'X-Requested-With': 'XMLHttpRequest' } });
     const res = await w.post('/portal/accept-invite', {
       data: { token: inv.token, password: WRITER_PASSWORD, username: `e2e-writer-${lang}` },

@@ -22,7 +22,7 @@ step "Roster integrity (report only)"
   "$BACKEND/venv/bin/python" scripts/integrity_audit.py --quiet --csv "$HERE/.tmp/integrity.csv") || true
 
 step "Lint"
-(cd "$FRONTEND" && npx eslint src e2e)
+(cd "$FRONTEND" && npx eslint --ext .js,.jsx src e2e)
 
 step "Unit tests"
 (cd "$FRONTEND" && CI=true npm test -- --watchAll=false)

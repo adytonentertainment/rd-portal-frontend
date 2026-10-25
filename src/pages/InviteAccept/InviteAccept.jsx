@@ -8,6 +8,9 @@ import FlatButton from '../../components/Buttons/FlatButton/FlatButton';
 import VeraxLogo from '../../components/VeraxLogo/VeraxLogo';
 import { previewInvite, acceptInvite } from '../../api/portal';
 import { brand } from '../../config/brand';
+import { useLanguage } from '../../i18n/LanguageContext';
+import LanguageToggle from '../../components/LanguageToggle/LanguageToggle';
+import { getPasswordRequirements, validatePassword } from '../../utils/passwordValidator';
 import styles from './inviteAccept.module.css';
 
 // Public landing for a portal-invite link (`/invite/:token`). The token IS the
@@ -18,6 +21,7 @@ import styles from './inviteAccept.module.css';
 const InviteAccept = () => {
   const { token } = useParams();
   const navigate = useNavigate();
+  const { t, lang, setLang } = useLanguage();
 
   const [preview, setPreview] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -40,6 +44,15 @@ const InviteAccept = () => {
         if (active) {
           setPreview(res);
           setUsername(res.suggested_username || '');
+          // Open in the language the invite email was written in, unless this
+          // browser already chose one.
+          let chosen = null;
+          try {
+            chosen = window.localStorage.getItem('portalLanguage');
+          } catch {
+            // no storage
+          }
+          if (!chosen && res.language && res.language !== lang) setLang(res.language);
         }
       } catch {
         // 400/404/expired/revoked all land here — a friendly dead-end, not a trace.
@@ -53,40 +66,42 @@ const InviteAccept = () => {
     };
   }, [token]);
 
+  // The server explains in English; in Spanish, say the same thing in Spanish.
+  const server = (err, key) => (lang === 'en' && err.message ? err.message : t(key));
   const messageFor = (err) => {
-    if (!err) return 'Something went wrong. Please try again.';
+    if (!err) return t('auth.somethingWrong');
     // 409 = the username belongs to somebody already. Ask again rather than
     // treating it as a dead end; the rest of what they typed is still good.
-    if (err.status === 409) return err.message || 'That username is taken. Pick another.';
-    if (err.status === 0) return 'Cannot reach the server. Please try again in a moment.';
-    if (err.status === 400) return err.message || 'This invite link is no longer valid.';
+    if (err.status === 409) return server(err, 'invite.errTaken');
+    if (err.status === 0) return t('invite.errOffline');
+    if (err.status === 400) return server(err, 'invite.errInvalid');
     // 401 = the link is fine, but you must prove the account is yours.
-    if (err.status === 401) return err.message || 'Please check your password and try again.';
-    if (err.status === 422) {
-      const detail = err.detail?.detail;
-      if (Array.isArray(detail) && detail.length) return detail[0]?.msg || 'Please check your password.';
-      return 'Your password may not meet the requirements.';
-    }
-    return err.message || 'Something went wrong. Please try again.';
+    if (err.status === 401) return server(err, 'invite.errPassword');
+    if (err.status === 422) return `${t('invite.errWeak')} ${getPasswordRequirements(t)}`;
+    return server(err, 'auth.somethingWrong');
   };
 
   const handleAccept = async (e) => {
     e?.preventDefault();
     if (submitting) return;
     if (preview?.requires_sign_in) {
-      setError('This account signs in with Google. Please sign in first, then reopen this link.');
+      setError(t('invite.errGoogle'));
       return;
     }
     if (preview?.needs_password && !password) {
-      setError(
-        preview?.has_login
-          ? 'Enter your existing password to accept this invite.'
-          : 'Please set a password to secure your portal.'
-      );
+      setError(preview?.has_login ? t('invite.errNeedExisting') : t('invite.errNeedNew'));
       return;
     }
+    // A new password is checked here first, in the reader's language.
+    if (preview?.needs_password && !preview?.has_login) {
+      const check = validatePassword(password, t);
+      if (!check.isValid) {
+        setError(check.errors.join(' · '));
+        return;
+      }
+    }
     if (!preview?.has_login && !username.trim()) {
-      setError('Choose a username. This is what you will sign in with.');
+      setError(t('invite.errNeedUsername'));
       return;
     }
     setSubmitting(true);
@@ -108,6 +123,9 @@ const InviteAccept = () => {
         <title>Accept invite | {brand.publisherShort}</title>
       </Helmet>
       <div className={styles.shell}>
+        <div style={{ position: 'fixed', top: 16, right: 16, zIndex: 10 }}>
+          <LanguageToggle />
+        </div>
         <div className={styles.card}>
           <VeraxLogo />
 
@@ -117,21 +135,30 @@ const InviteAccept = () => {
             </div>
           ) : deadEnd ? (
             <>
-              <h1 className={styles.title}>This invite link is no longer valid</h1>
-              <p className={styles.sub}>
-                It may have expired, been revoked, or already been used. Ask whoever sent it for a fresh link.
-              </p>
-              <FlatButton onClick={() => navigate('/login')}>Go to sign in</FlatButton>
+              <h1 className={styles.title}>{t('invite.deadTitle')}</h1>
+              <p className={styles.sub}>{t('invite.deadSub')}</p>
+              <FlatButton onClick={() => navigate('/login')}>{t('invite.goToSignIn')}</FlatButton>
             </>
           ) : (
             <form className={styles.form} onSubmit={handleAccept}>
               <div className={styles.badge}>
                 <FaCheckCircle size={20} />
               </div>
-              <h1 className={styles.title}>You&apos;ve been invited</h1>
+              <h1 className={styles.title}>{t('invite.title')}</h1>
               <p className={styles.sub}>
-                You&apos;re getting portal access to <strong>{preview.writer_name || 'a client'}</strong> as{' '}
-                <strong>{preview.email}</strong>. See statements, earnings, and distribution history.
+                {/* The names are bold wherever the translation puts them. */}
+                {t('invite.access')
+                  .split(/(\{writer\}|\{email\})/)
+                  .map((part, i) =>
+                    part === '{writer}' ? (
+                      <strong key={i}>{preview.writer_name || t('invite.aClient')}</strong>
+                    ) : part === '{email}' ? (
+                      <strong key={i}>{preview.email}</strong>
+                    ) : (
+                      part
+                    )
+                  )}{' '}
+                {t('invite.features')}
               </p>
 
               {/* Only when setting up a login. If this address already has
@@ -139,49 +166,44 @@ const InviteAccept = () => {
                   username it already has. */}
               {preview.needs_password && !preview.requires_sign_in && !preview.has_login && (
                 <Input
-                  label="Username"
+                  label={t('invite.username')}
                   value={username}
                   onValueChange={setUsername}
                   isRequired
                   autoComplete="username"
-                  description="You'll sign in with this."
+                  description={t('invite.usernameHint')}
                 />
               )}
 
               {preview.needs_password && !preview.requires_sign_in && (
                 <Input
-                  label={preview.has_login ? 'Your password' : 'Set a password'}
+                  label={preview.has_login ? t('invite.yourPassword') : t('invite.setPassword')}
                   type={showPassword ? 'text' : 'password'}
                   value={password}
                   onValueChange={setPassword}
                   isRequired
                   autoComplete={preview.has_login ? 'current-password' : 'new-password'}
-                  description={
-                    preview.has_login
-                      ? 'This email already has an account. Enter its password and this client is added to it.'
-                      : 'This secures your portal login'
-                  }
+                  description={preview.has_login ? t('invite.existingHint') : getPasswordRequirements(t)}
                   endContent={
-                    <button type="button" onClick={() => setShowPassword((s) => !s)} aria-label="Toggle password">
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword((s) => !s)}
+                      aria-label={t('invite.togglePassword')}
+                    >
                       {showPassword ? <FaEyeSlash size={14} /> : <FaEye size={14} />}
                     </button>
                   }
                 />
               )}
 
-              {preview.requires_sign_in && (
-                <p className={styles.sub}>
-                  This email signs in with Google. <strong>Sign in first</strong>, then reopen this invite link to
-                  finish.
-                </p>
-              )}
+              {preview.requires_sign_in && <p className={styles.sub}>{t('invite.googleNote')}</p>}
 
               {error && <div className={styles.error}>{error}</div>}
 
               {/* FlatButton renders a <div>, so it can't submit the form via
                   type="submit" — wire the click straight to handleAccept. */}
               <FlatButton onClick={submitting || preview.requires_sign_in ? undefined : handleAccept}>
-                {submitting ? <CircularProgress size={16} /> : 'Accept & open my portal'}
+                {submitting ? <CircularProgress size={16} /> : t('invite.accept')}
               </FlatButton>
 
               {(preview.has_login || preview.requires_sign_in) && (
@@ -198,7 +220,7 @@ const InviteAccept = () => {
                     fontSize: 13,
                   }}
                 >
-                  {preview.requires_sign_in ? 'Go to sign in' : 'Forgot your password?'}
+                  {preview.requires_sign_in ? t('invite.goToSignIn') : t('auth.forgot')}
                 </button>
               )}
             </form>

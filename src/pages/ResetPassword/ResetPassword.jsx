@@ -10,6 +10,8 @@ import { Helmet } from 'react-helmet-async';
 import { validatePassword, getPasswordRequirements } from '../../utils/passwordValidator';
 import VeraxLogo from '../../components/VeraxLogo/VeraxLogo';
 import { FaArrowLeft } from 'react-icons/fa6';
+import { useLanguage } from '../../i18n/LanguageContext';
+import LanguageToggle from '../../components/LanguageToggle/LanguageToggle';
 
 const ResetPassword = () => {
   const [newPassword, setNewPassword] = useState('');
@@ -18,17 +20,18 @@ const ResetPassword = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
+  const { t } = useLanguage();
 
   const handleSubmit = async (e) => {
     e?.preventDefault();
     setErrorMessage('');
 
     if (newPassword !== confirmPassword) {
-      setErrorMessage('Passwords do not match.');
+      setErrorMessage(t('auth.passwordsMismatch'));
       return;
     }
 
-    const validation = validatePassword(newPassword);
+    const validation = validatePassword(newPassword, t);
     if (!validation.isValid) {
       setErrorMessage(validation.errors.join(', '));
       return;
@@ -50,8 +53,8 @@ const ResetPassword = () => {
         navigate('/login');
       }
     } catch (error) {
-      const detail = error.response?.data?.detail;
-      setErrorMessage(detail || 'Something went wrong. Please try again.');
+      // The server's reason is English; say it in the reader's language.
+      setErrorMessage(t('auth.resetFailed'));
     } finally {
       setIsLoading(false);
     }
@@ -64,8 +67,11 @@ const ResetPassword = () => {
       </Helmet>
       <div
         className="flex items-center justify-center w-screen h-screen flex-col"
-        style={{ overflow: 'auto', padding: '20px', background: 'var(--background)' }}
+        style={{ overflow: 'auto', padding: '20px', background: 'var(--background)', position: 'relative' }}
       >
+        <div style={{ position: 'absolute', top: 16, right: 16 }}>
+          <LanguageToggle />
+        </div>
         <VeraxLogo width={180} className="mb-6" />
         <Card
           className="w-full max-w-md p-4"
@@ -74,14 +80,14 @@ const ResetPassword = () => {
         >
           <CardHeader className="flex flex-col gap-1 pb-4">
             <h1 className="text-xl font-semibold text-center" style={{ color: 'var(--text)' }}>
-              Choose a New Password
+              {t('auth.newPasswordTitle')}
             </h1>
           </CardHeader>
           <CardBody className="gap-4">
             <form onSubmit={handleSubmit} className="flex flex-col gap-3">
               <Input
                 type="password"
-                label="New Password"
+                label={t('auth.newPassword')}
                 variant="bordered"
                 size="lg"
                 value={newPassword}
@@ -90,11 +96,11 @@ const ResetPassword = () => {
                 classNames={{ input: 'text-base', label: 'text-sm font-medium' }}
               />
               <p style={{ fontSize: '12px', color: 'var(--soft-text)', marginTop: '-4px', textAlign: 'center' }}>
-                {getPasswordRequirements()}
+                {getPasswordRequirements(t)}
               </p>
               <Input
                 type="password"
-                label="Confirm Password"
+                label={t('auth.confirmPassword')}
                 variant="bordered"
                 size="lg"
                 value={confirmPassword}
@@ -104,7 +110,7 @@ const ResetPassword = () => {
               />
 
               <FlatButton className="mx-auto mt-2" style={{ width: '100%', maxWidth: '300px' }} onClick={handleSubmit}>
-                {isLoading ? <CircularProgress size={24} style={{ color: '#1a1a1a' }} /> : 'Change Password'}
+                {isLoading ? <CircularProgress size={24} style={{ color: '#1a1a1a' }} /> : t('auth.changePassword')}
               </FlatButton>
 
               {errorMessage && (
@@ -128,7 +134,7 @@ const ResetPassword = () => {
         <TransparentButton className="mt-4" onClick={() => navigate('/login')}>
           <div className="flex items-center gap-2" style={{ fontSize: '14px', fontWeight: 500, color: 'var(--text)' }}>
             <FaArrowLeft />
-            <div>Back to Login</div>
+            <div>{t('auth.backToLogin')}</div>
           </div>
         </TransparentButton>
       </div>

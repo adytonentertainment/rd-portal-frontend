@@ -97,7 +97,7 @@ const Settings = () => {
     }
 
     // Validate password strength
-    const validation = validatePassword(newPasswordRef.current.value);
+    const validation = validatePassword(newPasswordRef.current.value, t);
     if (!validation.isValid) {
       alert(t('settings.passwordWeak') + '\n' + validation.errors.join('\n'));
       return;
