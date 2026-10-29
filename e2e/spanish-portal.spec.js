@@ -34,4 +34,5 @@ test('Spanish client portal: Spanish labels, US figures, no dead clicks', async 
   const message = `${result.findings.length} problem(s):\n${lines.join('\n')}\nFull report: ${out}`;
   console.log(message);
   expect(result.findings, message).toEqual([]);
+  expect(result.stats.tooltips, 'no chart tooltip was read: the chart check did nothing').toBeGreaterThan(0);
 });

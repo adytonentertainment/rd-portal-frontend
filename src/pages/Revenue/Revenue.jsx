@@ -2313,6 +2313,11 @@ const Revenue = ({ portalPreviewWriterId = null }) => {
     });
   };
 
+  // Chart tooltips: with no valueFormatter MUI uses the browser's locale, so a
+  // Spanish browser showed $998.05 as "998,045".
+  const chartMoney = (value) => (value == null ? null : formatCurrency(value));
+  const pieMoney = (item) => formatCurrency(item.value);
+
   // Compact formatter for non-currency big numbers (usages, plays, views)
   const formatLargeNumber = (n) => {
     if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(n >= 10_000_000 ? 0 : 1).replace(/\.0$/, '')}M`;
@@ -3970,33 +3975,37 @@ const Revenue = ({ portalPreviewWriterId = null }) => {
                         ? [
                             {
                               data: muiRevenueTimeData.quarterlyData,
-                              label: 'Reported Revenue',
+                              label: t('earnings.reportedRevenue'),
                               id: 'quarterlyId',
                               color: '#3B82F6',
                               stack: 'total',
+                              valueFormatter: chartMoney,
                             },
                           ]
                         : [
                             {
                               data: muiRevenueTimeData.quarterlyData,
-                              label: 'Reported Revenue',
+                              label: t('earnings.reportedRevenue'),
                               id: 'quarterlyId',
                               color: '#3B82F6',
                               stack: 'total',
+                              valueFormatter: chartMoney,
                             },
                             {
                               data: discrepancyData,
-                              label: 'Discrepancy (Expected - Reported)',
+                              label: t('earnings.discrepancy'),
                               id: 'discrepancyId',
                               color: currentTheme === 'dark' ? 'url(#diagonalStripesDark)' : 'url(#diagonalStripes)',
                               stack: 'total',
+                              valueFormatter: chartMoney,
                             },
                             {
                               data: muiRevenueTimeData.statementData,
-                              label: 'Payout',
+                              label: t('earnings.payout'),
                               id: 'statementId',
                               color: '#EF4444',
                               stack: 'statement',
+                              valueFormatter: chartMoney,
                             },
                           ]
                     }
@@ -4129,6 +4138,7 @@ const Revenue = ({ portalPreviewWriterId = null }) => {
                         series={[
                           {
                             data: sourceViewMode === 'incomeType' ? muiSourceCategoryPieData : muiSourcePieData,
+                            valueFormatter: pieMoney,
                             innerRadius: 60,
                             outerRadius: 120,
                             paddingAngle: 2,
@@ -4532,6 +4542,7 @@ const Revenue = ({ portalPreviewWriterId = null }) => {
                         series={[
                           {
                             data: muiPlatformPieData,
+                            valueFormatter: pieMoney,
                             innerRadius: 60,
                             outerRadius: 120,
                             paddingAngle: 2,

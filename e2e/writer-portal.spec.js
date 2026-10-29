@@ -45,6 +45,7 @@ for (const { lang, locale, check } of LANGS) {
       const message = `${result.findings.length} problem(s) on ${result.stats.pages} pages, ${result.stats.clicks} clicks:\n${lines.join('\n')}\nFull report: ${out}`;
       console.log(message);
       expect(result.findings, message).toEqual([]);
+      expect(result.stats.tooltips, 'no chart tooltip was read: the chart check did nothing').toBeGreaterThan(0);
     });
   });
 }

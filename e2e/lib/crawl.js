@@ -146,6 +146,39 @@ function screenText() {
 const OVERLAY =
   '[role=dialog],[aria-modal=true],[class*="Overlay"],[class*="overlay"],[class*="Modal_"],[class*="modal_"]';
 
+// Chart marks (pie slices, bars) and the tooltip MUI shows over a hovered one.
+const CHART_MARK = '.MuiPieArc-root,.MuiBarElement-root';
+const CHART_VALUE = '.MuiChartsTooltip-root .MuiChartsTooltip-valueCell';
+
+// Runs in the page: the chart series on screen, as "chart index|series class".
+// A tooltip's format is set per series, so one mark of each is enough.
+function chartSeries(sel) {
+  const svgs = [...document.querySelectorAll('svg')];
+  const keyOf = (el) => `${svgs.indexOf(el.ownerSVGElement)}|${[...el.classList].find((c) => /-series-/.test(c))}`;
+  return [...new Set([...document.querySelectorAll(sel)].map(keyOf))];
+}
+
+// Runs in the page: a point where a mark of that series is what the pointer
+// hits (a 0% slice has none), scrolled into view.
+function pointOnSeries({ sel, key }) {
+  const svgs = [...document.querySelectorAll('svg')];
+  const keyOf = (el) => `${svgs.indexOf(el.ownerSVGElement)}|${[...el.classList].find((c) => /-series-/.test(c))}`;
+  for (const el of document.querySelectorAll(sel)) {
+    if (keyOf(el) !== key) continue;
+    el.scrollIntoView({ block: 'center' });
+    const r = el.getBoundingClientRect();
+    if (r.width < 3 || r.height < 3) continue;
+    for (let y = 1; y < 8; y += 1) {
+      for (let x = 1; x < 8; x += 1) {
+        const p = { x: r.left + (r.width * x) / 8, y: r.top + (r.height * y) / 8 };
+        const hit = document.elementFromPoint(p.x, p.y);
+        if (hit && (hit === el || el.contains(hit))) return p;
+      }
+    }
+  }
+  return null;
+}
+
 class Crawler {
   constructor(
     page,
@@ -178,7 +211,7 @@ class Crawler {
     this.visitedUrls = new Set();
     this.routeCounts = {};
     this.findings = [];
-    this.stats = { pages: 0, clicks: 0, effective: 0 };
+    this.stats = { pages: 0, clicks: 0, effective: 0, tooltips: 0 };
     this.requests = 0;
     this.current = null;
     page.on('request', (req) => {
@@ -245,7 +278,48 @@ class Crawler {
     await this.page.evaluate(installObserver);
   }
 
+  // Chart tooltips exist only while a mark is hovered, so the screen text never
+  // has them. Every chart here is in dollars: a tooltip figure without "$" is
+  // the browser formatting it ("998,045" for $998.05 in a Spanish browser).
+  // Checked again only when the charts on screen change.
+  async checkCharts(context) {
+    const page = this.page;
+    const keys = await page.evaluate(chartSeries, CHART_MARK).catch(() => []);
+    if (!keys.length || keys.join(',') === this.chartsChecked) return;
+    if (
+      await page
+        .locator(OVERLAY)
+        .filter({ visible: true })
+        .count()
+        .catch(() => 1)
+    )
+      return;
+    this.chartsChecked = keys.join(',');
+    for (const key of keys) {
+      const p = await page.evaluate(pointOnSeries, { sel: CHART_MARK, key }).catch(() => null);
+      if (!p) continue;
+      await page.mouse.move(p.x, p.y);
+      const values = page.locator(CHART_VALUE).filter({ visible: true });
+      const shown = await values
+        .first()
+        .waitFor({ timeout: 1500 })
+        .then(() => true)
+        .catch(() => false);
+      if (!shown) continue;
+      this.stats.tooltips += 1;
+      for (const v of (await values.allInnerTexts().catch(() => [])).map((t) => t.trim())) {
+        if (v && !v.includes('$')) this.finding('chart tooltip not in dollars', `"${v}"`, { context, chart: key });
+      }
+      if (this.screenCheck) {
+        const extra = await this.screenCheck(page).catch(() => []);
+        for (const f of extra) this.finding(f.kind, f.detail, { context: `${context}, chart tooltip` });
+      }
+    }
+    await page.mouse.move(0, 0).catch(() => {});
+  }
+
   async checkNumbers(context) {
+    await this.checkCharts(context);
     if (this.screenCheck) {
       const extra = await this.screenCheck(this.page).catch(() => []);
       for (const f of extra) this.finding(f.kind, f.detail, { context });
@@ -332,6 +406,7 @@ class Crawler {
 
   async crawlPage(path) {
     this.current = path;
+    this.chartsChecked = null;
     this.visitedUrls.add(path);
     this.stats.pages += 1;
     await this.open(path);

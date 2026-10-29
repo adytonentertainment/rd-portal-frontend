@@ -57,7 +57,9 @@ const englishCheck = (selector) =>
       // In the admin preview the sidebar is the ADMIN's (English by design);
       // signed in as the writer, their own sidebar is read like everything else.
       const adminChrome = (el) => Boolean(preview && el.closest('[class*="sidebar_"]'));
-      return [...root.querySelectorAll(sel)]
+      // Chart tooltips render outside the portal area, at the end of the page.
+      const tooltips = [...document.querySelectorAll('.MuiChartsTooltip-root td')];
+      return [...root.querySelectorAll(sel), ...tooltips]
         .filter((el) => (el.tagName === 'OPTION' || shown(el)) && !adminChrome(el))
         .map((el) => (el.innerText || el.textContent || '').replace(/\s+/g, ' ').trim())
         .filter(Boolean);

@@ -37,6 +37,10 @@
       {
         "selector": "NewExpression[callee.property.name='NumberFormat']:matches([arguments.length=0], [arguments.0.type='Identifier'][arguments.0.name='undefined'])",
         "message": "Intl.NumberFormat without a locale follows the VIEWER's locale. Use new Intl.NumberFormat('en-US', …)."
+      },
+      {
+        "selector": "JSXElement[openingElement.name.name=/^(PieChart|BarChart|LineChart|ScatterChart)$/]:not(:has(Property[key.name='valueFormatter']))",
+        "message": "MUI charts format tooltip values with the VIEWER's locale unless the series has a valueFormatter — a Spanish browser showed $998.05 as \"998,045\". Give every series valueFormatter built on formatCurrency()."
       }
     ]
   },
